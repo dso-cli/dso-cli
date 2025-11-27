@@ -64,20 +64,44 @@ install_go() {
         linux)
             if [ -f /etc/debian_version ]; then
                 # Debian/Ubuntu
+                echo -e "${BLUE}Installing Go via apt...${NC}"
                 sudo apt-get update
                 sudo apt-get install -y golang-go
             elif [ -f /etc/redhat-release ]; then
                 # RHEL/CentOS/Fedora
-                sudo dnf install -y golang || sudo yum install -y golang
+                echo -e "${BLUE}Installing Go via dnf/yum...${NC}"
+                if command_exists dnf; then
+                    sudo dnf install -y golang
+                else
+                    sudo yum install -y golang
+                fi
+            elif [ -f /etc/arch-release ]; then
+                # Arch Linux
+                echo -e "${BLUE}Installing Go via pacman...${NC}"
+                sudo pacman -S --noconfirm go
+            elif command_exists snap; then
+                # Snap fallback
+                echo -e "${BLUE}Installing Go via snap...${NC}"
+                sudo snap install go --classic
             else
                 echo -e "${YELLOW}⚠️  Please install Go manually: https://go.dev/doc/install${NC}"
+                echo -e "${YELLOW}   Or use the official installer script:${NC}"
+                echo "   curl -fsSL https://go.dev/dl/go1.21.linux-amd64.tar.gz | sudo tar -xzC /usr/local"
                 exit 1
             fi
             ;;
         windows)
-            echo -e "${YELLOW}⚠️  Please install Go manually: https://go.dev/doc/install${NC}"
-            echo "   Or use: winget install GoLang.Go"
-            exit 1
+            if command_exists winget; then
+                echo -e "${BLUE}Installing Go via winget...${NC}"
+                winget install GoLang.Go
+            elif command_exists scoop; then
+                echo -e "${BLUE}Installing Go via scoop...${NC}"
+                scoop install go
+            else
+                echo -e "${YELLOW}⚠️  Please install Go manually: https://go.dev/doc/install${NC}"
+                echo "   Or install winget/scoop first, then run this script again"
+                exit 1
+            fi
             ;;
     esac
     

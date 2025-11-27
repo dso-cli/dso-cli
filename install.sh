@@ -19,14 +19,49 @@ case "${OS}" in
     *)          OS_TYPE="unknown" ;;
 esac
 
+# Function to install Go
+install_go() {
+    echo "📦 Installing Go..."
+    
+    case "${OS_TYPE}" in
+        darwin)
+            if command -v brew &> /dev/null; then
+                brew install go
+            else
+                echo "❌ Homebrew not found. Please install Homebrew first:"
+                echo "   /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+                exit 1
+            fi
+            ;;
+        linux)
+            if [ -f /etc/debian_version ]; then
+                # Debian/Ubuntu
+                sudo apt-get update
+                sudo apt-get install -y golang-go
+            elif [ -f /etc/redhat-release ]; then
+                # RHEL/CentOS/Fedora
+                sudo dnf install -y golang 2>/dev/null || sudo yum install -y golang
+            else
+                echo "⚠️  Please install Go manually: https://go.dev/doc/install"
+                exit 1
+            fi
+            ;;
+    esac
+    
+    if command -v go &> /dev/null; then
+        echo "✅ Go installed: $(go version)"
+    else
+        echo "❌ Go installation failed"
+        exit 1
+    fi
+}
+
 # Check Go
 if ! command -v go &> /dev/null; then
-    echo "❌ Go is not installed."
-    echo "   Install it from: https://go.dev/doc/install"
-    exit 1
+    install_go
+else
+    echo "✅ Go found: $(go version)"
 fi
-
-echo "✅ Go found: $(go version)"
 echo ""
 
 # Build
