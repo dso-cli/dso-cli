@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/dso-cli/dso-cli/main/install | bash
 Or if you've cloned the repository:
 ```bash
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 chmod +x install
 ./install
 ```
@@ -38,23 +38,54 @@ chmod +x install
 **Windows (PowerShell):**
 ```powershell
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 .\install.ps1
 ```
 
 **Windows (Batch):**
 ```cmd
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 install.bat
 ```
 
 The installation script automatically:
 - ✅ Checks/Installs Go (if missing)
 - ✅ Builds DSO binary
+- ✅ Installs DSO globally (available as `dso` command)
 - ✅ Checks/Installs Ollama
-- ✅ Downloads AI model (llama3.1:8b)
+- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
 - ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
+
+### Native Package Installation
+
+**Debian/Ubuntu (.deb):**
+```bash
+# Download the .deb package from releases
+wget https://github.com/dso-cli/dso-cli/releases/latest/download/dso_0.1.0_amd64.deb
+sudo dpkg -i dso_0.1.0_amd64.deb
+```
+
+**RHEL/CentOS/Fedora (.rpm):**
+```bash
+# Download the .rpm package from releases
+wget https://github.com/dso-cli/dso-cli/releases/latest/download/dso_0.1.0_x86_64.rpm
+sudo rpm -i dso_0.1.0_x86_64.rpm
+```
+
+**macOS (.pkg):**
+```bash
+# Download the .pkg package from releases
+wget https://github.com/dso-cli/dso-cli/releases/latest/download/dso_0.1.0_arm64.pkg
+sudo installer -pkg dso_0.1.0_arm64.pkg -target /
+```
+
+**Windows (.msi):**
+```powershell
+# Download the .msi package from releases
+# Double-click to install, or use:
+msiexec /i dso_0.1.0_amd64.msi
+```
 
 ### Manual Installation
 

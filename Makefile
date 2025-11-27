@@ -73,6 +73,12 @@ release-archives:
 	done
 	@echo "✅ Archives created in dist/"
 
+# Build native packages (.deb, .rpm, .pkg, .msi)
+packages:
+	@echo "📦 Building native packages..."
+	@./scripts/build-packages.sh
+	@echo "✅ Packages ready in dist/packages/"
+
 # Build and package everything
 release: build-all checksums release-archives
 	@echo "🎉 Release packages ready in dist/"
