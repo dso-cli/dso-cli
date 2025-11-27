@@ -46,22 +46,23 @@ linters:
     - gocritic
     - gofmt
     - goimports
-    - golint
     - gosec
     - govet
     - ineffassign
-    - interfacer
     - misspell
     - nakedret
     - revive
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
+  disable:
+    - golint  # Deprecated, use revive instead
+    - interfacer  # Deprecated
+    - structcheck  # Deprecated, use unused instead
+    - varcheck  # Deprecated, use unused instead
 
 issues:
   exclude-rules:
