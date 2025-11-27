@@ -102,39 +102,146 @@ jobs:
             shasum -a 256 ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
           fi
 
-      - name: Build packages
-        if: matrix.os == 'linux' || matrix.os == 'darwin'
+      - name: Install package tools (Linux)
+        if: matrix.os == 'linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev rpm fakeroot || true
+
+      - name: Build Linux packages
+        if: matrix.os == 'linux'
         shell: bash
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           cd dist/dso-${{ matrix.os }}-${{ matrix.arch }}
-          if [ "${{ matrix.os }}" = "linux" ]; then
-            # Create .deb package for Linux
-            mkdir -p dso_${VERSION}_${{ matrix.arch }}/DEBIAN
-            mkdir -p dso_${VERSION}_${{ matrix.arch }}/usr/local/bin
-            cp ${{ matrix.binary }} dso_${VERSION}_${{ matrix.arch }}/usr/local/bin/
-            chmod +x dso_${VERSION}_${{ matrix.arch }}/usr/local/bin/${{ matrix.binary }}
-            cat > dso_${VERSION}_${{ matrix.arch }}/DEBIAN/control <<EOF
+          
+          # Create .deb package
+          DEB_ARCH="${{ matrix.arch }}"
+          if [ "$DEB_ARCH" = "amd64" ]; then
+            DEB_ARCH="amd64"
+          elif [ "$DEB_ARCH" = "arm64" ]; then
+            DEB_ARCH="arm64"
+          fi
+          
+          DEB_DIR="dso_${VERSION}_${DEB_ARCH}"
+          mkdir -p "${DEB_DIR}/DEBIAN"
+          mkdir -p "${DEB_DIR}/usr/local/bin"
+          mkdir -p "${DEB_DIR}/usr/share/doc/dso"
+          
+          cp ${{ matrix.binary }} "${DEB_DIR}/usr/local/bin/"
+          chmod +x "${DEB_DIR}/usr/local/bin/${{ matrix.binary }}"
+          
+          cat > "${DEB_DIR}/DEBIAN/control" <<EOF
 Package: dso
 Version: ${VERSION}
 Section: utils
 Priority: optional
-Architecture: ${{ matrix.arch }}
+Architecture: ${DEB_ARCH}
 Maintainer: Ismail MOUYAHADA <dev@dso-cli.dev>
 Description: DevSecOps Oracle - Local AI-powered security CLI
+ DSO is a DevSecOps CLI assistant powered by local AI that provides
+ intelligent security analysis with zero configuration.
+Homepage: https://github.com/dso-cli/dso-cli
 EOF
-            dpkg-deb --build dso_${VERSION}_${{ matrix.arch }} > /dev/null
-            echo "✅ Created: dso_${VERSION}_${{ matrix.arch }}.deb"
-          elif [ "${{ matrix.os }}" = "darwin" ]; then
-            # Create .pkg for macOS (simplified)
-            mkdir -p dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin
-            cp ${{ matrix.binary }} dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin/
-            chmod +x dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin/${{ matrix.binary }}
-            pkgbuild --root dso_${VERSION}_${{ matrix.arch }}.pkg \
+          
+          if command -v dpkg-deb &> /dev/null; then
+            dpkg-deb --build "${DEB_DIR}" "dso_${VERSION}_${DEB_ARCH}.deb"
+            echo "✅ Created: dso_${VERSION}_${DEB_ARCH}.deb"
+          else
+            echo "⚠️  dpkg-deb not available, skipping .deb creation"
+          fi
+          
+          # Create .rpm package (if rpmbuild available)
+          if command -v rpmbuild &> /dev/null; then
+            RPM_ARCH="${{ matrix.arch }}"
+            if [ "$RPM_ARCH" = "amd64" ]; then
+              RPM_ARCH="x86_64"
+            elif [ "$RPM_ARCH" = "arm64" ]; then
+              RPM_ARCH="aarch64"
+            fi
+            
+            RPM_DIR="rpmbuild"
+            mkdir -p "${RPM_DIR}/BUILD" "${RPM_DIR}/RPMS" "${RPM_DIR}/SOURCES" "${RPM_DIR}/SPECS"
+            
+            cat > "${RPM_DIR}/SPECS/dso.spec" <<EOF
+Name:           dso
+Version:        ${VERSION}
+Release:        1
+Summary:        DevSecOps Oracle - Local AI-powered security CLI
+License:        MIT
+URL:            https://github.com/dso-cli/dso-cli
+
+%description
+DSO is a DevSecOps CLI assistant powered by local AI that provides
+intelligent security analysis with zero configuration.
+
+%install
+mkdir -p %{buildroot}/usr/local/bin
+cp ${{ matrix.binary }} %{buildroot}/usr/local/bin/dso
+chmod +x %{buildroot}/usr/local/bin/dso
+
+%files
+/usr/local/bin/dso
+
+%changelog
+* $(date +"%a %b %d %Y") Ismail MOUYAHADA <dev@dso-cli.dev> - ${VERSION}-1
+- Release ${VERSION}
+EOF
+            
+            mkdir -p "${RPM_DIR}/BUILD"
+            cp ${{ matrix.binary }} "${RPM_DIR}/BUILD/dso"
+            
+            rpmbuild --define "_topdir $(pwd)/${RPM_DIR}" -bb "${RPM_DIR}/SPECS/dso.spec" || true
+            RPM_FILE=$(find "${RPM_DIR}/RPMS" -name "dso-${VERSION}*.rpm" 2>/dev/null | head -1)
+            if [ -n "$RPM_FILE" ]; then
+              cp "$RPM_FILE" "dso_${VERSION}_${RPM_ARCH}.rpm"
+              echo "✅ Created: dso_${VERSION}_${RPM_ARCH}.rpm"
+            fi
+          fi
+
+      - name: Build macOS packages
+        if: matrix.os == 'darwin'
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          cd dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+          
+          # Create .pkg package
+          PKG_ARCH="${{ matrix.arch }}"
+          PKG_DIR="dso_${VERSION}_${PKG_ARCH}.pkg"
+          mkdir -p "${PKG_DIR}/usr/local/bin"
+          
+          cp ${{ matrix.binary }} "${PKG_DIR}/usr/local/bin/"
+          chmod +x "${PKG_DIR}/usr/local/bin/${{ matrix.binary }}"
+          
+          if command -v pkgbuild &> /dev/null; then
+            pkgbuild --root "${PKG_DIR}" \
                      --identifier com.dso-cli.dso \
-                     --version ${VERSION} \
+                     --version "${VERSION}" \
                      --install-location / \
-                     dso_${VERSION}_${{ matrix.arch }}.pkg > /dev/null 2>&1 || echo "⚠️  pkgbuild not available, skipping .pkg creation"
+                     "dso_${VERSION}_${PKG_ARCH}.pkg" || echo "⚠️  pkgbuild failed"
+            echo "✅ Created: dso_${VERSION}_${PKG_ARCH}.pkg"
+          else
+            echo "⚠️  pkgbuild not available, skipping .pkg creation"
+          fi
+          
+          # Create .dmg package (requires hdiutil on macOS)
+          if command -v hdiutil &> /dev/null; then
+            DMG_NAME="dso_${VERSION}_${PKG_ARCH}"
+            mkdir -p "${DMG_NAME}"
+            cp ${{ matrix.binary }} "${DMG_NAME}/"
+            chmod +x "${DMG_NAME}/${{ matrix.binary }}"
+            
+            hdiutil create -volname "DSO ${VERSION}" \
+                           -srcfolder "${DMG_NAME}" \
+                           -ov -format UDZO \
+                           "${DMG_NAME}.dmg" || echo "⚠️  hdiutil failed"
+            if [ -f "${DMG_NAME}.dmg" ]; then
+              echo "✅ Created: ${DMG_NAME}.dmg"
+            fi
+          else
+            echo "⚠️  hdiutil not available, skipping .dmg creation"
           fi
 
       - name: Upload artifacts
@@ -175,20 +282,29 @@ EOF
         shell: bash
         run: |
           cd dist
+          # Create archives for each platform
           for dir in */; do
             dirname=${dir%/}
             cd "$dirname"
             if [[ "$dirname" == *"windows"* ]]; then
               zip -r "../${dirname}.zip" . > /dev/null
+              echo "✅ Created: ${dirname}.zip"
             else
               tar -czf "../${dirname}.tar.gz" . > /dev/null
+              echo "✅ Created: ${dirname}.tar.gz"
             fi
             cd ..
           done
-          # Include packages if they exist
-          find . -name "*.deb" -o -name "*.pkg" | while read pkg; do
-            echo "📦 Package: $pkg"
+          
+          # List all packages
+          echo ""
+          echo "📦 Native packages:"
+          find . -type f \( -name "*.deb" -o -name "*.rpm" -o -name "*.pkg" -o -name "*.dmg" -o -name "*.msi" \) | while read pkg; do
+            echo "  ✅ $pkg"
           done
+          
+          echo ""
+          echo "📦 Release archives:"
           ls -lh *.tar.gz *.zip 2>/dev/null || true
 
       - name: Create Release
@@ -198,7 +314,11 @@ EOF
             dist/*.tar.gz
             dist/*.zip
             dist/**/*.deb
+            dist/**/*.rpm
             dist/**/*.pkg
+            dist/**/*.dmg
+            dist/**/*.msi
+            dist/**/*.exe
           draft: false
           prerelease: false
           generate_release_notes: true

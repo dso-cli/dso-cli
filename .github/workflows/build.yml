@@ -96,6 +96,55 @@ jobs:
             shasum -a 256 ${{ matrix.binary }} > ${{ matrix.binary }}.sha256
           fi
 
+      - name: Build native packages
+        if: matrix.os == 'linux' || matrix.os == 'darwin'
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          cd dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+          
+          if [ "${{ matrix.os }}" = "linux" ]; then
+            # Create .deb package
+            DEB_ARCH="${{ matrix.arch }}"
+            DEB_DIR="dso_${VERSION}_${DEB_ARCH}"
+            mkdir -p "${DEB_DIR}/DEBIAN"
+            mkdir -p "${DEB_DIR}/usr/local/bin"
+            
+            cp ${{ matrix.binary }} "${DEB_DIR}/usr/local/bin/"
+            chmod +x "${DEB_DIR}/usr/local/bin/${{ matrix.binary }}"
+            
+            cat > "${DEB_DIR}/DEBIAN/control" <<EOF
+Package: dso
+Version: ${VERSION}
+Section: utils
+Priority: optional
+Architecture: ${DEB_ARCH}
+Maintainer: Ismail MOUYAHADA <dev@dso-cli.dev>
+Description: DevSecOps Oracle - Local AI-powered security CLI
+Homepage: https://github.com/dso-cli/dso-cli
+EOF
+            
+            if command -v dpkg-deb &> /dev/null; then
+              dpkg-deb --build "${DEB_DIR}" "dso_${VERSION}_${DEB_ARCH}.deb" || true
+            fi
+          elif [ "${{ matrix.os }}" = "darwin" ]; then
+            # Create .pkg package
+            PKG_ARCH="${{ matrix.arch }}"
+            PKG_DIR="dso_${VERSION}_${PKG_ARCH}.pkg"
+            mkdir -p "${PKG_DIR}/usr/local/bin"
+            
+            cp ${{ matrix.binary }} "${PKG_DIR}/usr/local/bin/"
+            chmod +x "${PKG_DIR}/usr/local/bin/${{ matrix.binary }}"
+            
+            if command -v pkgbuild &> /dev/null; then
+              pkgbuild --root "${PKG_DIR}" \
+                       --identifier com.dso-cli.dso \
+                       --version "${VERSION}" \
+                       --install-location / \
+                       "dso_${VERSION}_${PKG_ARCH}.pkg" || true
+            fi
+          fi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
