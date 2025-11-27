@@ -170,7 +170,7 @@ func detectNPM(projectPath string) ([]Component, error) {
 func detectGo(projectPath string) ([]Component, error) {
 	var components []Component
 	
-	// Lire go.mod
+	// Read go.mod
 	goModPath := filepath.Join(projectPath, "go.mod")
 	data, err := os.ReadFile(goModPath)
 	if err != nil {

@@ -41,7 +41,7 @@ func AutoFix(results *scanner.ScanResults, projectPath string, auto bool) ([]str
 func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, error) {
 	filePath := filepath.Join(projectPath, finding.File)
 
-	// Lire le fichier
+	// Read the file
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err
