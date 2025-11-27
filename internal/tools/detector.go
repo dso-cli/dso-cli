@@ -227,9 +227,9 @@ func InstallTool(tool Tool, interactive bool) error {
 
 	fmt.Printf("\n❓ Install %s now? (y/N): ", tool.Name)
 	var response string
-	fmt.Scanln(&response)
+	_, _ = fmt.Scanln(&response)
 
-	if strings.ToLower(response) != "y" && strings.ToLower(response) != "yes" {
+	if !strings.EqualFold(response, "y") && !strings.EqualFold(response, "yes") {
 		return fmt.Errorf("installation canceled")
 	}
 

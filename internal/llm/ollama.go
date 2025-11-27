@@ -138,7 +138,10 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("Ollama error (status %d): failed to read body", resp.StatusCode)
+		}
 		return "", fmt.Errorf("Ollama error (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -207,7 +210,10 @@ func (c *OllamaClient) GenerateStream(prompt string, onChunk func(string)) (stri
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("Ollama error (status %d): failed to read body", resp.StatusCode)
+		}
 		return "", fmt.Errorf("Ollama error (status %d): %s", resp.StatusCode, string(body))
 	}
 
