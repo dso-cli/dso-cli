@@ -291,7 +291,7 @@ select_and_download_models() {
 
 # Function to download Ollama model (legacy, for non-interactive)
 download_model() {
-    MODEL=${DSO_MODEL:-llama3.1:8b}
+    MODEL=${DSO_MODEL:-qwen2.5:7b}
     echo -e "${YELLOW}📥 Downloading AI model: $MODEL${NC}"
     echo -e "${YELLOW}   This may take a few minutes...${NC}"
     
