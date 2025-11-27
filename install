@@ -125,20 +125,30 @@ install_ollama() {
     case "$OS" in
         darwin)
             if command_exists brew; then
+                echo -e "${BLUE}Installing Ollama via Homebrew...${NC}"
                 brew install ollama
             else
-                echo -e "${YELLOW}⚠️  Installing Ollama manually...${NC}"
+                echo -e "${YELLOW}Installing Ollama manually...${NC}"
                 curl -fsSL https://ollama.ai/install.sh | sh
             fi
             ;;
         linux)
+            echo -e "${BLUE}Installing Ollama...${NC}"
             curl -fsSL https://ollama.ai/install.sh | sh
             ;;
         windows)
-            echo -e "${YELLOW}⚠️  Please install Ollama manually:${NC}"
-            echo "   Download from: https://ollama.ai"
-            echo "   Or use: winget install Ollama.Ollama"
-            return
+            if command_exists winget; then
+                echo -e "${BLUE}Installing Ollama via winget...${NC}"
+                winget install Ollama.Ollama
+            elif command_exists scoop; then
+                echo -e "${BLUE}Installing Ollama via scoop...${NC}"
+                scoop install ollama
+            else
+                echo -e "${YELLOW}⚠️  Please install Ollama manually:${NC}"
+                echo "   Download from: https://ollama.ai"
+                echo "   Or use: winget install Ollama.Ollama"
+                return
+            fi
             ;;
     esac
     
@@ -161,17 +171,129 @@ install_ollama() {
                     sleep 3
                 fi
                 ;;
+            windows)
+                echo -e "${YELLOW}🚀 Please start Ollama manually or it will start automatically${NC}"
+                ;;
         esac
     else
         echo -e "${YELLOW}⚠️  Ollama installation may have failed. Please install manually.${NC}"
     fi
 }
 
-# Function to download Ollama model
+# Function to select and download Ollama models
+select_and_download_models() {
+    if ! command_exists ollama; then
+        echo -e "${YELLOW}⚠️  Ollama not available. Install it first.${NC}"
+        return
+    fi
+    
+    echo -e "${BLUE}🤖 Available AI Models:${NC}"
+    echo ""
+    echo "  1) llama3.1:8b      (~4.7 GB) - Recommended, balanced performance"
+    echo "  2) llama3.1:70b     (~40 GB)  - Best quality, requires more RAM"
+    echo "  3) phi3              (~2.3 GB) - Lightweight, fast"
+    echo "  4) mistral:7b        (~4.1 GB) - Good balance"
+    echo "  5) gemma:7b          (~5.2 GB) - Google's model"
+    echo "  6) qwen2.5:7b        (~4.7 GB) - High quality"
+    echo "  7) All recommended  (llama3.1:8b, phi3)"
+    echo "  8) Skip model installation"
+    echo ""
+    
+    read -p "Select model(s) to install (1-8, multiple separated by space): " -r
+    echo
+    
+    SELECTED_MODELS=""
+    
+    for choice in $REPLY; do
+        case $choice in
+            1)
+                SELECTED_MODELS="$SELECTED_MODELS llama3.1:8b"
+                ;;
+            2)
+                SELECTED_MODELS="$SELECTED_MODELS llama3.1:70b"
+                ;;
+            3)
+                SELECTED_MODELS="$SELECTED_MODELS phi3"
+                ;;
+            4)
+                SELECTED_MODELS="$SELECTED_MODELS mistral:7b"
+                ;;
+            5)
+                SELECTED_MODELS="$SELECTED_MODELS gemma:7b"
+                ;;
+            6)
+                SELECTED_MODELS="$SELECTED_MODELS qwen2.5:7b"
+                ;;
+            7)
+                SELECTED_MODELS="$SELECTED_MODELS llama3.1:8b phi3"
+                ;;
+            8)
+                echo -e "${YELLOW}⏭️  Skipping model installation${NC}"
+                echo -e "${BLUE}   You can install models later with: ollama pull <model-name>${NC}"
+                return
+                ;;
+            *)
+                echo -e "${YELLOW}⚠️  Invalid choice: $choice${NC}"
+                ;;
+        esac
+    done
+    
+    if [ -z "$SELECTED_MODELS" ]; then
+        echo -e "${YELLOW}⏭️  No models selected${NC}"
+        return
+    fi
+    
+    # Set default model if not set
+    if [ -z "$DSO_MODEL" ]; then
+        # Use first selected model as default
+        FIRST_MODEL=$(echo $SELECTED_MODELS | awk '{print $1}')
+        export DSO_MODEL="$FIRST_MODEL"
+        echo -e "${BLUE}📌 Default model set to: $DSO_MODEL${NC}"
+        echo -e "${BLUE}   (You can change it with: export DSO_MODEL=<model-name>)${NC}"
+        echo ""
+    fi
+    
+    # Download selected models
+    for model in $SELECTED_MODELS; do
+        echo -e "${YELLOW}📥 Downloading model: $model${NC}"
+        
+        # Check model size info
+        case $model in
+            llama3.1:8b)
+                echo -e "${BLUE}   Size: ~4.7 GB${NC}"
+                ;;
+            llama3.1:70b)
+                echo -e "${BLUE}   Size: ~40 GB (this may take a while)${NC}"
+                ;;
+            phi3)
+                echo -e "${BLUE}   Size: ~2.3 GB${NC}"
+                ;;
+            mistral:7b)
+                echo -e "${BLUE}   Size: ~4.1 GB${NC}"
+                ;;
+            gemma:7b)
+                echo -e "${BLUE}   Size: ~5.2 GB${NC}"
+                ;;
+            qwen2.5:7b)
+                echo -e "${BLUE}   Size: ~4.7 GB${NC}"
+                ;;
+        esac
+        
+        ollama pull "$model" || {
+            echo -e "${YELLOW}⚠️  Model $model download failed. You can download it later with:${NC}"
+            echo "   ollama pull $model"
+        }
+        echo ""
+    done
+    
+    echo -e "${GREEN}✅ Model installation completed${NC}"
+}
+
+# Function to download Ollama model (legacy, for non-interactive)
 download_model() {
     MODEL=${DSO_MODEL:-llama3.1:8b}
     echo -e "${YELLOW}📥 Downloading AI model: $MODEL${NC}"
-    echo -e "${YELLOW}   This may take a few minutes (model size: ~4.7 GB)...${NC}"
+    echo -e "${YELLOW}   This may take a few minutes...${NC}"
     
     if command_exists ollama; then
         ollama pull "$MODEL" || {
@@ -343,7 +465,13 @@ main() {
     fi
     echo ""
     
-    # Step 2: Build DSO
+    # Step 2: Download dependencies and build DSO
+    echo -e "${YELLOW}📦 Downloading Go dependencies...${NC}"
+    go mod download
+    go mod tidy
+    echo -e "${GREEN}✅ Dependencies downloaded${NC}"
+    echo ""
+    
     build_dso
     echo ""
     
@@ -355,12 +483,32 @@ main() {
     fi
     echo ""
     
-    # Step 4: Download model
+    # Step 4: Download models (interactive)
     if command_exists ollama; then
-        if ollama list 2>/dev/null | grep -q "llama3.1:8b"; then
-            echo -e "${GREEN}✅ Model llama3.1:8b already installed${NC}"
+        # Check if any models are already installed
+        INSTALLED_MODELS=$(ollama list 2>/dev/null | tail -n +2 | awk '{print $1}' || echo "")
+        
+        if [ -n "$INSTALLED_MODELS" ]; then
+            echo -e "${GREEN}✅ Installed models:${NC}"
+            echo "$INSTALLED_MODELS" | while read model; do
+                echo -e "   • $model"
+            done
+            echo ""
+            read -p "Install additional models? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                select_and_download_models
+            else
+                # Set default model if not set
+                if [ -z "$DSO_MODEL" ]; then
+                    FIRST_MODEL=$(echo "$INSTALLED_MODELS" | head -1)
+                    export DSO_MODEL="$FIRST_MODEL"
+                    echo -e "${BLUE}📌 Using model: $DSO_MODEL${NC}"
+                fi
+            fi
         else
-            download_model
+            echo -e "${YELLOW}No models installed. Let's install some!${NC}"
+            select_and_download_models
         fi
     fi
     echo ""

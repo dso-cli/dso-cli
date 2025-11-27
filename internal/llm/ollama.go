@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -25,7 +26,32 @@ type OllamaClient struct {
 
 // NewOllamaClient crée un nouveau client Ollama
 func NewOllamaClient() *OllamaClient {
-	model := os.Getenv("DSO_MODEL")
+	// Try to get model from config file first, then environment, then default
+	model := ""
+	
+	// Check config file
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		configFile := filepath.Join(homeDir, ".dso", "config")
+		if data, err := os.ReadFile(configFile); err == nil {
+			lines := strings.Split(string(data), "\n")
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if strings.HasPrefix(line, "DSO_MODEL=") {
+					model = strings.TrimPrefix(line, "DSO_MODEL=")
+					model = strings.Trim(model, "\"\'")
+					break
+				}
+			}
+		}
+	}
+	
+	// Fallback to environment variable
+	if model == "" {
+		model = os.Getenv("DSO_MODEL")
+	}
+	
+	// Fallback to default
 	if model == "" {
 		model = defaultModel
 	}

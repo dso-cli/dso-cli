@@ -79,25 +79,101 @@ fi
 echo "✅ Build completed"
 echo ""
 
-# Check Ollama
-if ! command -v ollama &> /dev/null; then
-    echo "⚠️  Ollama is not installed."
-    echo "   Install it from: https://ollama.ai"
-    if [ "${OS_TYPE}" = "linux" ]; then
-        echo "   Or run: curl -fsSL https://ollama.ai/install.sh | sh"
-    elif [ "${OS_TYPE}" = "darwin" ]; then
-        echo "   Or run: brew install ollama"
+# Function to install Ollama
+install_ollama() {
+    echo "📦 Installing Ollama..."
+    
+    case "${OS_TYPE}" in
+        darwin)
+            if command -v brew &> /dev/null; then
+                brew install ollama
+            else
+                curl -fsSL https://ollama.ai/install.sh | sh
+            fi
+            ;;
+        linux)
+            curl -fsSL https://ollama.ai/install.sh | sh
+            ;;
+    esac
+    
+    if command -v ollama &> /dev/null; then
+        echo "✅ Ollama installed"
+        # Start Ollama
+        if ! pgrep -x "ollama" > /dev/null; then
+            echo "🚀 Starting Ollama..."
+            if [ "${OS_TYPE}" = "darwin" ]; then
+                brew services start ollama 2>/dev/null || ollama serve &
+            else
+                systemctl --user start ollama 2>/dev/null || ollama serve &
+            fi
+            sleep 3
+        fi
+    else
+        echo "⚠️  Ollama installation may have failed"
     fi
-    echo "   Then run: ollama pull llama3.1:8b"
+}
+
+# Function to select and download models
+select_models() {
+    echo ""
+    echo "🤖 Available AI Models:"
+    echo ""
+    echo "  1) llama3.1:8b      (~4.7 GB) - Recommended"
+    echo "  2) phi3              (~2.3 GB) - Lightweight"
+    echo "  3) mistral:7b        (~4.1 GB) - Good balance"
+    echo "  4) gemma:7b          (~5.2 GB) - Google's model"
+    echo "  5) qwen2.5:7b        (~4.7 GB) - High quality"
+    echo "  6) Skip"
+    echo ""
+    
+    read -p "Select model to install (1-6): " -n 1 -r
+    echo
+    
+    case $REPLY in
+        1) MODEL="llama3.1:8b" ;;
+        2) MODEL="phi3" ;;
+        3) MODEL="mistral:7b" ;;
+        4) MODEL="gemma:7b" ;;
+        5) MODEL="qwen2.5:7b" ;;
+        6)
+            echo "⏭️  Skipping model installation"
+            return
+            ;;
+        *)
+            echo "⚠️  Invalid choice, using default: llama3.1:8b"
+            MODEL="llama3.1:8b"
+            ;;
+    esac
+    
+    echo "📥 Downloading model: $MODEL..."
+    ollama pull "$MODEL" || echo "⚠️  Download failed"
+    
+    # Save to config
+    mkdir -p ~/.dso
+    echo "DSO_MODEL=$MODEL" > ~/.dso/config
+    echo "✅ Default model set to: $MODEL"
+}
+
+# Check/Install Ollama
+if ! command -v ollama &> /dev/null; then
+    install_ollama
 else
     echo "✅ Ollama found"
-    
-    # Check if model exists
-    if ollama list 2>/dev/null | grep -q "llama3.1:8b"; then
-        echo "✅ Model llama3.1:8b already installed"
+fi
+
+# Select and download models
+if command -v ollama &> /dev/null; then
+    INSTALLED=$(ollama list 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
+    if [ "$INSTALLED" -gt 0 ]; then
+        echo "✅ Models already installed:"
+        ollama list 2>/dev/null | tail -n +2 | awk '{print "  • " $1}'
+        read -p "Install additional models? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            select_models
+        fi
     else
-        echo "📥 Downloading model llama3.1:8b (this may take a few minutes)..."
-        ollama pull llama3.1:8b || echo "⚠️  Download failed. You can do it manually later."
+        select_models
     fi
 fi
 
