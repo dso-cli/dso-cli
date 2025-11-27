@@ -1,0 +1,15 @@
+{
+  "name": "dso-docs",
+  "version": "0.1.0",
+  "description": "DSO documentation with VitePress and Catppuccin theme",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0",
+    "shiki": "^0.14.0"
+  }
+}
+

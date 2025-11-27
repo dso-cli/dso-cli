@@ -1,0 +1,173 @@
+/* Custom styles for DSO documentation with Catppuccin colors */
+
+:root {
+  /* Catppuccin Mocha (dark) colors */
+  --vp-c-brand: #8aadf4;
+  --vp-c-brand-light: #a5b4fc;
+  --vp-c-brand-lighter: #b7cdfe;
+  --vp-c-brand-dark: #7c9ee0;
+  --vp-c-brand-darker: #6e8fd4;
+  
+  /* Catppuccin accent colors */
+  --catppuccin-blue: #8aadf4;
+  --catppuccin-green: #a6da95;
+  --catppuccin-yellow: #eed49f;
+  --catppuccin-red: #ed8796;
+  --catppuccin-mauve: #c6a0f6;
+}
+
+/* Dark mode (Catppuccin Mocha) */
+.dark {
+  --vp-c-bg: #1e1e2e;
+  --vp-c-bg-alt: #181825;
+  --vp-c-bg-soft: #24273a;
+  --vp-c-text: #cad3f5;
+  --vp-c-text-1: #cad3f5;
+  --vp-c-text-2: #a5adcb;
+  --vp-c-text-3: #8087a2;
+}
+
+/* Light mode (Catppuccin Latte) */
+:root {
+  --vp-c-bg: #eff1f5;
+  --vp-c-bg-alt: #e6e9ef;
+  --vp-c-bg-soft: #dce0e8;
+  --vp-c-text: #4c4f69;
+  --vp-c-text-1: #4c4f69;
+  --vp-c-text-2: #5c5f77;
+  --vp-c-text-3: #6c6f85;
+}
+
+/* Code blocks */
+.vp-code-group .tabs {
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+}
+
+/* Hero section */
+.hero {
+  text-align: center;
+}
+
+.hero .image {
+  margin: 0 auto;
+}
+
+/* Command examples */
+.command-example {
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid var(--catppuccin-blue);
+}
+
+.command-example code {
+  color: var(--vp-c-text-1);
+}
+
+/* Custom badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background: var(--catppuccin-green);
+  color: var(--vp-c-bg);
+}
+
+.badge-warning {
+  background: var(--catppuccin-yellow);
+  color: var(--vp-c-bg);
+}
+
+.badge-error {
+  background: var(--catppuccin-red);
+  color: var(--vp-c-bg);
+}
+
+/* Platform badges */
+.badge-platform {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0.125rem;
+}
+
+.badge-platform-mac {
+  background: #8aadf4;
+  color: #1e1e2e;
+}
+
+.badge-platform-linux {
+  background: #a6da95;
+  color: #1e1e2e;
+}
+
+.badge-platform-windows {
+  background: #c6a0f6;
+  color: #1e1e2e;
+}
+
+/* Command examples with better styling */
+div[class*="language-"] {
+  border-radius: 8px;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+table th,
+table td {
+  border: 1px solid var(--vp-c-divider);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+table th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+}
+
+/* Alert boxes */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background: rgba(138, 173, 244, 0.1);
+  border-color: var(--catppuccin-blue);
+  color: var(--catppuccin-blue);
+}
+
+.alert-success {
+  background: rgba(166, 218, 149, 0.1);
+  border-color: var(--catppuccin-green);
+  color: var(--catppuccin-green);
+}
+
+.alert-warning {
+  background: rgba(238, 212, 159, 0.1);
+  border-color: var(--catppuccin-yellow);
+  color: var(--catppuccin-yellow);
+}
+
+.alert-error {
+  background: rgba(237, 135, 150, 0.1);
+  border-color: var(--catppuccin-red);
+  color: var(--catppuccin-red);
+}
+
