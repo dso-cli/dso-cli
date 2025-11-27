@@ -542,8 +542,32 @@ main() {
                 fi
             fi
         else
-            echo -e "${YELLOW}No models installed. Let's install some!${NC}"
-            select_and_download_models
+            echo -e "${YELLOW}No models installed. Installing default model: qwen2.5:7b${NC}"
+            DEFAULT_MODEL="qwen2.5:7b"
+            
+            # Save default model to config
+            mkdir -p "$HOME/.dso"
+            echo "DSO_MODEL=$DEFAULT_MODEL" > "$HOME/.dso/config"
+            echo -e "${BLUE}📌 Default model set to: $DEFAULT_MODEL${NC}"
+            echo ""
+            
+            # Download the default model
+            echo -e "${YELLOW}📥 Downloading model: $DEFAULT_MODEL${NC}"
+            echo -e "${BLUE}   Size: ~4.7 GB${NC}"
+            echo -e "${BLUE}   This may take a few minutes...${NC}"
+            echo ""
+            
+            ollama pull "$DEFAULT_MODEL" || {
+                echo -e "${YELLOW}⚠️  Model download failed. You can download it later with:${NC}"
+                echo "   ollama pull $DEFAULT_MODEL"
+                echo ""
+                echo -e "${BLUE}💡 You can also select models interactively by running:${NC}"
+                echo "   dso check"
+            }
+            
+            if ollama list 2>/dev/null | grep -q "$DEFAULT_MODEL"; then
+                echo -e "${GREEN}✅ Model $DEFAULT_MODEL installed successfully${NC}"
+            fi
         fi
     fi
     echo ""

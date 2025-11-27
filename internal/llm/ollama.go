@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultOllamaURL = "http://localhost:11434"
-	defaultModel     = "llama3.1:8b"
+	defaultModel     = "qwen2.5:7b"
 )
 
 // OllamaClient est un client pour Ollama avec support de l'API chat moderne
