@@ -1,31 +1,32 @@
-.PHONY: build install test clean run
+.PHONY: build install test clean run deps fmt lint build-all checksums release-archives release
 
-# Build le binaire
+# Build the binary
 build:
 	go build -o dso .
 
-# Installer localement
+# Install locally
 install:
 	go install .
 
-# Lancer les tests
+# Run tests
 test:
 	go test ./...
 
-# Nettoyer
+# Clean
 clean:
-	rm -f dso dso.exe
+	rm -rf dist/
+	rm -f dso dso.exe dso-*
 
-# Lancer un audit de test
+# Run a test audit
 run:
 	./dso audit .
 
-# Vérifier les dépendances
+# Check dependencies
 deps:
 	go mod download
 	go mod verify
 
-# Format le code
+# Format code
 fmt:
 	go fmt ./...
 
@@ -35,12 +36,43 @@ lint:
 
 # Build for different platforms
 build-all:
-	@echo "Building for all platforms..."
-	GOOS=linux GOARCH=amd64 go build -o dso-linux-amd64 .
-	GOOS=linux GOARCH=arm64 go build -o dso-linux-arm64 .
-	GOOS=darwin GOARCH=amd64 go build -o dso-darwin-amd64 .
-	GOOS=darwin GOARCH=arm64 go build -o dso-darwin-arm64 .
-	GOOS=windows GOARCH=amd64 go build -o dso-windows-amd64.exe .
-	GOOS=windows GOARCH=arm64 go build -o dso-windows-arm64.exe .
-	@echo "✅ Build completed for all platforms"
+	@echo "🔨 Building for all platforms..."
+	@mkdir -p dist
+	@echo "Building Linux amd64..."
+	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-linux-amd64/dso .
+	@echo "Building Linux arm64..."
+	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-linux-arm64/dso .
+	@echo "Building macOS amd64..."
+	@GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-darwin-amd64/dso .
+	@echo "Building macOS arm64..."
+	@GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-darwin-arm64/dso .
+	@echo "Building Windows amd64..."
+	@GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-windows-amd64/dso.exe .
+	@echo "Building Windows arm64..."
+	@GOOS=windows GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-windows-arm64/dso.exe .
+	@echo "✅ Build completed! Binaries in dist/"
 
+# Create checksums for all binaries
+checksums:
+	@echo "📝 Creating checksums..."
+	@cd dist && find . -type f \( -name "dso" -o -name "dso.exe" \) ! -name "*.sha256" -exec sh -c 'shasum -a 256 "{}" > "{}.sha256"' \;
+	@echo "✅ Checksums created!"
+
+# Create release archives
+release-archives:
+	@echo "📦 Creating release archives..."
+	@cd dist && for dir in */; do \
+		dirname=$${dir%/}; \
+		cd "$$dirname"; \
+		if [[ "$$dirname" == *"windows"* ]]; then \
+			zip -r "../$$dirname.zip" . > /dev/null; \
+		else \
+			tar -czf "../$$dirname.tar.gz" . > /dev/null; \
+		fi; \
+		cd ..; \
+	done
+	@echo "✅ Archives created in dist/"
+
+# Build and package everything
+release: build-all checksums release-archives
+	@echo "🎉 Release packages ready in dist/"

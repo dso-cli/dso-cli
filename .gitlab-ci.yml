@@ -1,0 +1,124 @@
+stages:
+  - test
+  - build
+  - release
+
+variables:
+  GO_VERSION: "1.21"
+
+test:
+  stage: test
+  image: golang:${GO_VERSION}
+  script:
+    - go mod download
+    - go test -v ./...
+    - go vet ./...
+  only:
+    - merge_requests
+    - main
+    - develop
+
+build:linux:amd64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-linux-amd64
+    - GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-linux-amd64/dso .
+    - cd dist/dso-linux-amd64 && sha256sum dso > dso.sha256
+  artifacts:
+    paths:
+      - dist/dso-linux-amd64/
+    expire_in: 1 week
+
+build:linux:arm64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-linux-arm64
+    - GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-linux-arm64/dso .
+    - cd dist/dso-linux-arm64 && sha256sum dso > dso.sha256
+  artifacts:
+    paths:
+      - dist/dso-linux-arm64/
+    expire_in: 1 week
+
+build:darwin:amd64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-darwin-amd64
+    - GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-darwin-amd64/dso .
+    - cd dist/dso-darwin-amd64 && shasum -a 256 dso > dso.sha256
+  artifacts:
+    paths:
+      - dist/dso-darwin-amd64/
+    expire_in: 1 week
+
+build:darwin:arm64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-darwin-arm64
+    - GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-darwin-arm64/dso .
+    - cd dist/dso-darwin-arm64 && shasum -a 256 dso > dso.sha256
+  artifacts:
+    paths:
+      - dist/dso-darwin-arm64/
+    expire_in: 1 week
+
+build:windows:amd64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-windows-amd64
+    - GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-windows-amd64/dso.exe .
+    - cd dist/dso-windows-amd64 && sha256sum dso.exe > dso.exe.sha256
+  artifacts:
+    paths:
+      - dist/dso-windows-amd64/
+    expire_in: 1 week
+
+build:windows:arm64:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - mkdir -p dist/dso-windows-arm64
+    - GOOS=windows GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-w -s" -o dist/dso-windows-arm64/dso.exe .
+    - cd dist/dso-windows-amd64 && sha256sum dso.exe > dso.exe.sha256
+  artifacts:
+    paths:
+      - dist/dso-windows-arm64/
+    expire_in: 1 week
+
+release:
+  stage: release
+  image: alpine:latest
+  dependencies:
+    - build:linux:amd64
+    - build:linux:arm64
+    - build:darwin:amd64
+    - build:darwin:arm64
+    - build:windows:amd64
+    - build:windows:arm64
+  script:
+    - apk add --no-cache zip tar
+    - cd dist
+    - |
+      for dir in */; do
+        dirname=${dir%/}
+        cd "$dirname"
+        if [[ "$dirname" == *"windows"* ]]; then
+          zip -r "../${dirname}.zip" .
+        else
+          tar -czf "../${dirname}.tar.gz" .
+        fi
+        cd ..
+      done
+  artifacts:
+    paths:
+      - dist/*.tar.gz
+      - dist/*.zip
+    expire_in: 1 month
+  only:
+    - tags
+

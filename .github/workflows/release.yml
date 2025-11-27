@@ -1,0 +1,162 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.1.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            goos: linux
+            goarch: amd64
+            binary: dso
+            ext: ""
+          - os: linux
+            arch: arm64
+            goos: linux
+            goarch: arm64
+            binary: dso
+            ext: ""
+          - os: darwin
+            arch: amd64
+            goos: darwin
+            goarch: amd64
+            binary: dso
+            ext: ""
+          - os: darwin
+            arch: arm64
+            goos: darwin
+            goarch: arm64
+            binary: dso
+            ext: ""
+          - os: windows
+            arch: amd64
+            goos: windows
+            goarch: amd64
+            binary: dso
+            ext: .exe
+          - os: windows
+            arch: arm64
+            goos: windows
+            goarch: arm64
+            binary: dso
+            ext: .exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+          go build -ldflags="-w -s -X main.version=${VERSION} -X main.buildDate=$(date +%Y-%m-%d)" \
+            -o dist/dso-${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.binary }}${{ matrix.ext }} .
+
+      - name: Create checksum
+        working-directory: dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+        run: |
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            sha256sum ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
+          else
+            shasum -a 256 ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dso-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/dso-${{ matrix.os }}-${{ matrix.arch }}/*
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist
+
+      - name: Create release archives
+        run: |
+          cd dist
+          for dir in */; do
+            dirname=${dir%/}
+            cd "$dirname"
+            if [[ "$dirname" == *"windows"* ]]; then
+              zip -r "../${dirname}.zip" . > /dev/null
+            else
+              tar -czf "../${dirname}.tar.gz" . > /dev/null
+            fi
+            cd ..
+          done
+          ls -lh *.tar.gz *.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          name: Release ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

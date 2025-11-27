@@ -1,6 +1,12 @@
 # Binaries
 dso
 dso.exe
+dso-*
+
+# Build artifacts
+dist/
+*.tar.gz
+*.zip
 *.exe
 *.dll
 *.so
