@@ -54,6 +54,30 @@ for /f "tokens=*" %%i in ('go version') do set GO_VERSION=%%i
 echo ✅ Go found: !GO_VERSION!
 echo.
 
+REM Download dependencies
+echo 📦 Downloading Go dependencies...
+go mod download
+go mod tidy
+echo ✅ Dependencies downloaded
+echo.
+
+REM Remove old binary if exists
+if exist dso.exe (
+    echo 🗑️  Removing old binary...
+    del /f dso.exe
+)
+
+REM Update repository if in git repo
+if exist .git (
+    echo 📥 Updating to latest version...
+    git fetch origin 2>nul
+    git pull origin main 2>nul
+    if %ERRORLEVEL% NEQ 0 (
+        git pull origin master 2>nul
+    )
+    echo.
+)
+
 REM Build
 echo 🔨 Building binary...
 set GOOS=windows

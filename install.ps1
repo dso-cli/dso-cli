@@ -46,6 +46,30 @@ try {
 
 Write-Host ""
 
+# Download dependencies
+Write-Host "📦 Downloading Go dependencies..." -ForegroundColor Cyan
+go mod download
+go mod tidy
+Write-Host "✅ Dependencies downloaded" -ForegroundColor Green
+Write-Host ""
+
+# Remove old binary if exists
+if (Test-Path "dso.exe") {
+    Write-Host "🗑️  Removing old binary..." -ForegroundColor Cyan
+    Remove-Item -Force dso.exe
+}
+
+# Update repository if in git repo
+if (Test-Path ".git") {
+    Write-Host "📥 Updating to latest version..." -ForegroundColor Cyan
+    git fetch origin 2>$null
+    git pull origin main 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        git pull origin master 2>$null
+    }
+    Write-Host ""
+}
+
 # Build
 Write-Host "🔨 Building binary..." -ForegroundColor Cyan
 $env:GOOS = "windows"

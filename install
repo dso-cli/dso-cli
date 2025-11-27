@@ -382,6 +382,16 @@ build_dso() {
         exit 1
     fi
     
+    # Remove old binary if exists
+    if [ -f "dso" ]; then
+        echo -e "${BLUE}Removing old binary...${NC}"
+        rm -f dso
+    fi
+    if [ -f "dso.exe" ]; then
+        echo -e "${BLUE}Removing old binary...${NC}"
+        rm -f dso.exe
+    fi
+    
     # Set build variables
     export CGO_ENABLED=0
     
@@ -431,7 +441,20 @@ install_globally() {
     case "$OS" in
         darwin|linux)
             if [ -f "dso" ]; then
-                sudo cp dso /usr/local/bin/ || cp dso "$HOME/go/bin/" || cp dso "$HOME/.local/bin/"
+                # Remove old version if exists
+                if [ -f "/usr/local/bin/dso" ]; then
+                    echo -e "${BLUE}Removing old global installation...${NC}"
+                    sudo rm -f /usr/local/bin/dso 2>/dev/null || true
+                fi
+                if [ -f "$HOME/go/bin/dso" ]; then
+                    rm -f "$HOME/go/bin/dso" 2>/dev/null || true
+                fi
+                if [ -f "$HOME/.local/bin/dso" ]; then
+                    rm -f "$HOME/.local/bin/dso" 2>/dev/null || true
+                fi
+                
+                # Install new version
+                sudo cp dso /usr/local/bin/ 2>/dev/null || cp dso "$HOME/go/bin/" 2>/dev/null || cp dso "$HOME/.local/bin/" 2>/dev/null
                 sudo chmod +x /usr/local/bin/dso 2>/dev/null || chmod +x "$HOME/go/bin/dso" 2>/dev/null || chmod +x "$HOME/.local/bin/dso" 2>/dev/null
                 echo -e "${GREEN}✅ DSO installed globally${NC}"
                 echo -e "${BLUE}   Run: dso --version${NC}"
@@ -449,11 +472,23 @@ main() {
     if [ ! -f "main.go" ] && [ ! -f "go.mod" ]; then
         echo -e "${YELLOW}📥 Cloning DSO repository...${NC}"
         if command_exists git; then
+            # Remove old installation if exists
+            if [ -d "/tmp/dso-install" ]; then
+                echo -e "${BLUE}Removing previous installation...${NC}"
+                rm -rf /tmp/dso-install
+            fi
             git clone https://github.com/dso-cli/dso-cli.git /tmp/dso-install
             cd /tmp/dso-install
         else
             echo -e "${RED}❌ Git not found. Please install git first.${NC}"
             exit 1
+        fi
+    else
+        # We're in the repo, update to latest
+        if command_exists git && [ -d ".git" ]; then
+            echo -e "${BLUE}📥 Updating to latest version...${NC}"
+            git fetch origin
+            git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || true
         fi
     fi
     

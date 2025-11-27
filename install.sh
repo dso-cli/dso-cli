@@ -71,6 +71,20 @@ go mod tidy
 echo "✅ Dependencies downloaded"
 echo ""
 
+# Remove old binary if exists
+if [ -f "dso" ]; then
+    echo "🗑️  Removing old binary..."
+    rm -f dso
+fi
+
+# Update repository if in git repo
+if [ -d ".git" ] && command -v git &> /dev/null; then
+    echo "📥 Updating to latest version..."
+    git fetch origin 2>/dev/null || true
+    git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || true
+    echo ""
+fi
+
 # Build
 echo "🔨 Building binary..."
 BINARY_NAME="dso"
