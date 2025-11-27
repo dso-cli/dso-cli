@@ -63,7 +63,7 @@ func GetModel() string {
 		line := strings.TrimSpace(scanner.Text())
 		if strings.HasPrefix(line, "DSO_MODEL=") {
 			model := strings.TrimPrefix(line, "DSO_MODEL=")
-			model = strings.Trim(model, "\"\'")
+			model = strings.Trim(model, `"'`)
 			return model
 		}
 	}
@@ -114,7 +114,7 @@ func GetAllConfig() (map[string]string, error) {
 			if len(parts) == 2 {
 				key := strings.TrimSpace(parts[0])
 				value := strings.TrimSpace(parts[1])
-				value = strings.Trim(value, "\"\'")
+				value = strings.Trim(value, `"'`)
 				config[key] = value
 			}
 		}
