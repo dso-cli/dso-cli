@@ -247,22 +247,16 @@ echo ""
 echo "🎉 Installation completed!"
 echo ""
 echo "To use DSO:"
-echo "  ./${BINARY_NAME} audit ."
-echo ""
-
-# Installation instructions based on OS
-if [ "${OS_TYPE}" = "linux" ]; then
-    echo "To install globally (Linux):"
-    echo "  sudo cp ${BINARY_NAME} /usr/local/bin/"
-    echo "  sudo chmod +x /usr/local/bin/${BINARY_NAME}"
-elif [ "${OS_TYPE}" = "darwin" ]; then
-    echo "To install globally (macOS):"
-    echo "  sudo cp ${BINARY_NAME} /usr/local/bin/"
-    echo "  sudo chmod +x /usr/local/bin/${BINARY_NAME}"
+if command -v dso &> /dev/null; then
+    echo "  dso audit .        # Run security audit"
+    echo "  dso check          # Check Ollama"
+    echo "  dso tools         # Check scanners"
+    echo "  dso --version     # Check version"
+elif [ -f "${BINARY_NAME}" ]; then
+    echo "  ./${BINARY_NAME} audit .      # Run security audit"
+    echo "  ./${BINARY_NAME} check        # Check Ollama"
+    echo "  ./${BINARY_NAME} tools       # Check scanners"
     echo ""
-    echo "Or using Homebrew (if installed):"
-    echo "  brew install --formula ${BINARY_NAME}"
+    echo "💡 Tip: Add to PATH to use 'dso' directly"
 fi
-
 echo ""
-echo "💡 For Windows installation, see: README.md or run install.ps1"
