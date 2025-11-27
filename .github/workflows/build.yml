@@ -67,12 +67,14 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 0
+        shell: bash
         run: |
           go build -ldflags="-w -s -X main.version=${GITHUB_REF#refs/tags/} -X main.buildDate=$(date +%Y-%m-%d)" \
             -o dist/dso-${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.binary }} .
 
       - name: Create checksum
         working-directory: dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+        shell: bash
         run: |
           if [ "${{ matrix.os }}" = "windows" ]; then
             sha256sum ${{ matrix.binary }} > ${{ matrix.binary }}.sha256
@@ -103,6 +105,7 @@ jobs:
           path: dist
 
       - name: Create release archive
+        shell: bash
         run: |
           cd dist
           for dir in */; do

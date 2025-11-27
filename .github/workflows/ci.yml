@@ -46,6 +46,7 @@ jobs:
           go-version: '1.21'
 
       - name: Build
+        shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             go build -o dso.exe .
@@ -54,6 +55,7 @@ jobs:
           fi
 
       - name: Test binary
+        shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             ./dso.exe --version

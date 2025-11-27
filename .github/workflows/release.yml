@@ -69,6 +69,7 @@ jobs:
 
       - name: Get version
         id: version
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
@@ -91,6 +92,7 @@ jobs:
 
       - name: Create checksum
         working-directory: dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+        shell: bash
         run: |
           if [ "${{ matrix.os }}" = "windows" ]; then
             sha256sum ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
@@ -117,6 +119,7 @@ jobs:
 
       - name: Get version
         id: version
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
@@ -132,6 +135,7 @@ jobs:
           path: dist
 
       - name: Create release archives
+        shell: bash
         run: |
           cd dist
           for dir in */; do
