@@ -10,12 +10,12 @@ import (
 	"time"
 )
 
-// RunFullScan exécute tous les scanners disponibles
+// RunFullScan runs all available scanners
 func RunFullScan(path string) (*ScanResults, error) {
 	return RunFullScanInteractive(path, false, nil)
 }
 
-// RunFullScanInteractive exécute tous les scanners avec suivi de progression
+// RunFullScanInteractive runs all scanners with progress tracking
 func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTracker) (*ScanResults, error) {
 	results := &ScanResults{
 		Path:      path,
@@ -57,7 +57,7 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 		{"Scanning Kubernetes", hasK8s, func() ([]Finding, error) { return scanKubernetes(path) }},
 	}
 
-	// Ajouter les étapes au tracker
+	// Add steps to tracker
 	for _, step := range steps {
 		if step.enabled {
 			tracker.AddStep(step.name)

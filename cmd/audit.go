@@ -51,7 +51,7 @@ and analyzes results with local AI to give you the 3-5 critical issues.`,
 		}
 
 		// Phase 1: Full scan
-		fmt.Println("🔍 Scanning... (Trivy, grype, gitleaks, tfsec…)")
+		fmt.Println("🔍 Scanning... (Trivy, grype, gitleaks, tfsec...)")
 		start := time.Now()
 
 		tracker := scanner.NewProgressTracker(auditVerbose)
@@ -67,7 +67,7 @@ and analyzes results with local AI to give you the 3-5 critical issues.`,
 		}
 
 		// Phase 2: AI Analysis
-		fmt.Println("🧠 Analyzing with local AI (Ollama)…")
+		fmt.Println("🧠 Analyzing with local AI (Ollama)...")
 		if auditVerbose {
 			fmt.Println("   💡 Use 'dso check' to verify Ollama status")
 		}

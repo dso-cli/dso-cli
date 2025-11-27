@@ -289,7 +289,7 @@ func (c *OllamaClient) ensureModel() error {
 	}
 
 	// Model doesn't exist, download it
-	fmt.Printf("📥 Downloading model %s (this may take a few minutes)…\n", c.model)
+	fmt.Printf("📥 Downloading model %s (this may take a few minutes)...\n", c.model)
 	return c.pullModel()
 }
 

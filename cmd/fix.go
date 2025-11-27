@@ -33,14 +33,14 @@ fixes .env files, etc.). Use --auto to apply without confirmation.`,
 			os.Exit(1)
 		}
 
-		fmt.Println("🔍 Quick scan to identify fixes…")
+		fmt.Println("🔍 Quick scan to identify fixes...")
 		results, err := scanner.RunFullScan(absPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error during scan: %v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Println("🔧 Applying fixes…")
+		fmt.Println("🔧 Applying fixes...")
 		fixes, err := fixer.AutoFix(results, absPath, fixAuto)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error applying fixes: %v\n", err)

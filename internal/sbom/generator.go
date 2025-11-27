@@ -136,7 +136,7 @@ func generateSPDX(components []Component, projectPath string) (string, error) {
 	return sb.String(), nil
 }
 
-// Fonctions de détection par langage
+// Language-specific detection functions
 func detectNPM(projectPath string) ([]Component, error) {
 	var components []Component
 	
@@ -203,8 +203,8 @@ func detectGo(projectPath string) ([]Component, error) {
 
 func detectPython(projectPath string) ([]Component, error) {
 	var components []Component
-	
-	// Lire requirements.txt
+
+	// Read requirements.txt
 	reqPath := filepath.Join(projectPath, "requirements.txt")
 	if data, err := os.ReadFile(reqPath); err == nil {
 		lines := strings.Split(string(data), "\n")
@@ -235,8 +235,8 @@ func detectPython(projectPath string) ([]Component, error) {
 
 func detectMaven(projectPath string) ([]Component, error) {
 	var components []Component
-	
-	// Lire pom.xml (version simplifiée)
+
+	// Read pom.xml (simplified version)
 	pomPath := filepath.Join(projectPath, "pom.xml")
 	if _, err := os.Stat(pomPath); err == nil {
 		// For a complete implementation, we would need to parse the XML

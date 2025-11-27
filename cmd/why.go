@@ -23,7 +23,7 @@ whether it's a false positive, why it's critical, or how to fix it.`,
 		}
 
 		fmt.Printf("🔍 Analyzing vulnerability: %s\n", vulnID)
-		fmt.Println("🧠 Consulting local AI…")
+		fmt.Println("🧠 Consulting local AI...")
 
 		explanation, err := llm.ExplainVulnerability(vulnID, ".")
 		if err != nil {

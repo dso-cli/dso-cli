@@ -34,7 +34,7 @@ on GitHub/GitLab with the changes.`,
 			os.Exit(1)
 		}
 
-		fmt.Println("🔍 Scanning and applying fixes…")
+		fmt.Println("🔍 Scanning and applying fixes...")
 		results, err := scanner.RunFullScan(absPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error during scan: %v\n", err)
@@ -52,7 +52,7 @@ on GitHub/GitLab with the changes.`,
 			return
 		}
 
-		fmt.Println("📝 Creating Pull Request…")
+		fmt.Println("📝 Creating Pull Request...")
 		prURL, err := fixer.CreatePullRequest(absPath, prBranch, prTitle, prMessage, fixes)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error creating PR: %v\n", err)
