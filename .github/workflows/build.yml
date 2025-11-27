@@ -82,6 +82,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         shell: bash
         run: |
+          mkdir -p dist/dso-${{ matrix.os }}-${{ matrix.arch }}
           LDFLAGS="-w -s -X github.com/dso-cli/dso-cli/cmd.version=${VERSION} -X github.com/dso-cli/dso-cli/cmd.buildDate=$(date +%Y-%m-%d) -X github.com/dso-cli/dso-cli/cmd.buildTime=$(date +%H:%M:%S)"
           go build -ldflags="$LDFLAGS" \
             -o dist/dso-${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.binary }} .
