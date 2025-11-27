@@ -79,7 +79,7 @@ func SetModel(model string) error {
 	}
 
 	content := fmt.Sprintf("DSO_MODEL=%s\n", model)
-	return os.WriteFile(configFile, []byte(content), 0600)
+	return os.WriteFile(configFile, []byte(content), 0o600)
 }
 
 // GetAllConfig reads all config values

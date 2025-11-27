@@ -38,10 +38,7 @@ func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult,
 	client := NewOllamaClient()
 
 	// Load the system prompt
-	prompt, err := loadSystemPrompt()
-	if err != nil {
-		return nil, err
-	}
+	prompt := loadSystemPrompt()
 
 	// Prepare data for AI
 	scanData := formatScanResultsForAI(results, projectPath)
@@ -77,22 +74,22 @@ Be direct, technical but educational.`, vulnID, projectPath)
 }
 
 // loadSystemPrompt loads the system prompt from template
-func loadSystemPrompt() (string, error) {
+func loadSystemPrompt() string {
 	// Look for template in several possible locations
 	paths := []string{
 		"templates/prompt_system.txt",
 		"./templates/prompt_system.txt",
-		filepath.Join(os.Getenv("HOME"), ".dso/templates/prompt_system.txt"),
+		filepath.Join(os.Getenv("HOME"), ".dso", "templates", "prompt_system.txt"),
 	}
 
 	for _, path := range paths {
 		if data, err := os.ReadFile(path); err == nil {
-			return string(data), nil
+			return string(data)
 		}
 	}
 
 	// Fallback: embedded prompt
-	return getDefaultPrompt(), nil
+	return getDefaultPrompt()
 }
 
 // getDefaultPrompt returns the default prompt

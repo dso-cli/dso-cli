@@ -69,7 +69,7 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 	newContent := strings.Join(newLines, "\n")
 
 	// Write file
-	if err := os.WriteFile(filePath, []byte(newContent), 0600); err != nil {
+	if err := os.WriteFile(filePath, []byte(newContent), 0o600); err != nil {
 		return "", err
 	}
 
@@ -96,7 +96,7 @@ func fixDependency(finding scanner.Finding, projectPath string, auto bool) (stri
 }
 
 // fixNPMDependency updates an npm dependency
-func fixNPMDependency(finding scanner.Finding, projectPath string, auto bool) (string, error) {
+func fixNPMDependency(finding scanner.Finding, projectPath string, _ bool) (string, error) {
 	// Extract package name from finding
 	// Expected format: "vulnerability-id in package-name"
 	parts := strings.Fields(finding.Title)
@@ -117,7 +117,7 @@ func fixNPMDependency(finding scanner.Finding, projectPath string, auto bool) (s
 }
 
 // fixGoDependency updates a Go dependency
-func fixGoDependency(finding scanner.Finding, projectPath string, auto bool) (string, error) {
+func fixGoDependency(_ scanner.Finding, projectPath string, _ bool) (string, error) {
 	// go get -u to update
 	cmd := exec.Command("go", "get", "-u", "./...")
 	cmd.Dir = projectPath
@@ -129,7 +129,7 @@ func fixGoDependency(finding scanner.Finding, projectPath string, auto bool) (st
 }
 
 // fixPythonDependency updates a Python dependency
-func fixPythonDependency(finding scanner.Finding, projectPath string, auto bool) (string, error) {
+func fixPythonDependency(_ scanner.Finding, projectPath string, _ bool) (string, error) {
 	// Try pip-audit if available
 	if _, err := exec.LookPath("pip-audit"); err == nil {
 		cmd := exec.Command("pip-audit", "--fix")
@@ -143,7 +143,7 @@ func fixPythonDependency(finding scanner.Finding, projectPath string, auto bool)
 }
 
 // fixJavaDependency updates a Java dependency
-func fixJavaDependency(finding scanner.Finding, projectPath string, auto bool) (string, error) {
+func fixJavaDependency(finding scanner.Finding, projectPath string, _ bool) (string, error) {
 	// For Maven
 	if strings.Contains(finding.File, "pom.xml") {
 		cmd := exec.Command("mvn", "versions:use-latest-versions")

@@ -68,7 +68,7 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 	cmd = exec.Command("gh", "pr", "create", "--title", title, "--body", message)
 	cmd.Dir = projectPath
 	output, err := cmd.Output()
-	if err != nil {
+	if err != nil || len(output) == 0 {
 		return "", fmt.Errorf("cannot create PR: %v", err)
 	}
 
@@ -81,7 +81,7 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 func ApplyPatch(patch string, projectPath string) error {
 	// Create temporary file for patch
 	tmpFile := filepath.Join(projectPath, ".dso-patch.tmp")
-	if err := os.WriteFile(tmpFile, []byte(patch), 0600); err != nil {
+	if err := os.WriteFile(tmpFile, []byte(patch), 0o600); err != nil {
 		return err
 	}
 	defer os.Remove(tmpFile)

@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/dso-cli/dso-cli/internal/constants"
 )
 
 // Tool represents a scan tool
@@ -92,7 +94,7 @@ func isInstalled(command string) bool {
 func getVersion(command string) string {
 	cmd := exec.Command(command, "--version")
 	output, err := cmd.Output()
-	if err != nil {
+	if err != nil || len(output) == 0 {
 		return "unknown"
 	}
 
@@ -158,15 +160,15 @@ func PrintToolsStatus() {
 // getTrivyInstallCmd returns installation command for Trivy
 func getTrivyInstallCmd() string {
 	switch runtime.GOOS {
-	case "darwin":
+	case constants.OSDarwin:
 		return "brew install trivy"
-	case "linux":
+	case constants.OSLinux:
 		// Detect Linux distribution
 		if isDebianBased() {
 			return "sudo apt-get update && sudo apt-get install -y wget apt-transport-https gnupg lsb-release && wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add - && echo \"deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main\" | sudo tee -a /etc/apt/sources.list.d/trivy.list && sudo apt-get update && sudo apt-get install -y trivy"
 		}
 		return "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin"
-	case "windows":
+	case constants.OSWindows:
 		return "scoop install trivy || winget install AquaSecurity.Trivy"
 	default:
 		return "https://aquasecurity.github.io/trivy/"
@@ -176,11 +178,11 @@ func getTrivyInstallCmd() string {
 // getGrypeInstallCmd returns installation command for Grype
 func getGrypeInstallCmd() string {
 	switch runtime.GOOS {
-	case "darwin":
+	case constants.OSDarwin:
 		return "brew install grype"
-	case "linux":
+	case constants.OSLinux:
 		return "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
-	case "windows":
+	case constants.OSWindows:
 		return "scoop install grype || winget install Anchore.Grype"
 	default:
 		return "https://github.com/anchore/grype"
@@ -190,14 +192,14 @@ func getGrypeInstallCmd() string {
 // getGitleaksInstallCmd returns installation command for gitleaks
 func getGitleaksInstallCmd() string {
 	switch runtime.GOOS {
-	case "darwin":
+	case constants.OSDarwin:
 		return "brew install gitleaks"
-	case "linux":
+	case constants.OSLinux:
 		if isDebianBased() {
 			return "wget https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_$(uname -s)_$(uname -m).tar.gz -O /tmp/gitleaks.tar.gz && tar -xzf /tmp/gitleaks.tar.gz -C /tmp && sudo mv /tmp/gitleaks /usr/local/bin/ && chmod +x /usr/local/bin/gitleaks"
 		}
 		return "brew install gitleaks || go install github.com/gitleaks/gitleaks/v8@latest"
-	case "windows":
+	case constants.OSWindows:
 		return "scoop install gitleaks || winget install Gitleaks.Gitleaks"
 	default:
 		return "https://github.com/gitleaks/gitleaks"
@@ -207,11 +209,11 @@ func getGitleaksInstallCmd() string {
 // getTfsecInstallCmd returns installation command for tfsec
 func getTfsecInstallCmd() string {
 	switch runtime.GOOS {
-	case "darwin":
+	case constants.OSDarwin:
 		return "brew install tfsec"
-	case "linux":
+	case constants.OSLinux:
 		return "brew install tfsec || go install github.com/aquasecurity/tfsec/cmd/tfsec@latest"
-	case "windows":
+	case constants.OSWindows:
 		return "scoop install tfsec || winget install AquaSecurity.Tfsec"
 	default:
 		return "https://github.com/aquasecurity/tfsec"
@@ -236,6 +238,10 @@ func InstallTool(tool Tool, interactive bool) error {
 	// Try to execute installation command
 	if strings.HasPrefix(tool.InstallCmd, "brew") {
 		parts := strings.Fields(tool.InstallCmd)
+		if len(parts) < 2 {
+			return fmt.Errorf("invalid brew command")
+		}
+		// #nosec G204 - command is from user input, but we validate it's brew
 		cmd := exec.Command(parts[0], parts[1:]...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -249,7 +255,7 @@ func InstallTool(tool Tool, interactive bool) error {
 
 // isDebianBased checks if the Linux system is Debian-based (Ubuntu, Debian, etc.)
 func isDebianBased() bool {
-	if runtime.GOOS != "linux" {
+	if runtime.GOOS != constants.OSLinux {
 		return false
 	}
 

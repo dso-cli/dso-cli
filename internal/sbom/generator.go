@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/dso-cli/dso-cli/internal/constants"
 )
 
 // Component represents a component in the SBOM
@@ -19,8 +21,8 @@ type Component struct {
 	Properties map[string]string `json:"properties,omitempty"`
 }
 
-// SBOMDocument represents an SBOM document
-type SBOMDocument struct {
+// Document represents an SBOM document
+type Document struct {
 	Format     string      `json:"format"`
 	Version    string      `json:"version"`
 	Timestamp  time.Time   `json:"timestamp"`
@@ -29,15 +31,12 @@ type SBOMDocument struct {
 
 // GenerateSBOM generates an SBOM in the specified format
 func GenerateSBOM(projectPath string, format string) (string, error) {
-	components, err := detectComponents(projectPath)
-	if err != nil {
-		return "", err
-	}
+	components := detectComponents(projectPath)
 
 	switch format {
 	case "cyclonedx":
 		return generateCycloneDX(components, projectPath)
-	case "spdx":
+	case constants.FormatSPDX:
 		return generateSPDX(components, projectPath)
 	default:
 		return "", fmt.Errorf("unsupported format: %s (supported: cyclonedx, spdx)", format)
@@ -45,39 +44,31 @@ func GenerateSBOM(projectPath string, format string) (string, error) {
 }
 
 // detectComponents detects all components in the project
-func detectComponents(projectPath string) ([]Component, error) {
+func detectComponents(projectPath string) []Component {
 	var components []Component
 
 	// Detect dependency managers
 	if hasFile(projectPath, "package.json") {
-		npmComponents, err := detectNPM(projectPath)
-		if err == nil {
-			components = append(components, npmComponents...)
-		}
+		npmComponents := detectNPM(projectPath)
+		components = append(components, npmComponents...)
 	}
 
 	if hasFile(projectPath, "go.mod") {
-		goComponents, err := detectGo(projectPath)
-		if err == nil {
-			components = append(components, goComponents...)
-		}
+		goComponents := detectGo(projectPath)
+		components = append(components, goComponents...)
 	}
 
 	if hasFile(projectPath, "requirements.txt") || hasFile(projectPath, "Pipfile") {
-		pythonComponents, err := detectPython(projectPath)
-		if err == nil {
-			components = append(components, pythonComponents...)
-		}
+		pythonComponents := detectPython(projectPath)
+		components = append(components, pythonComponents...)
 	}
 
 	if hasFile(projectPath, "pom.xml") {
-		javaComponents, err := detectMaven(projectPath)
-		if err == nil {
-			components = append(components, javaComponents...)
-		}
+		javaComponents := detectMaven(projectPath)
+		components = append(components, javaComponents...)
 	}
 
-	return components, nil
+	return components
 }
 
 // generateCycloneDX generates an SBOM in CycloneDX format
@@ -136,8 +127,8 @@ func generateSPDX(components []Component, projectPath string) (string, error) {
 	return sb.String(), nil
 }
 
-// Language-specific detection functions
-func detectNPM(projectPath string) ([]Component, error) {
+// detectNPM detects NPM dependencies
+func detectNPM(projectPath string) []Component {
 	var components []Component
 
 	// Use npm list if available
@@ -145,7 +136,7 @@ func detectNPM(projectPath string) ([]Component, error) {
 		cmd := exec.Command("npm", "list", "--json", "--depth=0")
 		cmd.Dir = projectPath
 		output, err := cmd.Output()
-		if err == nil {
+		if err == nil && len(output) > 0 {
 			var npmList struct {
 				Dependencies map[string]struct {
 					Version string `json:"version"`
@@ -164,17 +155,17 @@ func detectNPM(projectPath string) ([]Component, error) {
 		}
 	}
 
-	return components, nil
+	return components
 }
 
-func detectGo(projectPath string) ([]Component, error) {
+func detectGo(projectPath string) []Component {
 	var components []Component
 
 	// Read go.mod
 	goModPath := filepath.Join(projectPath, "go.mod")
 	data, err := os.ReadFile(goModPath)
 	if err != nil {
-		return components, err
+		return components
 	}
 
 	lines := strings.Split(string(data), "\n")
@@ -198,10 +189,10 @@ func detectGo(projectPath string) ([]Component, error) {
 		}
 	}
 
-	return components, nil
+	return components
 }
 
-func detectPython(projectPath string) ([]Component, error) {
+func detectPython(projectPath string) []Component {
 	var components []Component
 
 	// Read requirements.txt
@@ -230,10 +221,10 @@ func detectPython(projectPath string) ([]Component, error) {
 		}
 	}
 
-	return components, nil
+	return components
 }
 
-func detectMaven(projectPath string) ([]Component, error) {
+func detectMaven(projectPath string) []Component {
 	var components []Component
 
 	// Read pom.xml (simplified version)
@@ -247,7 +238,7 @@ func detectMaven(projectPath string) ([]Component, error) {
 		})
 	}
 
-	return components, nil
+	return components
 }
 
 func hasFile(projectPath, filename string) bool {

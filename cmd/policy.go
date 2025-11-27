@@ -72,7 +72,7 @@ Supports OPA/Rego for validation and GitHub CODEOWNERS for review.`,
 		}
 
 		// Write file
-		if err := os.WriteFile(filename, []byte(content), 0600); err != nil {
+		if err := os.WriteFile(filename, []byte(content), 0o600); err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error writing file: %v\n", err)
 			os.Exit(1)
 		}

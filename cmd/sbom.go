@@ -52,7 +52,7 @@ Useful for compliance and dependency tracking.`,
 		}
 
 		// Write file
-		if err := os.WriteFile(outputFile, []byte(content), 0600); err != nil {
+		if err := os.WriteFile(outputFile, []byte(content), 0o600); err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error writing file: %v\n", err)
 			os.Exit(1)
 		}

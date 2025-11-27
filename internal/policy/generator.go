@@ -141,8 +141,8 @@ func GenerateCODEOWNERS(projectPath string) (string, error) {
 // Utility functions
 func detectFileType(path string, patterns ...string) bool {
 	for _, pattern := range patterns {
-		matches, _ := filepath.Glob(filepath.Join(path, pattern))
-		if len(matches) > 0 {
+		matches, err := filepath.Glob(filepath.Join(path, pattern))
+		if err == nil && len(matches) > 0 {
 			return true
 		}
 	}

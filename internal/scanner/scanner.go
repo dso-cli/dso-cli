@@ -122,7 +122,7 @@ func scanSecrets(path string) ([]Finding, error) {
 	if _, err := exec.LookPath("gitleaks"); err == nil {
 		cmd := exec.Command("gitleaks", "detect", "--source", path, "--no-git", "--format", "json")
 		output, err := cmd.Output()
-		if err != nil {
+		if err != nil && len(output) > 0 {
 			// gitleaks returns an error code if secrets are found
 			var gitleaksResults []struct {
 				RuleID string `json:"RuleID"`
@@ -154,7 +154,7 @@ func scanSecrets(path string) ([]Finding, error) {
 }
 
 // scanSAST scans source code with Trivy
-func scanSAST(path string, lang string) ([]Finding, error) {
+func scanSAST(path string, _ string) ([]Finding, error) {
 	return scanWithTrivy(path, "fs", "--scanners", "vuln,secret,config")
 }
 
@@ -228,7 +228,7 @@ func scanTerraform(path string) ([]Finding, error) {
 	if _, err := exec.LookPath("tfsec"); err == nil {
 		cmd := exec.Command("tfsec", path, "--format", "json")
 		output, err := cmd.Output()
-		if err == nil {
+		if err == nil && len(output) > 0 {
 			var tfsecResults struct {
 				Results []struct {
 					RuleID      string `json:"rule_id"`
@@ -282,9 +282,10 @@ func scanWithTrivy(path string, scanType string, extraArgs ...string) ([]Finding
 
 	cmd := exec.Command("trivy", args...)
 	output, err := cmd.Output()
-	if err != nil {
+	if err != nil && len(output) == 0 {
 		// Trivy may return an error if vulnerabilities are found
-		// Continue anyway to parse results
+		// Continue anyway to parse results if we have output
+		return nil, fmt.Errorf("trivy scan failed: %v", err)
 	}
 
 	var trivyResults struct {
