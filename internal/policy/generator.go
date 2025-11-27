@@ -10,7 +10,7 @@ import (
 // GenerateOPAPolicy generates an OPA/Rego policy based on detected patterns
 func GenerateOPAPolicy(projectPath string) (string, error) {
 	// Detect file types in the project
-	hasSecrets := detectSecretsPatterns(projectPath)
+	_ = detectSecretsPatterns(projectPath) // hasSecrets - used for future policy generation
 	hasDocker := detectFileType(projectPath, "Dockerfile", "docker-compose.yml")
 	hasTerraform := detectFileType(projectPath, "*.tf")
 	hasK8s := detectFileType(projectPath, "*.yaml", "*.yml")

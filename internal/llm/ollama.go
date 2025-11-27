@@ -37,11 +37,11 @@ func NewOllamaClient() *OllamaClient {
 			lines := strings.Split(string(data), "\n")
 			for _, line := range lines {
 				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "DSO_MODEL=") {
-					model = strings.TrimPrefix(line, "DSO_MODEL=")
-					model = strings.Trim(model, "\"\'")
-					break
-				}
+			if strings.HasPrefix(line, "DSO_MODEL=") {
+				model = strings.TrimPrefix(line, "DSO_MODEL=")
+				model = strings.Trim(model, `"'`)
+				break
+			}
 			}
 		}
 	}

@@ -41,7 +41,7 @@ and analyzes results with local AI to give you the 3-5 critical issues.`,
 		}
 
 		// Check available tools
-		installed, missing := tools.CheckTools(false)
+		_, missing := tools.CheckTools(false)
 		if len(missing) > 0 && auditVerbose {
 			fmt.Println("⚠️  Some tools are missing (scan will continue with available tools):")
 			for _, tool := range missing {

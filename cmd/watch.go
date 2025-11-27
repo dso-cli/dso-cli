@@ -6,9 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/dso-cli/dso-cli/internal/llm"
 	"github.com/dso-cli/dso-cli/internal/scanner"
-	"github.com/dso-cli/dso-cli/internal/ui"
 	"github.com/spf13/cobra"
 )
 

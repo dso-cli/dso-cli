@@ -1,7 +1,6 @@
 package ci
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -85,8 +84,8 @@ jobs:
             const high = results.results.summary.high || 0;
             
             let comment = '## 🔒 DSO Security Audit Results\n\n';
-            comment += `**Summary:** ${summary}\n\n`;
-            comment += `**Findings:** ${critical} critical, ${high} high severity\n\n`;
+            comment += '**Summary:** ' + summary + '\n\n';
+            comment += '**Findings:** ' + critical + ' critical, ' + high + ' high severity\n\n';
             
             if (critical > 0 || high > 0) {
               comment += '⚠️ **Action required:** Please review and fix the security issues.\n';

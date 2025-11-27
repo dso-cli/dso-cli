@@ -74,6 +74,7 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 	}
 
 	return fmt.Sprintf("Secret removed from %s:%d", finding.File, finding.Line), nil
+}
 
 // fixDependency attempts to update a vulnerable dependency
 func fixDependency(finding scanner.Finding, projectPath string, auto bool) (string, error) {
