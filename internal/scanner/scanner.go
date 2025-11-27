@@ -87,14 +87,14 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 	return results, nil
 }
 
-// detectFileType vérifie si un type de fichier existe dans le répertoire
+// detectFileType checks if a file type exists in the directory
 func detectFileType(path string, patterns ...string) bool {
 	for _, pattern := range patterns {
 		matches, _ := filepath.Glob(filepath.Join(path, pattern))
 		if len(matches) > 0 {
 			return true
 		}
-		// Recherche récursive pour certains patterns
+		// Recursive search for certain patterns
 		if strings.Contains(pattern, "*") {
 			err := filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
 				if err != nil {
@@ -102,7 +102,7 @@ func detectFileType(path string, patterns ...string) bool {
 				}
 				matched, _ := filepath.Match(pattern, info.Name())
 				if matched {
-					return fmt.Errorf("found") // Arrête la recherche
+					return fmt.Errorf("found") // Stop the search
 				}
 				return nil
 			})

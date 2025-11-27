@@ -22,7 +22,7 @@ type AnalysisResult struct {
 	TopFixes      []Fix    `json:"top_fixes"`
 }
 
-// Fix représente un correctif recommandé
+// Fix represents a recommended fix
 type Fix struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -33,27 +33,27 @@ type Fix struct {
 	Priority    int    `json:"priority"`
 }
 
-// Analyze analyse les résultats du scan avec l'IA
+// Analyze analyzes scan results with AI
 func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult, error) {
 	client := NewOllamaClient()
 
-	// Charger le prompt système
+	// Load the system prompt
 	prompt, err := loadSystemPrompt()
 	if err != nil {
 		return nil, err
 	}
 
-	// Préparer les données pour l'IA
+	// Prepare data for AI
 	scanData := formatScanResultsForAI(results, projectPath)
 	fullPrompt := fmt.Sprintf("%s\n\n%s", prompt, scanData)
 
-	// Appeler l'IA
+	// Call AI
 	response, err := client.Generate(fullPrompt)
 	if err != nil {
 		return nil, err
 	}
 
-	// Parser la réponse (format JSON ou texte libre)
+	// Parse the response (JSON format or free text)
 	return parseAIResponse(response, results)
 }
 

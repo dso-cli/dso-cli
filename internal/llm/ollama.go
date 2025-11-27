@@ -17,14 +17,14 @@ const (
 	defaultModel     = "qwen2.5:7b"
 )
 
-// OllamaClient est un client pour Ollama avec support de l'API chat moderne
+// OllamaClient is a client for Ollama with support for the modern chat API
 type OllamaClient struct {
 	baseURL string
 	model   string
 	client  *http.Client
 }
 
-// NewOllamaClient crée un nouveau client Ollama
+// NewOllamaClient creates a new Ollama client
 func NewOllamaClient() *OllamaClient {
 	// Try to get model from config file first, then environment, then default
 	model := ""
@@ -60,39 +60,39 @@ func NewOllamaClient() *OllamaClient {
 	if baseURL == "" {
 		baseURL = defaultOllamaURL
 	}
-	// S'assurer que l'URL n'a pas de trailing slash
+	// Ensure the URL doesn't have a trailing slash
 	baseURL = strings.TrimSuffix(baseURL, "/")
 
 	return &OllamaClient{
 		baseURL: baseURL,
 		model:   model,
 		client: &http.Client{
-			Timeout: 300 * time.Second, // 5 minutes pour les analyses longues
+			Timeout: 300 * time.Second, // 5 minutes for long analyses
 		},
 	}
 }
 
-// Generate envoie une requête à Ollama et retourne la réponse (utilise l'API chat moderne)
+// Generate sends a request to Ollama and returns the response (uses the modern chat API)
 func (c *OllamaClient) Generate(prompt string) (string, error) {
 	return c.GenerateWithContext(prompt, nil)
 }
 
-// GenerateWithContext génère une réponse avec un contexte de conversation
+// GenerateWithContext generates a response with a conversation context
 func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]string) (string, error) {
 	// Check that Ollama is available
 	if err := c.checkOllamaAvailable(); err != nil {
 		return "", fmt.Errorf("Ollama is not available: %v\n💡 Install it: https://ollama.ai\n💡 Then run: ollama pull %s", err, c.model)
 	}
 
-	// Vérification que le modèle est disponible
+	// Verify that the model is available
 	if err := c.ensureModel(); err != nil {
 		return "", err
 	}
 
-	// Construire les messages pour l'API chat
+	// Build messages for the chat API
 	messages := []map[string]interface{}{}
 	
-	// Ajouter le contexte si fourni
+	// Add context if provided
 	if context != nil {
 		for _, msg := range context {
 			messages = append(messages, map[string]interface{}{
@@ -102,13 +102,13 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 		}
 	}
 	
-	// Ajouter le prompt actuel
+	// Add the current prompt
 	messages = append(messages, map[string]interface{}{
 		"role":    "user",
 		"content": prompt,
 	})
 
-	// Utiliser l'API chat moderne d'Ollama
+	// Use Ollama's modern chat API
 	payload := map[string]interface{}{
 		"model":    c.model,
 		"messages": messages,
@@ -116,7 +116,7 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 		"options": map[string]interface{}{
 			"temperature": 0.7,
 			"top_p":       0.9,
-			"num_predict": 4000, // Limite de tokens pour les réponses longues
+			"num_predict": 4000, // Token limit for long responses
 		},
 	}
 
@@ -244,7 +244,7 @@ func (c *OllamaClient) GenerateStream(prompt string, onChunk func(string)) (stri
 	return fullResponse.String(), nil
 }
 
-// checkOllamaAvailable vérifie si Ollama est disponible avec retry
+// checkOllamaAvailable checks if Ollama is available with retry
 func (c *OllamaClient) checkOllamaAvailable() error {
 	maxRetries := 3
 	for i := 0; i < maxRetries; i++ {
@@ -262,9 +262,9 @@ func (c *OllamaClient) checkOllamaAvailable() error {
 	return fmt.Errorf("Ollama is not accessible at %s\n💡 Start Ollama: ollama serve", c.baseURL)
 }
 
-// ensureModel vérifie et télécharge le modèle si nécessaire
+// ensureModel checks and downloads the model if necessary
 func (c *OllamaClient) ensureModel() error {
-	// Vérifier si le modèle existe
+	// Check if the model exists
 	resp, err := http.Get(fmt.Sprintf("%s/api/tags", c.baseURL))
 	if err != nil {
 		return err
@@ -281,7 +281,7 @@ func (c *OllamaClient) ensureModel() error {
 		return err
 	}
 
-	// Vérifier si le modèle est présent
+	// Check if the model is present
 	for _, model := range modelsResp.Models {
 		if model.Name == c.model {
 			return nil
@@ -343,7 +343,7 @@ func (c *OllamaClient) pullModel() error {
 			return fmt.Errorf("parsing error: %v", err)
 		}
 
-		// Afficher la progression seulement si le statut change
+		// Display progress only if status changes
 		if progress.Status != lastStatus {
 			if progress.Total > 0 {
 				percent := float64(progress.Completed) / float64(progress.Total) * 100
@@ -355,7 +355,7 @@ func (c *OllamaClient) pullModel() error {
 		}
 
 		if progress.Done {
-			fmt.Println() // Nouvelle ligne après la progression
+			fmt.Println() // New line after progress
 			break
 		}
 	}
@@ -363,7 +363,7 @@ func (c *OllamaClient) pullModel() error {
 	return nil
 }
 
-// ListModels liste les modèles disponibles
+// ListModels lists available models
 func (c *OllamaClient) ListModels() ([]string, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/api/tags", c.baseURL))
 	if err != nil {
@@ -393,17 +393,17 @@ func (c *OllamaClient) ListModels() ([]string, error) {
 	return models, nil
 }
 
-// CheckConnection vérifie que la connexion à Ollama fonctionne
+// CheckConnection checks that the connection to Ollama works
 func (c *OllamaClient) CheckConnection() error {
 	return c.checkOllamaAvailable()
 }
 
-// GetModel retourne le modèle configuré
+// GetModel returns the configured model
 func (c *OllamaClient) GetModel() string {
 	return c.model
 }
 
-// GetBaseURL retourne l'URL de base d'Ollama
+// GetBaseURL returns Ollama's base URL
 func (c *OllamaClient) GetBaseURL() string {
 	return c.baseURL
 }

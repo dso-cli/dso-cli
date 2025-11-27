@@ -239,8 +239,8 @@ func detectMaven(projectPath string) ([]Component, error) {
 	// Lire pom.xml (version simplifiée)
 	pomPath := filepath.Join(projectPath, "pom.xml")
 	if _, err := os.Stat(pomPath); err == nil {
-		// Pour une implémentation complète, il faudrait parser le XML
-		// Ici on retourne juste une structure de base
+		// For a complete implementation, we would need to parse the XML
+		// Here we just return a basic structure
 		components = append(components, Component{
 			Type: "application",
 			Name: filepath.Base(projectPath),
