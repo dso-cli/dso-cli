@@ -64,6 +64,13 @@ else
 fi
 echo ""
 
+# Download dependencies
+echo "📦 Downloading Go dependencies..."
+go mod download
+go mod tidy
+echo "✅ Dependencies downloaded"
+echo ""
+
 # Build
 echo "🔨 Building binary..."
 BINARY_NAME="dso"
