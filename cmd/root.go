@@ -9,7 +9,7 @@ import (
 
 var (
 	// version is set at build time via ldflags
-	version = "dev"
+	version   = "dev"
 	buildDate = "unknown"
 	buildTime = "unknown"
 )
@@ -42,11 +42,10 @@ func init() {
 	rootCmd.AddCommand(sbomCmd)
 	rootCmd.AddCommand(toolsCmd)
 	rootCmd.AddCommand(ciCmd)
-	
+
 	// Override version template to include build info
 	rootCmd.SetVersionTemplate(fmt.Sprintf(`{{with .Name}}{{printf "%%s " .}}{{end}}{{printf "version %%s" .Version}}
 Build date: %s
 Build time: %s
 `, buildDate, buildTime))
 }
-

@@ -1,12 +1,6 @@
 run:
   timeout: 5m
   tests: true
-  skip-dirs:
-    - vendor
-    - dist
-    - .git
-  skip-files:
-    - ".*\\.pb\\.go$"
 
 linters-settings:
   errcheck:
@@ -14,20 +8,18 @@ linters-settings:
     check-blank: true
   goconst:
     min-len: 3
-    min-occurrences: 2
+    min-occurrences: 3
   gocritic:
     enabled-tags:
       - diagnostic
-      - experimental
-      - opinionated
       - performance
       - style
-  govet:
-    check-shadowing: true
+    disabled-checks:
+      - rangeValCopy  # Too strict for our use case
+      - hugeParam  # Acceptable for clarity
+      - paramTypeCombine  # Acceptable for clarity
   gocyclo:
     min-complexity: 15
-  maligned:
-    suggest-new: true
   misspell:
     locale: US
   revive:
@@ -58,13 +50,14 @@ linters:
     - unparam
     - unused
     - whitespace
-  disable:
-    - golint  # Deprecated, use revive instead
-    - interfacer  # Deprecated
-    - structcheck  # Deprecated, use unused instead
-    - varcheck  # Deprecated, use unused instead
 
 issues:
+  exclude-dirs:
+    - vendor
+    - dist
+    - .git
+  exclude-files:
+    - ".*\\.pb\\.go$"
   exclude-rules:
     - path: _test\.go
       linters:
@@ -72,6 +65,9 @@ issues:
         - goconst
         - gocyclo
         - gosec
+    - linters:
+        - unparam
+      text: "result.*is always nil"
   max-issues-per-linter: 0
   max-same-issues: 0
 

@@ -12,14 +12,14 @@ import (
 
 // AnalysisResult contains the AI analysis summary
 type AnalysisResult struct {
-	Summary      string   `json:"summary"`
-	Critical     []string `json:"critical"`
-	High         []string `json:"high"`
-	Medium       []string `json:"medium"`
-	Low          []string `json:"low"`
+	Summary        string   `json:"summary"`
+	Critical       []string `json:"critical"`
+	High           []string `json:"high"`
+	Medium         []string `json:"medium"`
+	Low            []string `json:"low"`
 	FalsePositives []string `json:"false_positives,omitempty"`
-	BusinessImpact string  `json:"business_impact"`
-	TopFixes      []Fix    `json:"top_fixes"`
+	BusinessImpact string   `json:"business_impact"`
+	TopFixes       []Fix    `json:"top_fixes"`
 }
 
 // Fix represents a recommended fix
@@ -139,7 +139,7 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("Project: %s\n", projectPath))
 	sb.WriteString(fmt.Sprintf("Total findings: %d\n", results.Summary.Total))
-	sb.WriteString(fmt.Sprintf("Critical: %d, High: %d, Medium: %d, Low: %d\n\n", 
+	sb.WriteString(fmt.Sprintf("Critical: %d, High: %d, Medium: %d, Low: %d\n\n",
 		results.Summary.Critical, results.Summary.High, results.Summary.Medium, results.Summary.Low))
 
 	// Group by severity
@@ -172,13 +172,13 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 
 	sb.WriteString("=== CRITICAL ===\n")
 	for _, f := range critical {
-		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s:%d\n  %s\n\n", 
+		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s:%d\n  %s\n\n",
 			f.ID, f.Title, f.File, f.Line, f.Description))
 	}
 
 	sb.WriteString("=== HIGH ===\n")
 	for _, f := range high {
-		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s:%d\n  %s\n\n", 
+		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s:%d\n  %s\n\n",
 			f.ID, f.Title, f.File, f.Line, f.Description))
 	}
 
@@ -187,7 +187,7 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 		if i >= 10 {
 			break
 		}
-		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s\n\n", 
+		sb.WriteString(fmt.Sprintf("- [%s] %s\n  File: %s\n\n",
 			f.ID, f.Title, f.File))
 	}
 
@@ -198,7 +198,7 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisResult, error) {
 	// Try to parse as JSON first
 	response = strings.TrimSpace(response)
-	
+
 	// Look for a JSON block in the response
 	jsonStart := strings.Index(response, "{")
 	jsonEnd := strings.LastIndex(response, "}")
@@ -217,7 +217,7 @@ func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisRe
 // createFallbackAnalysis creates a basic analysis if AI doesn't respond in JSON
 func createFallbackAnalysis(results *scanner.ScanResults) *AnalysisResult {
 	analysis := &AnalysisResult{
-		Summary: fmt.Sprintf("Scan completed: %d findings total (%d critical, %d high).", 
+		Summary: fmt.Sprintf("Scan completed: %d findings total (%d critical, %d high).",
 			results.Summary.Total, results.Summary.Critical, results.Summary.High),
 		TopFixes: []Fix{},
 	}
@@ -242,4 +242,3 @@ func createFallbackAnalysis(results *scanner.ScanResults) *AnalysisResult {
 
 	return analysis
 }
-

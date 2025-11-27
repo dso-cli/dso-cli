@@ -176,4 +176,3 @@ func detectSecretsPatterns(path string) bool {
 
 	return err != nil && err.Error() == "found"
 }
-

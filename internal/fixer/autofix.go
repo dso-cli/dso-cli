@@ -58,8 +58,8 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 		fmt.Printf("   Line: %s\n", strings.TrimSpace(lines[finding.Line-1]))
 		fmt.Print("   Remove this line? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
-		if strings.ToLower(response) != "y" && strings.ToLower(response) != "yes" {
+		_, _ = fmt.Scanln(&response)
+		if !strings.EqualFold(response, "y") && !strings.EqualFold(response, "yes") {
 			return "", nil
 		}
 	}
@@ -69,7 +69,7 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 	newContent := strings.Join(newLines, "\n")
 
 	// Write file
-	if err := os.WriteFile(filePath, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte(newContent), 0600); err != nil {
 		return "", err
 	}
 
@@ -155,4 +155,3 @@ func fixJavaDependency(finding scanner.Finding, projectPath string, auto bool) (
 
 	return "", fmt.Errorf("automatic update not available for this project")
 }
-

@@ -97,4 +97,3 @@ func init() {
 	auditCmd.Flags().StringVarP(&auditFormat, "format", "f", "text", "Output format (text, json)")
 	auditCmd.Flags().BoolVarP(&auditVerbose, "verbose", "v", false, "Verbose mode")
 }
-

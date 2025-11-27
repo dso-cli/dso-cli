@@ -182,4 +182,3 @@ dso-audit:
 
 	return workflow, filename, nil
 }
-

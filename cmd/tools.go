@@ -53,7 +53,7 @@ Useful to verify that all scanners are available.`,
 				fmt.Println("📥 Interactive installation of missing tools...")
 				for _, tool := range missing {
 					if err := tools.InstallTool(tool, true); err != nil {
-						if !strings.Contains(err.Error(), "cancelled") {
+						if !strings.Contains(err.Error(), "canceled") {
 							fmt.Printf("⚠️  Failed to install %s: %v\n", tool.Name, err)
 						}
 					} else {

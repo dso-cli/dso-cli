@@ -70,7 +70,7 @@ var (
 // DetectTools detects which tools are installed
 func DetectTools() []Tool {
 	detected := make([]Tool, 0, len(Tools))
-	
+
 	for _, tool := range Tools {
 		tool.Installed = isInstalled(tool.Command)
 		if tool.Installed {
@@ -78,7 +78,7 @@ func DetectTools() []Tool {
 		}
 		detected = append(detected, tool)
 	}
-	
+
 	return detected
 }
 
@@ -95,7 +95,7 @@ func getVersion(command string) string {
 	if err != nil {
 		return "unknown"
 	}
-	
+
 	version := strings.TrimSpace(string(output))
 	// Extract just the version number if possible
 	lines := strings.Split(version, "\n")
@@ -110,7 +110,7 @@ func CheckTools(requiredOnly bool) ([]Tool, []Tool) {
 	allTools := DetectTools()
 	installed := []Tool{}
 	missing := []Tool{}
-	
+
 	for _, tool := range allTools {
 		if tool.Installed {
 			installed = append(installed, tool)
@@ -120,17 +120,17 @@ func CheckTools(requiredOnly bool) ([]Tool, []Tool) {
 			}
 		}
 	}
-	
+
 	return installed, missing
 }
 
 // PrintToolsStatus displays tools status
 func PrintToolsStatus() {
 	installed, missing := CheckTools(false)
-	
+
 	fmt.Println("🔧 Scan tools detected:")
 	fmt.Println()
-	
+
 	if len(installed) > 0 {
 		fmt.Println("✅ Installed:")
 		for _, tool := range installed {
@@ -142,7 +142,7 @@ func PrintToolsStatus() {
 		}
 		fmt.Println()
 	}
-	
+
 	if len(missing) > 0 {
 		fmt.Println("⚠️  Missing (optional):")
 		for _, tool := range missing {
@@ -224,15 +224,15 @@ func InstallTool(tool Tool, interactive bool) error {
 		fmt.Printf("💡 To install %s: %s\n", tool.Name, tool.InstallCmd)
 		return fmt.Errorf("non-interactive installation")
 	}
-	
+
 	fmt.Printf("\n❓ Install %s now? (y/N): ", tool.Name)
 	var response string
 	fmt.Scanln(&response)
-	
+
 	if strings.ToLower(response) != "y" && strings.ToLower(response) != "yes" {
-		return fmt.Errorf("installation cancelled")
+		return fmt.Errorf("installation canceled")
 	}
-	
+
 	// Try to execute installation command
 	if strings.HasPrefix(tool.InstallCmd, "brew") {
 		parts := strings.Fields(tool.InstallCmd)
@@ -241,7 +241,7 @@ func InstallTool(tool Tool, interactive bool) error {
 		cmd.Stderr = os.Stderr
 		return cmd.Run()
 	}
-	
+
 	// For other methods, display instructions
 	fmt.Printf("📝 Run this command:\n   %s\n", tool.InstallCmd)
 	return fmt.Errorf("manual installation required")
@@ -252,25 +252,24 @@ func isDebianBased() bool {
 	if runtime.GOOS != "linux" {
 		return false
 	}
-	
+
 	// Check for common Debian-based distribution indicators
 	debianFiles := []string{
 		"/etc/debian_version",
 		"/etc/os-release",
 	}
-	
+
 	for _, file := range debianFiles {
 		if data, err := os.ReadFile(file); err == nil {
 			content := strings.ToLower(string(data))
-			if strings.Contains(content, "debian") || 
-			   strings.Contains(content, "ubuntu") ||
-			   strings.Contains(content, "mint") ||
-			   strings.Contains(content, "elementary") {
+			if strings.Contains(content, "debian") ||
+				strings.Contains(content, "ubuntu") ||
+				strings.Contains(content, "mint") ||
+				strings.Contains(content, "elementary") {
 				return true
 			}
 		}
 	}
-	
+
 	return false
 }
-

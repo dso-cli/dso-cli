@@ -28,7 +28,7 @@ type OllamaClient struct {
 func NewOllamaClient() *OllamaClient {
 	// Try to get model from config file first, then environment, then default
 	model := ""
-	
+
 	// Check config file
 	homeDir, err := os.UserHomeDir()
 	if err == nil {
@@ -37,20 +37,20 @@ func NewOllamaClient() *OllamaClient {
 			lines := strings.Split(string(data), "\n")
 			for _, line := range lines {
 				line = strings.TrimSpace(line)
-			if strings.HasPrefix(line, "DSO_MODEL=") {
-				model = strings.TrimPrefix(line, "DSO_MODEL=")
-				model = strings.Trim(model, `"'`)
-				break
-			}
+				if strings.HasPrefix(line, "DSO_MODEL=") {
+					model = strings.TrimPrefix(line, "DSO_MODEL=")
+					model = strings.Trim(model, `"'`)
+					break
+				}
 			}
 		}
 	}
-	
+
 	// Fallback to environment variable
 	if model == "" {
 		model = os.Getenv("DSO_MODEL")
 	}
-	
+
 	// Fallback to default
 	if model == "" {
 		model = defaultModel
@@ -67,7 +67,7 @@ func NewOllamaClient() *OllamaClient {
 		baseURL: baseURL,
 		model:   model,
 		client: &http.Client{
-			Timeout: 300 * time.Second, // 5 minutes for long analyses
+			Timeout: 300 * time.Second, // 5 minutes for long analyzes
 		},
 	}
 }
@@ -91,7 +91,7 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 
 	// Build messages for the chat API
 	messages := []map[string]interface{}{}
-	
+
 	// Add context if provided
 	if context != nil {
 		for _, msg := range context {
@@ -101,7 +101,7 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 			})
 		}
 	}
-	
+
 	// Add the current prompt
 	messages = append(messages, map[string]interface{}{
 		"role":    "user",
@@ -322,7 +322,10 @@ func (c *OllamaClient) pullModel() error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("model download error (status %d): failed to read body", resp.StatusCode)
+		}
 		return fmt.Errorf("model download error (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -331,10 +334,10 @@ func (c *OllamaClient) pullModel() error {
 	lastStatus := ""
 	for {
 		var progress struct {
-			Status    string  `json:"status"`
-			Completed int64   `json:"completed,omitempty"`
-			Total     int64   `json:"total,omitempty"`
-			Done      bool    `json:"done"`
+			Status    string `json:"status"`
+			Completed int64  `json:"completed,omitempty"`
+			Total     int64  `json:"total,omitempty"`
+			Done      bool   `json:"done"`
 		}
 		if err := decoder.Decode(&progress); err != nil {
 			if err == io.EOF {
@@ -371,9 +374,9 @@ func (c *OllamaClient) ListModels() ([]string, error) {
 	}
 	defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("error retrieving models")
-		}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error retrieving models")
+	}
 
 	var modelsResp struct {
 		Models []struct {
@@ -407,4 +410,3 @@ func (c *OllamaClient) GetModel() string {
 func (c *OllamaClient) GetBaseURL() string {
 	return c.baseURL
 }
-

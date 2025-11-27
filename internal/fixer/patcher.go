@@ -81,7 +81,7 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 func ApplyPatch(patch string, projectPath string) error {
 	// Create temporary file for patch
 	tmpFile := filepath.Join(projectPath, ".dso-patch.tmp")
-	if err := os.WriteFile(tmpFile, []byte(patch), 0644); err != nil {
+	if err := os.WriteFile(tmpFile, []byte(patch), 0600); err != nil {
 		return err
 	}
 	defer os.Remove(tmpFile)
@@ -95,4 +95,3 @@ func ApplyPatch(patch string, projectPath string) error {
 
 	return nil
 }
-

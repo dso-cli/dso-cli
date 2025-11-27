@@ -8,11 +8,11 @@ import (
 
 // ProgressTracker tracks scan progress
 type ProgressTracker struct {
-	totalSteps   int
-	currentStep  int
-	stepNames    []string
-	startTime    time.Time
-	interactive  bool
+	totalSteps  int
+	currentStep int
+	stepNames   []string
+	startTime   time.Time
+	interactive bool
 }
 
 // NewProgressTracker creates a new progress tracker
@@ -72,4 +72,3 @@ func (pt *ProgressTracker) PrintSummary(results *ScanResults) {
 	fmt.Printf("   • Low: %d\n", results.Summary.Low)
 	fmt.Println()
 }
-

@@ -200,4 +200,3 @@ func printJSON(analysis *llm.AnalysisResult, results *scanner.ScanResults) {
 
 	fmt.Println(string(jsonData))
 }
-

@@ -16,13 +16,13 @@ const (
 // Finding représente une vulnérabilité ou un problème de sécurité
 type Finding struct {
 	ID          string    `json:"id"`
-	Type        string    `json:"type"`        // SAST, SECRET, DEPENDENCY, IAC
+	Type        string    `json:"type"` // SAST, SECRET, DEPENDENCY, IAC
 	Severity    Severity  `json:"severity"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	File        string    `json:"file"`
 	Line        int       `json:"line,omitempty"`
-	Column     int       `json:"column,omitempty"`
+	Column      int       `json:"column,omitempty"`
 	RuleID      string    `json:"rule_id,omitempty"`
 	Tool        string    `json:"tool"` // trivy, grype, gitleaks, tfsec, etc.
 	Fixable     bool      `json:"fixable"`
@@ -77,4 +77,3 @@ func (sr *ScanResults) CalculateSummary() {
 		}
 	}
 }
-

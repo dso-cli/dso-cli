@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/dso-cli/dso-cli/internal/constants"
 )
 
 // RunFullScan runs all available scanners
@@ -64,34 +66,34 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 		}
 	}
 
-		// Execute scans
-		for _, step := range steps {
-			if !step.enabled {
-				continue
-			}
-			tracker.StartStep(stepIndex-1, step.name)
-			if findings, err := step.scan(); err == nil {
-				results.Findings = append(results.Findings, findings...)
-				tracker.CompleteStep(stepIndex-1, len(findings))
-			} else {
-				if interactive {
-					fmt.Printf("\r[%d/%d] ⚠️  %s (error: %v)\n", stepIndex, tracker.totalSteps, step.name, err)
-				}
-			}
-			stepIndex++
+	// Execute scans
+	for _, step := range steps {
+		if !step.enabled {
+			continue
 		}
+		tracker.StartStep(stepIndex-1, step.name)
+		if findings, err := step.scan(); err == nil {
+			results.Findings = append(results.Findings, findings...)
+			tracker.CompleteStep(stepIndex-1, len(findings))
+		} else {
+			if interactive {
+				fmt.Printf("\r[%d/%d] ⚠️  %s (error: %v)\n", stepIndex, tracker.totalSteps, step.name, err)
+			}
+		}
+		stepIndex++
+	}
 
 	results.CalculateSummary()
 	tracker.Finish(results.Summary.Total)
-	
+
 	return results, nil
 }
 
 // detectFileType checks if a file type exists in the directory
 func detectFileType(path string, patterns ...string) bool {
 	for _, pattern := range patterns {
-		matches, _ := filepath.Glob(filepath.Join(path, pattern))
-		if len(matches) > 0 {
+		matches, err := filepath.Glob(filepath.Join(path, pattern))
+		if err == nil && len(matches) > 0 {
 			return true
 		}
 		// Recursive search for certain patterns
@@ -100,8 +102,8 @@ func detectFileType(path string, patterns ...string) bool {
 				if err != nil {
 					return nil
 				}
-				matched, _ := filepath.Match(pattern, info.Name())
-				if matched {
+				matched, matchErr := filepath.Match(pattern, info.Name())
+				if matchErr == nil && matched {
 					return fmt.Errorf("found") // Stop the search
 				}
 				return nil
@@ -125,10 +127,10 @@ func scanSecrets(path string) ([]Finding, error) {
 		if err != nil {
 			// gitleaks returns an error code if secrets are found
 			var gitleaksResults []struct {
-				RuleID    string `json:"RuleID"`
-				File      string `json:"File"`
-				Line      string `json:"StartLine"`
-				Secret  string `json:"Secret"`
+				RuleID string `json:"RuleID"`
+				File   string `json:"File"`
+				Line   string `json:"StartLine"`
+				Secret string `json:"Secret"`
 			}
 			if json.Unmarshal(output, &gitleaksResults) == nil {
 				for _, r := range gitleaksResults {
@@ -171,13 +173,13 @@ func scanDependencies(path string) ([]Finding, error) {
 	if _, err := exec.LookPath("grype"); err == nil {
 		cmd := exec.Command("grype", path, "-o", "json")
 		output, err := cmd.Output()
-		if err == nil {
+		if err == nil && len(output) > 0 {
 			var grypeResults struct {
 				Matches []struct {
 					Vulnerability struct {
-						ID          string  `json:"id"`
-						Severity    string  `json:"severity"`
-						Description string  `json:"description"`
+						ID          string `json:"id"`
+						Severity    string `json:"severity"`
+						Description string `json:"description"`
 						CVSS        []struct {
 							Metrics struct {
 								BaseScore float64 `json:"baseScore"`
@@ -235,8 +237,8 @@ func scanTerraform(path string) ([]Finding, error) {
 					Severity    string `json:"severity"`
 					Description string `json:"description"`
 					Location    struct {
-						Filename string `json:"filename"`
-						StartLine int   `json:"start_line"`
+						Filename  string `json:"filename"`
+						StartLine int    `json:"start_line"`
 					} `json:"location"`
 				} `json:"results"`
 			}
@@ -291,10 +293,10 @@ func scanWithTrivy(path string, scanType string, extraArgs ...string) ([]Finding
 		Results []struct {
 			Target          string `json:"Target"`
 			Vulnerabilities []struct {
-				VulnerabilityID string  `json:"VulnerabilityID"`
-				Severity        string  `json:"Severity"`
-				Title           string  `json:"Title"`
-				Description     string  `json:"Description"`
+				VulnerabilityID string `json:"VulnerabilityID"`
+				Severity        string `json:"Severity"`
+				Title           string `json:"Title"`
+				Description     string `json:"Description"`
 				CVSS            map[string]struct {
 					V3Score float64 `json:"v3Score"`
 				} `json:"CVSS"`
@@ -346,4 +348,3 @@ func mapSeverity(s string) Severity {
 		return SeverityInfo
 	}
 }
-

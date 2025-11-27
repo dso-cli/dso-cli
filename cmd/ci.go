@@ -57,14 +57,14 @@ Supports GitHub Actions and GitLab CI.`,
 		// Create directory if needed
 		dir := filepath.Dir(filename)
 		if dir != "." && dir != "" {
-			if err := os.MkdirAll(dir, 0755); err != nil {
+			if err := os.MkdirAll(dir, 0o755); err != nil {
 				fmt.Fprintf(os.Stderr, "❌ Error creating directory: %v\n", err)
 				os.Exit(1)
 			}
 		}
 
 		// Write file
-		if err := os.WriteFile(filename, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(filename, []byte(content), 0600); err != nil {
 			fmt.Fprintf(os.Stderr, "❌ Error writing file: %v\n", err)
 			os.Exit(1)
 		}
