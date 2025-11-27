@@ -9,30 +9,42 @@ DSO supports multiple platforms: **macOS**, **Linux** (Ubuntu, Debian, and other
 
 ## Quick Install
 
-### macOS / Linux
+### One-Command Installation (Recommended)
 
+**macOS / Linux:**
 ```bash
-git clone https://github.com/dso-cli/dso-cli.git
-cd dso
-chmod +x install.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/dso-cli/dso-cli/main/install | bash
 ```
 
-### Windows
+Or if you've cloned the repository:
+```bash
+git clone https://github.com/dso-cli/dso-cli.git
+cd dso-cli
+chmod +x install
+./install
+```
 
-**PowerShell:**
+**Windows (PowerShell):**
 ```powershell
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 .\install.ps1
 ```
 
-**Batch:**
+**Windows (Batch):**
 ```cmd
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 install.bat
 ```
+
+The installation script automatically:
+- ✅ Checks/Installs Go (if missing)
+- ✅ Builds DSO binary
+- ✅ Checks/Installs Ollama
+- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
+- ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
+- ✅ Updates to latest version if already installed
 
 ## Manual Installation
 
@@ -93,13 +105,17 @@ scoop install ollama
 #### Download Model
 
 ```bash
-# Recommended model (4.7 GB)
-ollama pull llama3.1:8b
+# Default model (4.7 GB) - automatically installed by install script
+ollama pull qwen2.5:7b
 
-# Or a lighter model
-ollama pull phi3        # ~2.3 GB
-ollama pull mistral:7b  # ~4.1 GB
+# Other recommended models
+ollama pull llama3.1:8b  # ~4.7 GB - Alternative high quality
+ollama pull phi3         # ~2.3 GB - Lightweight, fast
+ollama pull mistral:7b   # ~4.1 GB - Good balance
+ollama pull gemma:7b     # ~5.2 GB - Google's model
 ```
+
+**Note:** The installation script automatically installs `qwen2.5:7b` by default if no models are present.
 
 ### 3. Install Scanners (Optional but Recommended)
 
@@ -246,10 +262,12 @@ install.bat
 ```
 
 The scripts will:
-- ✅ Check that Go is installed
+- ✅ Check/Install Go (if missing)
 - ✅ Build DSO
-- ✅ Check Ollama
-- ✅ Download model if needed
+- ✅ Check/Install Ollama (if missing)
+- ✅ Download **qwen2.5:7b** model automatically (if no models exist)
+- ✅ Update to latest version if already installed
+- ✅ Remove old versions before reinstalling
 
 ## Troubleshooting
 
@@ -289,8 +307,21 @@ dso tools --install
 # List available models
 ollama list
 
-# Download missing model
+# Download default model
+ollama pull qwen2.5:7b
+
+# Or download other models
 ollama pull llama3.1:8b
+ollama pull phi3
+```
+
+**Note:** The default model is saved in `~/.dso/config`. You can change it:
+```bash
+# View current config
+cat ~/.dso/config
+
+# Change model
+echo "DSO_MODEL=llama3.1:8b" > ~/.dso/config
 ```
 
 ### Windows-specific Issues

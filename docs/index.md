@@ -40,26 +40,48 @@ features:
 
 ## Quick Installation
 
+### One-Command Installation (Recommended)
+
 **macOS / Linux:**
 ```bash
-git clone https://github.com/dso-cli/dso-cli.git
-cd dso
-chmod +x install.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/dso-cli/dso-cli/main/install | bash
 ```
 
-**Windows:**
+Or if you've cloned the repository:
+```bash
+git clone https://github.com/dso-cli/dso-cli.git
+cd dso-cli
+chmod +x install
+./install
+```
+
+**Windows (PowerShell):**
 ```powershell
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 .\install.ps1
 ```
 
-**Manual:**
+**Windows (Batch):**
+```cmd
+git clone https://github.com/dso-cli/dso-cli.git
+cd dso-cli
+install.bat
+```
+
+The installation script automatically:
+- ✅ Checks/Installs Go (if missing)
+- ✅ Builds DSO binary
+- ✅ Checks/Installs Ollama
+- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
+- ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
+
+### Manual Installation
+
 ```bash
 # Clone and build
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 go build -o dso .        # Linux/macOS
 go build -o dso.exe .   # Windows
 
@@ -67,7 +89,7 @@ go build -o dso.exe .   # Windows
 # macOS: brew install ollama
 # Linux: curl -fsSL https://ollama.ai/install.sh | sh
 # Windows: Download from ollama.ai
-ollama pull llama3.1:8b
+ollama pull qwen2.5:7b  # Default model
 
 # Run your first audit
 ./dso audit .           # Linux/macOS

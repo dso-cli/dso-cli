@@ -58,9 +58,20 @@ Ollama runs as a service automatically after installation.
 
 ## Downloading Models
 
-DSO works with various models. Recommended:
+DSO works with various models. The installation script automatically installs **qwen2.5:7b** by default.
 
-### Recommended: llama3.1:8b
+### Default: qwen2.5:7b
+
+```bash
+ollama pull qwen2.5:7b
+```
+
+- **Size**: ~4.7 GB
+- **Speed**: Fast
+- **Quality**: Excellent for security analysis
+- **Default**: Automatically installed if no models exist
+
+### Alternative: llama3.1:8b
 
 ```bash
 ollama pull llama3.1:8b
@@ -80,21 +91,24 @@ ollama pull phi3
 - **Speed**: Very fast
 - **Quality**: Good for basic analysis
 
-### Alternative: mistral:7b
+### Other Options
 
 ```bash
-ollama pull mistral:7b
+ollama pull mistral:7b    # ~4.1 GB - Good balance
+ollama pull gemma:7b      # ~5.2 GB - Google's model
+ollama pull llama3.1:70b  # ~40 GB - Best quality (requires more RAM)
 ```
-
-- **Size**: ~4.1 GB
-- **Speed**: Fast
-- **Quality**: Excellent
 
 ## Configuration
 
 ### Model Selection
 
-Set the model via environment variable:
+DSO uses the following priority order:
+1. Environment variable `DSO_MODEL`
+2. Configuration file `~/.dso/config`
+3. Default: `qwen2.5:7b`
+
+#### Via Environment Variable
 
 ```bash
 # macOS / Linux
@@ -105,6 +119,24 @@ dso audit .
 $env:DSO_MODEL="phi3"
 dso audit .
 ```
+
+#### Via Configuration File
+
+The installation script automatically saves the default model to `~/.dso/config`:
+
+```bash
+# View current config
+cat ~/.dso/config
+# Output: DSO_MODEL=qwen2.5:7b
+
+# Change model
+echo "DSO_MODEL=llama3.1:8b" > ~/.dso/config
+dso audit .
+```
+
+#### Interactive Model Selection
+
+During installation, you can select models interactively. The selected model is saved to `~/.dso/config`.
 
 ### Remote Ollama
 
@@ -121,15 +153,23 @@ Add to your shell profile:
 
 **macOS / Linux** (`~/.zshrc` or `~/.bashrc`):
 ```bash
-export DSO_MODEL=llama3.1:8b
+export DSO_MODEL=qwen2.5:7b  # Default model
 export OLLAMA_HOST=http://localhost:11434
 ```
 
 **Windows** (PowerShell profile):
 ```powershell
-$env:DSO_MODEL="llama3.1:8b"
+$env:DSO_MODEL="qwen2.5:7b"
 $env:OLLAMA_HOST="http://localhost:11434"
 ```
+
+**Or use configuration file** (recommended):
+```bash
+# ~/.dso/config
+DSO_MODEL=qwen2.5:7b
+```
+
+The configuration file is automatically created during installation.
 
 ## Verification
 
@@ -167,15 +207,18 @@ When you run `dso why`, DSO:
 ### Model Selection
 
 - **Development**: Use `phi3` for faster feedback
-- **Production**: Use `llama3.1:8b` for better analysis
-- **Large Projects**: Use `mistral:7b` for comprehensive analysis
+- **Production**: Use `qwen2.5:7b` (default) for excellent analysis
+- **Large Projects**: Use `llama3.1:70b` for best quality (requires ~40 GB RAM)
 
 ### Resource Usage
 
 Models use RAM:
 - `phi3`: ~2.3 GB RAM
+- `qwen2.5:7b`: ~4.7 GB RAM (default)
 - `llama3.1:8b`: ~4.7 GB RAM
 - `mistral:7b`: ~4.1 GB RAM
+- `gemma:7b`: ~5.2 GB RAM
+- `llama3.1:70b`: ~40 GB RAM
 
 Ensure you have enough RAM available.
 
@@ -260,7 +303,7 @@ For CI/CD, you can:
 2. **Download Model**:
    ```yaml
    - name: Pull model
-     run: ollama pull llama3.1:8b
+     run: ollama pull qwen2.5:7b
    ```
 
 3. **Run DSO**:
