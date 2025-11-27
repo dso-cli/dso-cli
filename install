@@ -424,7 +424,73 @@ build_dso() {
     fi
 }
 
-# Function to install DSO globally
+# Function to install DSO globally (automatic)
+install_globally_auto() {
+    case "$OS" in
+        darwin|linux)
+            if [ -f "dso" ]; then
+                echo -e "${YELLOW}📦 Installing DSO globally...${NC}"
+                
+                # Remove old version if exists
+                if [ -f "/usr/local/bin/dso" ]; then
+                    echo -e "${BLUE}Removing old global installation...${NC}"
+                    sudo rm -f /usr/local/bin/dso 2>/dev/null || true
+                fi
+                if [ -f "$HOME/go/bin/dso" ]; then
+                    rm -f "$HOME/go/bin/dso" 2>/dev/null || true
+                fi
+                if [ -f "$HOME/.local/bin/dso" ]; then
+                    rm -f "$HOME/.local/bin/dso" 2>/dev/null || true
+                fi
+                
+                # Try to install in /usr/local/bin first (requires sudo)
+                if sudo cp dso /usr/local/bin/ 2>/dev/null; then
+                    sudo chmod +x /usr/local/bin/dso
+                    echo -e "${GREEN}✅ DSO installed globally in /usr/local/bin${NC}"
+                    echo -e "${BLUE}   You can now use 'dso' from anywhere${NC}"
+                # Fallback to user directories (no sudo needed)
+                elif [ -d "$HOME/go/bin" ]; then
+                    cp dso "$HOME/go/bin/"
+                    chmod +x "$HOME/go/bin/dso"
+                    echo -e "${GREEN}✅ DSO installed in $HOME/go/bin${NC}"
+                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/go/bin${NC}"
+                    echo -e "${BLUE}   Or use: dso --version${NC}"
+                elif [ -d "$HOME/.local/bin" ]; then
+                    cp dso "$HOME/.local/bin/"
+                    chmod +x "$HOME/.local/bin/dso"
+                    echo -e "${GREEN}✅ DSO installed in $HOME/.local/bin${NC}"
+                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin${NC}"
+                    echo -e "${BLUE}   Or use: dso --version${NC}"
+                else
+                    # Create ~/.local/bin if it doesn't exist
+                    mkdir -p "$HOME/.local/bin"
+                    cp dso "$HOME/.local/bin/"
+                    chmod +x "$HOME/.local/bin/dso"
+                    echo -e "${GREEN}✅ DSO installed in $HOME/.local/bin${NC}"
+                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin${NC}"
+                    echo -e "${BLUE}   Or add to ~/.bashrc or ~/.zshrc:${NC}"
+                    echo -e "${BLUE}   echo 'export PATH=\$PATH:\$HOME/.local/bin' >> ~/.bashrc${NC}"
+                fi
+            fi
+            ;;
+        windows)
+            echo -e "${YELLOW}📦 Installing DSO globally...${NC}"
+            if [ -f "dso.exe" ]; then
+                # Try to add to user PATH
+                USER_BIN="$HOME/go/bin"
+                if [ ! -d "$USER_BIN" ]; then
+                    mkdir -p "$USER_BIN"
+                fi
+                cp dso.exe "$USER_BIN/"
+                echo -e "${GREEN}✅ DSO installed in $USER_BIN${NC}"
+                echo -e "${BLUE}   Add to PATH: $USER_BIN${NC}"
+                echo -e "${BLUE}   Or use: $USER_BIN\\dso.exe --version${NC}"
+            fi
+            ;;
+    esac
+}
+
+# Function to install DSO globally (interactive, legacy)
 install_globally() {
     INSTALL_GLOBAL=false
     read -p "Install DSO globally? (y/N): " -n 1 -r
@@ -438,32 +504,7 @@ install_globally() {
         return
     fi
     
-    case "$OS" in
-        darwin|linux)
-            if [ -f "dso" ]; then
-                # Remove old version if exists
-                if [ -f "/usr/local/bin/dso" ]; then
-                    echo -e "${BLUE}Removing old global installation...${NC}"
-                    sudo rm -f /usr/local/bin/dso 2>/dev/null || true
-                fi
-                if [ -f "$HOME/go/bin/dso" ]; then
-                    rm -f "$HOME/go/bin/dso" 2>/dev/null || true
-                fi
-                if [ -f "$HOME/.local/bin/dso" ]; then
-                    rm -f "$HOME/.local/bin/dso" 2>/dev/null || true
-                fi
-                
-                # Install new version
-                sudo cp dso /usr/local/bin/ 2>/dev/null || cp dso "$HOME/go/bin/" 2>/dev/null || cp dso "$HOME/.local/bin/" 2>/dev/null
-                sudo chmod +x /usr/local/bin/dso 2>/dev/null || chmod +x "$HOME/go/bin/dso" 2>/dev/null || chmod +x "$HOME/.local/bin/dso" 2>/dev/null
-                echo -e "${GREEN}✅ DSO installed globally${NC}"
-                echo -e "${BLUE}   Run: dso --version${NC}"
-            fi
-            ;;
-        windows)
-            echo -e "${YELLOW}⚠️  Please add dso.exe to your PATH manually${NC}"
-            ;;
-    esac
+    install_globally_auto
 }
 
 # Main installation flow
@@ -572,12 +613,12 @@ main() {
     fi
     echo ""
     
-    # Step 5: Install security tools (optional)
-    install_security_tools "$@"
+    # Step 5: Install DSO globally (automatic)
+    install_globally_auto
     echo ""
     
-    # Step 6: Global installation (optional)
-    install_globally
+    # Step 6: Install security tools (optional)
+    install_security_tools "$@"
     echo ""
     
     # Final message

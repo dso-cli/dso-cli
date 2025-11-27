@@ -100,6 +100,51 @@ fi
 echo "✅ Build completed"
 echo ""
 
+# Install DSO globally automatically
+if [ -f "dso" ]; then
+    echo "📦 Installing DSO globally..."
+    
+    # Remove old version if exists
+    if [ -f "/usr/local/bin/dso" ]; then
+        echo "Removing old global installation..."
+        sudo rm -f /usr/local/bin/dso 2>/dev/null || true
+    fi
+    if [ -f "$HOME/go/bin/dso" ]; then
+        rm -f "$HOME/go/bin/dso" 2>/dev/null || true
+    fi
+    if [ -f "$HOME/.local/bin/dso" ]; then
+        rm -f "$HOME/.local/bin/dso" 2>/dev/null || true
+    fi
+    
+    # Try to install in /usr/local/bin first (requires sudo)
+    if sudo cp dso /usr/local/bin/ 2>/dev/null; then
+        sudo chmod +x /usr/local/bin/dso
+        echo "✅ DSO installed globally in /usr/local/bin"
+        echo "   You can now use 'dso' from anywhere"
+    # Fallback to user directories (no sudo needed)
+    elif [ -d "$HOME/go/bin" ]; then
+        cp dso "$HOME/go/bin/"
+        chmod +x "$HOME/go/bin/dso"
+        echo "✅ DSO installed in $HOME/go/bin"
+        echo "   Add to PATH: export PATH=\$PATH:\$HOME/go/bin"
+    elif [ -d "$HOME/.local/bin" ]; then
+        cp dso "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/dso"
+        echo "✅ DSO installed in $HOME/.local/bin"
+        echo "   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin"
+    else
+        # Create ~/.local/bin if it doesn't exist
+        mkdir -p "$HOME/.local/bin"
+        cp dso "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/dso"
+        echo "✅ DSO installed in $HOME/.local/bin"
+        echo "   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin"
+        echo "   Or add to ~/.bashrc or ~/.zshrc:"
+        echo "   echo 'export PATH=\$PATH:\$HOME/.local/bin' >> ~/.bashrc"
+    fi
+fi
+echo ""
+
 # Function to install Ollama
 install_ollama() {
     echo "📦 Installing Ollama..."
