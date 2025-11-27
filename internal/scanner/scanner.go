@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/dso-cli/dso-cli/internal/constants"
 )
 
 // RunFullScan runs all available scanners
