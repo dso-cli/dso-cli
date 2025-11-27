@@ -30,6 +30,8 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 		if err := cmd.Run(); err != nil {
 			return "", fmt.Errorf("cannot create/checkout branch: %v", err)
 		}
+	} else if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("cannot create/checkout branch: %v", err)
 	}
 
 	// Add changes
@@ -47,8 +49,9 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 	cmd.Dir = projectPath
 	if err := cmd.Run(); err != nil {
 		// Maybe there are no changes
-		status, _ := exec.Command("git", "status", "--porcelain").Output()
-		if len(status) == 0 {
+		statusCmd := exec.Command("git", "status", "--porcelain")
+		status, errStatus := statusCmd.Output()
+		if errStatus == nil && len(status) == 0 {
 			return "", fmt.Errorf("no changes to commit")
 		}
 		return "", fmt.Errorf("cannot commit: %v", err)

@@ -33,7 +33,7 @@ type Fix struct {
 	Priority    int    `json:"priority"`
 }
 
-// Analyze analyzes scan results with AI
+// Analyze analyzes scan results with AI and returns the analysis result.
 func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult, error) {
 	client := NewOllamaClient()
 
@@ -42,7 +42,7 @@ func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult,
 
 	// Prepare data for AI
 	scanData := formatScanResultsForAI(results, projectPath)
-	fullPrompt := fmt.Sprintf("%s\n\n%s", prompt, scanData)
+	fullPrompt := prompt + "\n\n" + scanData
 
 	// Call AI
 	response, err := client.Generate(fullPrompt)
@@ -134,8 +134,8 @@ Respond in JSON with this structure:
 // formatScanResultsForAI formats results for AI
 func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("Project: %s\n", projectPath))
-	sb.WriteString(fmt.Sprintf("Total findings: %d\n", results.Summary.Total))
+	sb.WriteString("Project: " + projectPath + "\n")
+	sb.WriteString("Total findings: " + fmt.Sprintf("%d", results.Summary.Total) + "\n")
 	sb.WriteString(fmt.Sprintf("Critical: %d, High: %d, Medium: %d, Low: %d\n\n",
 		results.Summary.Critical, results.Summary.High, results.Summary.Medium, results.Summary.Low))
 
@@ -191,7 +191,7 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 	return sb.String()
 }
 
-// parseAIResponse parses the AI response
+// parseAIResponse parses the AI response and returns the analysis result.
 func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisResult, error) {
 	// Try to parse as JSON first
 	response = strings.TrimSpace(response)
@@ -211,11 +211,12 @@ func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisRe
 	return createFallbackAnalysis(results), nil
 }
 
-// createFallbackAnalysis creates a basic analysis if AI doesn't respond in JSON
+// createFallbackAnalysis creates a basic analysis if AI doesn't respond in JSON and returns the result.
 func createFallbackAnalysis(results *scanner.ScanResults) *AnalysisResult {
+	summary := fmt.Sprintf("Scan completed: %d findings total (%d critical, %d high).",
+		results.Summary.Total, results.Summary.Critical, results.Summary.High)
 	analysis := &AnalysisResult{
-		Summary: fmt.Sprintf("Scan completed: %d findings total (%d critical, %d high).",
-			results.Summary.Total, results.Summary.Critical, results.Summary.High),
+		Summary:  summary,
 		TopFixes: []Fix{},
 	}
 

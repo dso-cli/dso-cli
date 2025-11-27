@@ -229,7 +229,9 @@ func InstallTool(tool Tool, interactive bool) error {
 
 	fmt.Printf("\n❓ Install %s now? (y/N): ", tool.Name)
 	var response string
-	_, _ = fmt.Scanln(&response)
+	if _, err := fmt.Scanln(&response); err != nil {
+		return fmt.Errorf("cannot read input: %w", err)
+	}
 
 	if !strings.EqualFold(response, "y") && !strings.EqualFold(response, "yes") {
 		return fmt.Errorf("installation canceled")

@@ -58,7 +58,9 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 		fmt.Printf("   Line: %s\n", strings.TrimSpace(lines[finding.Line-1]))
 		fmt.Print("   Remove this line? (y/N): ")
 		var response string
-		_, _ = fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			return "", fmt.Errorf("cannot read input: %w", err)
+		}
 		if !strings.EqualFold(response, "y") && !strings.EqualFold(response, "yes") {
 			return "", nil
 		}
