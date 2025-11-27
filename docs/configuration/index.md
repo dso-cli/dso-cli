@@ -15,9 +15,12 @@ export DSO_MODEL=mistral:7b
 ```
 
 Supported models:
-- `llama3.1:8b` (default, ~4.7 GB)
+- `qwen2.5:7b` (default, ~4.7 GB) - Automatically installed
+- `llama3.1:8b` (~4.7 GB, alternative)
 - `phi3` (~2.3 GB, lighter)
 - `mistral:7b` (~4.1 GB)
+- `gemma:7b` (~5.2 GB)
+- `llama3.1:70b` (~40 GB, best quality)
 
 ### `OLLAMA_HOST`
 
@@ -29,12 +32,31 @@ export OLLAMA_HOST=http://192.168.1.100:11434
 
 ## Configuration Files
 
-### `.dso/config.yaml` (Coming Soon)
+### `~/.dso/config`
 
-Advanced configuration in a file:
+The installation script automatically creates this file with your selected model:
+
+```bash
+# View current config
+cat ~/.dso/config
+# Output: DSO_MODEL=qwen2.5:7b
+
+# Change model
+echo "DSO_MODEL=llama3.1:8b" > ~/.dso/config
+```
+
+**Priority order:**
+1. Environment variable `DSO_MODEL`
+2. Configuration file `~/.dso/config`
+3. Default: `qwen2.5:7b`
+
+### Advanced Configuration (Coming Soon)
+
+Future support for YAML configuration:
 
 ```yaml
-model: llama3.1:8b
+# ~/.dso/config.yaml (planned)
+model: qwen2.5:7b
 ollama_host: http://localhost:11434
 scanners:
   trivy: true
@@ -81,13 +103,24 @@ dso watch --quiet .
 
 ### Change Model
 
+**Via environment variable (temporary):**
 ```bash
-# Temporary
 export DSO_MODEL=phi3
 dso audit .
+```
 
-# Permanent (add to ~/.zshrc or ~/.bashrc)
+**Via configuration file (permanent, recommended):**
+```bash
+# The installation script creates this automatically
+echo "DSO_MODEL=phi3" > ~/.dso/config
+dso audit .
+```
+
+**Via shell profile (permanent):**
+```bash
+# Add to ~/.zshrc or ~/.bashrc
 echo 'export DSO_MODEL=phi3' >> ~/.zshrc
+source ~/.zshrc
 ```
 
 ### Ollama on Remote Server
