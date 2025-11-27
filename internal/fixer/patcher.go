@@ -24,14 +24,12 @@ func CreatePullRequest(projectPath, branch, title, message string, fixes []strin
 	cmd := exec.Command("git", "checkout", "-b", branch)
 	cmd.Dir = projectPath
 	if err := cmd.Run(); err != nil {
-		// Branch might already exist
-		cmd = exec.Command("git", "checkout", branch)
-		cmd.Dir = projectPath
-		if err := cmd.Run(); err != nil {
+		// Branch might already exist, try to checkout
+		checkoutCmd := exec.Command("git", "checkout", branch)
+		checkoutCmd.Dir = projectPath
+		if err := checkoutCmd.Run(); err != nil {
 			return "", fmt.Errorf("cannot create/checkout branch: %v", err)
 		}
-	} else if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("cannot create/checkout branch: %v", err)
 	}
 
 	// Add changes
