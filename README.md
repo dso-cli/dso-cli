@@ -113,9 +113,10 @@ go build -o dso.exe    # Windows
 
 **Download AI Model:**
 ```bash
-ollama pull llama3.1:8b  # Recommended (~4.7 GB)
-# Or lighter alternatives:
-ollama pull phi3          # ~2.3 GB
+ollama pull qwen2.5:7b   # Default (~4.7 GB) - automatically installed
+# Or other alternatives:
+ollama pull llama3.1:8b  # ~4.7 GB
+ollama pull phi3          # ~2.3 GB - Lightweight
 ollama pull mistral:7b    # ~4.1 GB
 ```
 
