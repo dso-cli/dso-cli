@@ -1,0 +1,384 @@
+package llm
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+)
+
+const (
+	defaultOllamaURL = "http://localhost:11434"
+	defaultModel     = "llama3.1:8b"
+)
+
+// OllamaClient est un client pour Ollama avec support de l'API chat moderne
+type OllamaClient struct {
+	baseURL string
+	model   string
+	client  *http.Client
+}
+
+// NewOllamaClient crée un nouveau client Ollama
+func NewOllamaClient() *OllamaClient {
+	model := os.Getenv("DSO_MODEL")
+	if model == "" {
+		model = defaultModel
+	}
+
+	baseURL := os.Getenv("OLLAMA_HOST")
+	if baseURL == "" {
+		baseURL = defaultOllamaURL
+	}
+	// S'assurer que l'URL n'a pas de trailing slash
+	baseURL = strings.TrimSuffix(baseURL, "/")
+
+	return &OllamaClient{
+		baseURL: baseURL,
+		model:   model,
+		client: &http.Client{
+			Timeout: 300 * time.Second, // 5 minutes pour les analyses longues
+		},
+	}
+}
+
+// Generate envoie une requête à Ollama et retourne la réponse (utilise l'API chat moderne)
+func (c *OllamaClient) Generate(prompt string) (string, error) {
+	return c.GenerateWithContext(prompt, nil)
+}
+
+// GenerateWithContext génère une réponse avec un contexte de conversation
+func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]string) (string, error) {
+	// Check that Ollama is available
+	if err := c.checkOllamaAvailable(); err != nil {
+		return "", fmt.Errorf("Ollama is not available: %v\n💡 Install it: https://ollama.ai\n💡 Then run: ollama pull %s", err, c.model)
+	}
+
+	// Vérification que le modèle est disponible
+	if err := c.ensureModel(); err != nil {
+		return "", err
+	}
+
+	// Construire les messages pour l'API chat
+	messages := []map[string]interface{}{}
+	
+	// Ajouter le contexte si fourni
+	if context != nil {
+		for _, msg := range context {
+			messages = append(messages, map[string]interface{}{
+				"role":    msg["role"],
+				"content": msg["content"],
+			})
+		}
+	}
+	
+	// Ajouter le prompt actuel
+	messages = append(messages, map[string]interface{}{
+		"role":    "user",
+		"content": prompt,
+	})
+
+	// Utiliser l'API chat moderne d'Ollama
+	payload := map[string]interface{}{
+		"model":    c.model,
+		"messages": messages,
+		"stream":   false,
+		"options": map[string]interface{}{
+			"temperature": 0.7,
+			"top_p":       0.9,
+			"num_predict": 4000, // Limite de tokens pour les réponses longues
+		},
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return "", fmt.Errorf("serialization error: %v", err)
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/chat", c.baseURL), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", fmt.Errorf("request creation error: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("cannot contact Ollama at %s: %v\n💡 Check that Ollama is running: ollama serve", c.baseURL, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("Ollama error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	var result struct {
+		Message struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"message"`
+		Done bool `json:"done"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("response parsing error: %v", err)
+	}
+
+	if !result.Done {
+		return "", fmt.Errorf("response is not complete")
+	}
+
+	return result.Message.Content, nil
+}
+
+// GenerateStream generates a streaming response (for progressive display)
+func (c *OllamaClient) GenerateStream(prompt string, onChunk func(string)) (string, error) {
+	// Check that Ollama is available
+	if err := c.checkOllamaAvailable(); err != nil {
+		return "", fmt.Errorf("Ollama is not available: %v", err)
+	}
+
+	if err := c.ensureModel(); err != nil {
+		return "", err
+	}
+
+	messages := []map[string]interface{}{
+		{
+			"role":    "user",
+			"content": prompt,
+		},
+	}
+
+	payload := map[string]interface{}{
+		"model":    c.model,
+		"messages": messages,
+		"stream":   true,
+		"options": map[string]interface{}{
+			"temperature": 0.7,
+			"top_p":       0.9,
+		},
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/chat", c.baseURL), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("Ollama error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	var fullResponse strings.Builder
+	decoder := json.NewDecoder(resp.Body)
+
+	for {
+		var chunk struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+			Done bool `json:"done"`
+		}
+
+		if err := decoder.Decode(&chunk); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return "", err
+		}
+
+		if chunk.Message.Content != "" {
+			fullResponse.WriteString(chunk.Message.Content)
+			if onChunk != nil {
+				onChunk(chunk.Message.Content)
+			}
+		}
+
+		if chunk.Done {
+			break
+		}
+	}
+
+	return fullResponse.String(), nil
+}
+
+// checkOllamaAvailable vérifie si Ollama est disponible avec retry
+func (c *OllamaClient) checkOllamaAvailable() error {
+	maxRetries := 3
+	for i := 0; i < maxRetries; i++ {
+		resp, err := http.Get(fmt.Sprintf("%s/api/tags", c.baseURL))
+		if err == nil {
+			resp.Body.Close()
+			if resp.StatusCode == http.StatusOK {
+				return nil
+			}
+		}
+		if i < maxRetries-1 {
+			time.Sleep(time.Second * time.Duration(i+1))
+		}
+	}
+	return fmt.Errorf("Ollama is not accessible at %s\n💡 Start Ollama: ollama serve", c.baseURL)
+}
+
+// ensureModel vérifie et télécharge le modèle si nécessaire
+func (c *OllamaClient) ensureModel() error {
+	// Vérifier si le modèle existe
+	resp, err := http.Get(fmt.Sprintf("%s/api/tags", c.baseURL))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var modelsResp struct {
+		Models []struct {
+			Name string `json:"name"`
+		} `json:"models"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&modelsResp); err != nil {
+		return err
+	}
+
+	// Vérifier si le modèle est présent
+	for _, model := range modelsResp.Models {
+		if model.Name == c.model {
+			return nil
+		}
+	}
+
+	// Model doesn't exist, download it
+	fmt.Printf("📥 Downloading model %s (this may take a few minutes)…\n", c.model)
+	return c.pullModel()
+}
+
+// pullModel downloads the model with progress display
+func (c *OllamaClient) pullModel() error {
+	payload := map[string]interface{}{
+		"name": c.model,
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/pull", c.baseURL), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Longer timeout for download
+	client := &http.Client{
+		Timeout: 0, // No timeout for large downloads
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("connection error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("model download error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	// Read streaming response to display progress
+	decoder := json.NewDecoder(resp.Body)
+	lastStatus := ""
+	for {
+		var progress struct {
+			Status    string  `json:"status"`
+			Completed int64   `json:"completed,omitempty"`
+			Total     int64   `json:"total,omitempty"`
+			Done      bool    `json:"done"`
+		}
+		if err := decoder.Decode(&progress); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return fmt.Errorf("parsing error: %v", err)
+		}
+
+		// Afficher la progression seulement si le statut change
+		if progress.Status != lastStatus {
+			if progress.Total > 0 {
+				percent := float64(progress.Completed) / float64(progress.Total) * 100
+				fmt.Printf("\r📥 %s (%.1f%%)", progress.Status, percent)
+			} else {
+				fmt.Printf("\r📥 %s", progress.Status)
+			}
+			lastStatus = progress.Status
+		}
+
+		if progress.Done {
+			fmt.Println() // Nouvelle ligne après la progression
+			break
+		}
+	}
+
+	return nil
+}
+
+// ListModels liste les modèles disponibles
+func (c *OllamaClient) ListModels() ([]string, error) {
+	resp, err := http.Get(fmt.Sprintf("%s/api/tags", c.baseURL))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("error retrieving models")
+		}
+
+	var modelsResp struct {
+		Models []struct {
+			Name string `json:"name"`
+		} `json:"models"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&modelsResp); err != nil {
+		return nil, err
+	}
+
+	models := make([]string, len(modelsResp.Models))
+	for i, m := range modelsResp.Models {
+		models[i] = m.Name
+	}
+
+	return models, nil
+}
+
+// CheckConnection vérifie que la connexion à Ollama fonctionne
+func (c *OllamaClient) CheckConnection() error {
+	return c.checkOllamaAvailable()
+}
+
+// GetModel retourne le modèle configuré
+func (c *OllamaClient) GetModel() string {
+	return c.model
+}
+
+// GetBaseURL retourne l'URL de base d'Ollama
+func (c *OllamaClient) GetBaseURL() string {
+	return c.baseURL
+}
+

@@ -1,0 +1,41 @@
+# Binaries
+dso
+dso.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+.cache/
+
+# Documentation
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
