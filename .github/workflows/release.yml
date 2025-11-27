@@ -85,9 +85,11 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 0
           VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
         run: |
           mkdir -p dist/dso-${{ matrix.os }}-${{ matrix.arch }}
-          go build -ldflags="-w -s -X main.version=${VERSION} -X main.buildDate=$(date +%Y-%m-%d)" \
+          LDFLAGS="-w -s -X github.com/dso-cli/dso-cli/cmd.version=${VERSION} -X github.com/dso-cli/dso-cli/cmd.buildDate=$(date +%Y-%m-%d) -X github.com/dso-cli/dso-cli/cmd.buildTime=$(date +%H:%M:%S)"
+          go build -ldflags="$LDFLAGS" \
             -o dist/dso-${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.binary }}${{ matrix.ext }} .
 
       - name: Create checksum
@@ -98,6 +100,41 @@ jobs:
             sha256sum ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
           else
             shasum -a 256 ${{ matrix.binary }}${{ matrix.ext }} > ${{ matrix.binary }}${{ matrix.ext }}.sha256
+          fi
+
+      - name: Build packages
+        if: matrix.os == 'linux' || matrix.os == 'darwin'
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          cd dist/dso-${{ matrix.os }}-${{ matrix.arch }}
+          if [ "${{ matrix.os }}" = "linux" ]; then
+            # Create .deb package for Linux
+            mkdir -p dso_${VERSION}_${{ matrix.arch }}/DEBIAN
+            mkdir -p dso_${VERSION}_${{ matrix.arch }}/usr/local/bin
+            cp ${{ matrix.binary }} dso_${VERSION}_${{ matrix.arch }}/usr/local/bin/
+            chmod +x dso_${VERSION}_${{ matrix.arch }}/usr/local/bin/${{ matrix.binary }}
+            cat > dso_${VERSION}_${{ matrix.arch }}/DEBIAN/control <<EOF
+Package: dso
+Version: ${VERSION}
+Section: utils
+Priority: optional
+Architecture: ${{ matrix.arch }}
+Maintainer: Ismail MOUYAHADA <dev@dso-cli.dev>
+Description: DevSecOps Oracle - Local AI-powered security CLI
+EOF
+            dpkg-deb --build dso_${VERSION}_${{ matrix.arch }} > /dev/null
+            echo "✅ Created: dso_${VERSION}_${{ matrix.arch }}.deb"
+          elif [ "${{ matrix.os }}" = "darwin" ]; then
+            # Create .pkg for macOS (simplified)
+            mkdir -p dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin
+            cp ${{ matrix.binary }} dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin/
+            chmod +x dso_${VERSION}_${{ matrix.arch }}.pkg/usr/local/bin/${{ matrix.binary }}
+            pkgbuild --root dso_${VERSION}_${{ matrix.arch }}.pkg \
+                     --identifier com.dso-cli.dso \
+                     --version ${VERSION} \
+                     --install-location / \
+                     dso_${VERSION}_${{ matrix.arch }}.pkg > /dev/null 2>&1 || echo "⚠️  pkgbuild not available, skipping .pkg creation"
           fi
 
       - name: Upload artifacts
@@ -148,7 +185,11 @@ jobs:
             fi
             cd ..
           done
-          ls -lh *.tar.gz *.zip
+          # Include packages if they exist
+          find . -name "*.deb" -o -name "*.pkg" | while read pkg; do
+            echo "📦 Package: $pkg"
+          done
+          ls -lh *.tar.gz *.zip 2>/dev/null || true
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -156,6 +197,8 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.zip
+            dist/**/*.deb
+            dist/**/*.pkg
           draft: false
           prerelease: false
           generate_release_notes: true

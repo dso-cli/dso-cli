@@ -62,14 +62,28 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
       - name: Build binary
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 0
+          VERSION: ${{ steps.version.outputs.version }}
         shell: bash
         run: |
-          go build -ldflags="-w -s -X main.version=${GITHUB_REF#refs/tags/} -X main.buildDate=$(date +%Y-%m-%d)" \
+          LDFLAGS="-w -s -X github.com/dso-cli/dso-cli/cmd.version=${VERSION} -X github.com/dso-cli/dso-cli/cmd.buildDate=$(date +%Y-%m-%d) -X github.com/dso-cli/dso-cli/cmd.buildTime=$(date +%H:%M:%S)"
+          go build -ldflags="$LDFLAGS" \
             -o dist/dso-${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.binary }} .
 
       - name: Create checksum

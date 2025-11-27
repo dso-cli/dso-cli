@@ -7,6 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	// version is set at build time via ldflags
+	version = "dev"
+	buildDate = "unknown"
+	buildTime = "unknown"
+)
+
 var rootCmd = &cobra.Command{
 	Use:   "dso",
 	Short: "Your senior DevSecOps engineer in your terminal",
@@ -14,7 +21,7 @@ var rootCmd = &cobra.Command{
 
 Analyzes your code, tells you what really matters and proposes fixes in 1 command.
 100% local, zero data leakage, zero configuration.`,
-	Version: "0.1.0",
+	Version: version,
 }
 
 func Execute() {
@@ -35,5 +42,11 @@ func init() {
 	rootCmd.AddCommand(sbomCmd)
 	rootCmd.AddCommand(toolsCmd)
 	rootCmd.AddCommand(ciCmd)
+	
+	// Override version template to include build info
+	rootCmd.SetVersionTemplate(fmt.Sprintf(`{{with .Name}}{{printf "%%s " .}}{{end}}{{printf "version %%s" .Version}}
+Build date: %s
+Build time: %s
+`, buildDate, buildTime))
 }
 
