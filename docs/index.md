@@ -38,6 +38,14 @@ features:
 
 ---
 
+## About the Developer
+
+**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
+---
+
 ## Quick Installation
 
 ### One-Command Installation (Recommended)

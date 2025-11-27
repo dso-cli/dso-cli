@@ -2,6 +2,8 @@
 
 DSO (DevSecOps Oracle) is a DevSecOps CLI assistant powered by local AI that talks to you like a senior security engineer sitting next to you.
 
+**Developed by:** Ismail MOUYAHADA - DevSecOps Engineer & Multi-Platform Software Developer
+
 ## Why DSO?
 
 ### The Problem
@@ -37,7 +39,7 @@ And DSO does **EVERYTHING** automatically:
 
 ### 🧠 Local AI
 
-Uses Ollama with models like `llama3.1:8b`, `phi3`, or `mistral:7b` to analyze results. Everything works locally, no data is sent outside.
+Uses Ollama with models like `qwen2.5:7b` (default), `llama3.1:8b`, `phi3`, or `mistral:7b` to analyze results. Everything works locally, no data is sent outside.
 
 ### 🔍 Multiple Scanners
 

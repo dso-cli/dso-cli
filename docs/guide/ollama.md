@@ -314,6 +314,12 @@ For CI/CD, you can:
 
 **Note**: CI environments may have limited resources. Consider using smaller models or running without AI analysis.
 
+## About the Developer
+
+**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
 ## See Also
 
 - [`check`](/commands/check): Verify Ollama setup

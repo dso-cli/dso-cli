@@ -2,6 +2,8 @@
 
 This document outlines planned bonus features that can be implemented in ~1 hour each.
 
+**Developed by:** Ismail MOUYAHADA - DevSecOps Engineer & Multi-Platform Software Developer
+
 ## 1. `dso pr` - Automated Pull Request Creation
 
 **Estimated Time:** ~1 hour  

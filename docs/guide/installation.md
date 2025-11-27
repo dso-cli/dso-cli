@@ -343,6 +343,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 For detailed platform-specific instructions, see [PLATFORMS.md](https://github.com/dso-cli/dso-cli/blob/main/PLATFORMS.md) in the repository root.
 
+## About the Developer
+
+**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
 ## Support
 
 If you encounter issues, open an issue on [GitHub](https://github.com/dso-cli/dso-cli/issues).

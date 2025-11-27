@@ -115,6 +115,12 @@ git commit -m "ci: add DSO security audit"
 git push
 ```
 
+## About the Developer
+
+**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
 ## Next Steps
 
 - [Commands](/commands/): Discover all available commands

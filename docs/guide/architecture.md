@@ -217,6 +217,12 @@ Beautiful output, clear error messages, helpful suggestions.
 - **Input Validation**: All user input is validated
 - **Error Handling**: Graceful degradation on failures
 
+## About the Developer
+
+**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
 ## See Also
 
 - [Getting Started](/guide/getting-started): Start using DSO

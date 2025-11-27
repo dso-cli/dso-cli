@@ -1,8 +1,10 @@
-# Documentation DSO
+# DSO Documentation
 
-Documentation générée avec VitePress et le thème Catppuccin.
+Documentation built with VitePress and the Catppuccin theme.
 
-## Développement
+**Developed by:** Ismail MOUYAHADA - DevSecOps Engineer & Multi-Platform Software Developer
+
+## Development
 
 ```bash
 cd docs
@@ -10,7 +12,7 @@ npm install
 npm run dev
 ```
 
-La documentation sera accessible sur `http://localhost:5173`.
+The documentation will be accessible at `http://localhost:5173`.
 
 ## Build
 
@@ -18,7 +20,7 @@ La documentation sera accessible sur `http://localhost:5173`.
 npm run build
 ```
 
-Les fichiers générés seront dans `docs/.vitepress/dist`.
+Generated files will be in `docs/.vitepress/dist`.
 
 ## Preview
 
@@ -31,12 +33,12 @@ npm run preview
 ```
 docs/
 ├── .vitepress/
-│   ├── config.js      # Configuration VitePress
-│   └── theme/         # Thème personnalisé
-├── guide/             # Guide d'utilisation
-├── commands/          # Documentation des commandes
-├── configuration/     # Guide de configuration
-├── examples/          # Exemples
-└── api/               # Documentation API
+│   ├── config.js      # VitePress configuration
+│   └── theme/         # Custom theme
+├── guide/             # Usage guides
+├── commands/          # Command documentation
+├── configuration/     # Configuration guide
+├── examples/          # Examples
+└── api/               # API documentation
 ```
 
