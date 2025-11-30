@@ -47,3 +47,35 @@ export interface MenuItem {
   command?: () => void
 }
 
+export interface OPAPolicy {
+  name: string
+  rules: string[]
+  content: string
+}
+
+export interface SecurityPolicy {
+  name: string
+  type: 'opa' | 'codeowners' | 'cicd'
+  content: string
+}
+
+export interface CICDWorkflow {
+  provider: 'github' | 'gitlab'
+  name: string
+  content: string
+  triggers?: string[]
+}
+
+export interface SBOMDocument {
+  format: SBOMFormat
+  version: string
+  components: Array<{
+    type: string
+    name: string
+    version: string
+    purl?: string
+  }>
+}
+
+export type SBOMFormat = 'cyclonedx' | 'spdx'
+

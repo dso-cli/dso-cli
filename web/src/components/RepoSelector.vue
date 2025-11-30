@@ -325,6 +325,7 @@ const authenticate = async () => {
     tokenStorage.set(selectedProvider.value, tokenInput.value)
     
     // Authenticate with backend
+    if (!selectedProvider.value) return
     const success = await repoService.authenticate(selectedProvider.value, tokenInput.value)
     
     if (success) {
@@ -338,7 +339,9 @@ const authenticate = async () => {
       throw new Error('Authentication failed')
     }
   } catch (error) {
-    tokenStorage.remove(selectedProvider.value)
+    if (selectedProvider.value) {
+      tokenStorage.remove(selectedProvider.value)
+    }
     emit('toast', 'error', 'Authentication failed', error instanceof Error ? error.message : 'Invalid token')
     tokenInput.value = '' // Clear on error
   }
@@ -390,6 +393,7 @@ const loadRepos = async () => {
   
   loadingRepos.value = true
   try {
+    if (!selectedProvider.value) return
     repos.value = await repoService.listRepos(selectedProvider.value)
   } catch (error) {
     emit('toast', 'error', 'Failed to load repositories', error instanceof Error ? error.message : 'Unknown error')

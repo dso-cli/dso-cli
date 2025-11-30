@@ -55,7 +55,7 @@
               @scan-local="handleNavigation('scan')"
               @scan-repo="handleNavigation('repos')"
               @view-config="handleNavigation('config')"
-              @view-scan="viewScan"
+              @view-scan="handleNavigation('results')"
             />
           </div>
 
@@ -124,6 +124,26 @@
             />
           </div>
 
+          <!-- Monitoring View -->
+          <div v-if="activeView === 'monitoring'">
+            <Monitoring />
+          </div>
+
+          <!-- Integrations View -->
+          <div v-if="activeView === 'integrations'">
+            <Integrations />
+          </div>
+
+          <!-- AutoFix View -->
+          <div v-if="activeView === 'autofix'">
+            <AutoFix />
+          </div>
+
+          <!-- Manual Config View -->
+          <div v-if="activeView === 'manual-config'">
+            <ManualConfig />
+          </div>
+
           <!-- History View -->
           <div v-if="activeView === 'history'">
             <div class="card text-center py-12">
@@ -161,6 +181,10 @@ import ConfigPanel from './components/ConfigPanel.vue'
 import Dashboard from './components/Dashboard.vue'
 import Sidebar from './components/Sidebar.vue'
 import Chat from './components/Chat.vue'
+import Monitoring from './components/Monitoring.vue'
+import Integrations from './components/Integrations.vue'
+import AutoFix from './components/AutoFix.vue'
+import ManualConfig from './components/ManualConfig.vue'
 import { scanService } from './services/scanService'
 import { repoService } from './services/repoService'
 import { supabaseService } from './services/supabaseService'
@@ -202,6 +226,10 @@ const pageSubtitle = computed(() => {
     case 'dashboard': return 'Vue d\'ensemble de vos scans de sécurité'
     case 'scan': return 'Lancez un nouveau scan de sécurité'
     case 'results': return 'Analysez les résultats de votre scan'
+    case 'monitoring': return 'Surveillez les KPI, SLO et l\'utilisation des services'
+    case 'integrations': return 'Connectez DSO à vos outils de monitoring et communication'
+    case 'autofix': return 'Résolution automatique des problèmes avec l\'IA'
+    case 'manual-config': return 'Configuration manuelle des outils nécessitant une intervention'
     case 'history': return 'Consultez l\'historique de vos scans'
     case 'config': return 'Configurez vos outils et paramètres'
     case 'repos': return 'Connectez-vous à GitHub ou GitLab'

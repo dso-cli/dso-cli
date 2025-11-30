@@ -63,7 +63,7 @@ export const sbomService = {
     xml += `<bom xmlns="http://cyclonedx.org/schema/bom/1.4" version="1">\n`
     xml += `  <components>\n`
     
-    sbom.components.forEach(comp => {
+    sbom.components.forEach((comp: { type: string; name: string; version: string; purl?: string }) => {
       xml += `    <component type="${comp.type}">\n`
       xml += `      <name>${this.escapeXML(comp.name)}</name>\n`
       xml += `      <version>${this.escapeXML(comp.version)}</version>\n`

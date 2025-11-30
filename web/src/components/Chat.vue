@@ -71,7 +71,7 @@
           <div 
             v-if="message.role === 'assistant'"
             class="text-sm prose prose-sm max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-code:text-emerald-600 prose-code:bg-emerald-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-100 prose-pre:border prose-pre:border-slate-200 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline"
-            v-html="renderMarkdownInTemplate(message.content)"
+            :ref="(el) => setupTyped(el as HTMLElement | ComponentPublicInstance | null, message, index)"
           ></div>
           <div 
             v-else
@@ -190,12 +190,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted } from 'vue'
+import { ref, nextTick, watch, onMounted, onUnmounted, ComponentPublicInstance } from 'vue'
 import { chatService } from '../services/chatService'
-import { renderMarkdown, sanitizeInput, isInputSafe } from '../utils/markdown'
+import { renderMarkdown } from '../utils/markdown'
+import Typed from 'typed.js'
 
-// Expose renderMarkdown for template
-const renderMarkdownInTemplate = (content: string) => renderMarkdown(content)
+// Typed.js instances
+const typedInstances = new Map<number, Typed>()
+const animatedMessages = new Set<number>() // Track which messages have been animated
+
+const setupTyped = (el: HTMLElement | ComponentPublicInstance | null, message: Message, index: number) => {
+  if (!el || message.role !== 'assistant') return
+  
+  // Get the actual DOM element if it's a Vue component instance
+  let element: HTMLElement | null = null
+  if (el instanceof HTMLElement) {
+    element = el
+  } else if (el && typeof el === 'object' && '$el' in el) {
+    element = (el as ComponentPublicInstance).$el as HTMLElement
+  }
+  if (!element) return
+  
+  // If this message has already been animated, just render markdown directly
+  if (animatedMessages.has(index)) {
+    element.innerHTML = renderMarkdown(message.content)
+    return
+  }
+  
+  // Clean up existing instance if any
+  if (typedInstances.has(index)) {
+    typedInstances.get(index)?.destroy()
+    typedInstances.delete(index)
+  }
+  
+  // Mark this message as being animated
+  animatedMessages.add(index)
+  
+  // Only animate if this is a new message (not already rendered)
+  nextTick(() => {
+    // Check if element already has content (avoid re-animating)
+    if (element.textContent && element.textContent.trim() !== '') {
+      element.innerHTML = renderMarkdown(message.content)
+      return
+    }
+    
+    const typed = new Typed(element, {
+      strings: [message.content],
+      typeSpeed: 30,
+      showCursor: false,
+      contentType: 'html',
+      onComplete: () => {
+        // After typing is complete, render markdown properly
+        element.innerHTML = renderMarkdown(message.content)
+      }
+    })
+    typedInstances.set(index, typed)
+  })
+}
 
 interface ChatAction {
   label: string
@@ -308,7 +359,11 @@ const sendMessage = async (text: string) => {
       actions: actions.length > 0 ? actions : undefined
     }
 
+    const messageIndex = messages.value.length
     messages.value.push(assistantMessage)
+    
+    // Ensure the new message will be animated
+    animatedMessages.delete(messageIndex) // Remove if exists to allow animation
     
     // Generate new suggestions based on response
     generateSuggestions(responseText)
@@ -417,6 +472,19 @@ onMounted(() => {
   checkConnection()
   // Check connection every 30 seconds
   setInterval(checkConnection, 30000)
+})
+
+onUnmounted(() => {
+  // Clean up all Typed.js instances
+  typedInstances.forEach(typed => typed.destroy())
+  typedInstances.clear()
+  animatedMessages.clear()
+})
+
+onUnmounted(() => {
+  // Clean up all Typed.js instances
+  typedInstances.forEach(typed => typed.destroy())
+  typedInstances.clear()
 })
 </script>
 

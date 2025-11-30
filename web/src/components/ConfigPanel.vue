@@ -79,30 +79,100 @@
                     tool.installed ? 'text-green-800' : 'text-gray-700'
                   ]">{{ tool.name }}</span>
                 </div>
-                <span :class="[
-                  'text-xs font-mono',
-                  tool.installed ? 'text-green-700' : 'text-gray-500'
-                ]">
-                  {{ tool.installed ? (tool.version || '✓') : '✗' }}
-                </span>
+                <div class="flex items-center gap-2">
+                  <span :class="[
+                    'text-xs font-mono',
+                    tool.installed ? 'text-green-700' : 'text-gray-500'
+                  ]">
+                    {{ tool.installed ? (tool.version || '✓') : '✗' }}
+                  </span>
+                  <button
+                    v-if="tool.installed"
+                    @click.stop="updateTool(tool.name)"
+                    class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="installingTools"
+                    title="Update tool"
+                  >
+                    ↻
+                  </button>
+                  <button
+                    v-else
+                    @click.stop="installSingleTool(tool.name)"
+                    class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="installingTools"
+                    title="Install tool"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <button
-          @click="checkTools"
-          class="btn btn-secondary text-sm mt-4 w-full"
-          :disabled="checkingTools"
-        >
-          <span v-if="checkingTools" class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Checking...
-          </span>
-          <span v-else>Refresh Status</span>
-        </button>
+        <div class="flex gap-2 mt-4">
+          <button
+            @click="checkTools"
+            class="btn btn-secondary text-sm flex-1"
+            :disabled="checkingTools || installingTools"
+          >
+            <span v-if="checkingTools" class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Checking...
+            </span>
+            <span v-else>Refresh Status</span>
+          </button>
+          <button
+            v-if="missingToolsCount > 0"
+            @click="installAllTools"
+            class="btn bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm flex-1"
+            :disabled="checkingTools || installingTools"
+          >
+            <span v-if="installingTools" class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Installing...
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Install All ({{ missingToolsCount }})
+            </span>
+          </button>
+        </div>
+        
+        <!-- Installation Progress -->
+        <div v-if="installingTools && installationProgress.length > 0" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="text-xs font-semibold text-blue-900 mb-2">Installation Progress</div>
+          <div class="space-y-1 max-h-32 overflow-y-auto">
+            <div
+              v-for="(progress, idx) in installationProgress"
+              :key="idx"
+              class="flex items-center gap-2 text-xs"
+            >
+              <svg v-if="progress.status === 'success'" class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <svg v-else-if="progress.status === 'error'" class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+              <svg v-else class="w-3 h-3 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span :class="[
+                'flex-1',
+                progress.status === 'success' ? 'text-green-700' :
+                progress.status === 'error' ? 'text-red-700' : 'text-blue-700'
+              ]">
+                {{ progress.tool }}: {{ progress.message }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- DSO Version -->
@@ -136,6 +206,8 @@ const dsoVersion = ref<string>('')
 const checkingOllama = ref(false)
 const checkingTools = ref(false)
 const checkingVersion = ref(false)
+const installingTools = ref(false)
+const installationProgress = ref<Array<{ tool: string; status: 'pending' | 'success' | 'error'; message: string }>>([])
 
 const checkOllama = async () => {
   checkingOllama.value = true
@@ -240,6 +312,201 @@ const checkVersion = async () => {
     dsoVersion.value = 'Error'
   } finally {
     checkingVersion.value = false
+  }
+}
+
+const missingToolsCount = computed(() => {
+  return toolsStatus.value.filter(t => !t.installed).length
+})
+
+const installAllTools = async () => {
+  // Get all tools (both missing and installed)
+  const allTools = toolsStatus.value
+  const toolsToProcess = allTools.filter(t => {
+    // Include missing tools or tools that might need update
+    return !t.installed || true // Process all tools to check for updates
+  })
+  
+  if (toolsToProcess.length === 0) {
+    return
+  }
+  
+  installingTools.value = true
+  installationProgress.value = []
+  
+  try {
+    for (const tool of toolsToProcess) {
+      const toolName = tool.name
+      
+      // Check if already installed
+      if (tool.installed) {
+        // Ask user if they want to update (for now, skip installed tools)
+        installationProgress.value.push({
+          tool: toolName,
+          status: 'success',
+          message: `Already installed (${tool.version || 'version unknown'}) - Skipped`
+        })
+        continue
+      }
+      
+      // Tool is not installed, install it
+      installationProgress.value.push({
+        tool: toolName,
+        status: 'pending',
+        message: 'Installing...'
+      })
+      
+      try {
+        const result = await scanService.installTool(toolName, false)
+        const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+        if (progressIndex !== -1) {
+          if (result.alreadyInstalled) {
+            installationProgress.value[progressIndex] = {
+              tool: toolName,
+              status: 'success',
+              message: `Already installed (${result.version || 'version unknown'})`
+            }
+          } else if (result.success) {
+            installationProgress.value[progressIndex] = {
+              tool: toolName,
+              status: 'success',
+              message: result.message || 'Installed successfully'
+            }
+          } else {
+            installationProgress.value[progressIndex] = {
+              tool: toolName,
+              status: 'error',
+              message: result.message || result.error || 'Installation failed'
+            }
+          }
+        }
+      } catch (error) {
+        const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+        if (progressIndex !== -1) {
+          installationProgress.value[progressIndex] = {
+            tool: toolName,
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Installation failed'
+          }
+        }
+      }
+      
+      // Small delay between installations to avoid overwhelming the system
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+    
+    // Refresh tools status after installation
+    await checkTools()
+  } catch (error) {
+    console.error('Error installing tools:', error)
+  } finally {
+    installingTools.value = false
+    // Clear progress after 10 seconds
+    setTimeout(() => {
+      installationProgress.value = []
+    }, 10000)
+  }
+}
+
+const installSingleTool = async (toolName: string) => {
+  installingTools.value = true
+  installationProgress.value = []
+  
+  installationProgress.value.push({
+    tool: toolName,
+    status: 'pending',
+    message: 'Installing...'
+  })
+  
+  try {
+    const result = await scanService.installTool(toolName, false)
+    const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+    if (progressIndex !== -1) {
+      if (result.alreadyInstalled) {
+        installationProgress.value[progressIndex] = {
+          tool: toolName,
+          status: 'success',
+          message: `Already installed (${result.version || 'version unknown'})`
+        }
+      } else if (result.success) {
+        installationProgress.value[progressIndex] = {
+          tool: toolName,
+          status: 'success',
+          message: result.message || 'Installed successfully'
+        }
+      } else {
+        installationProgress.value[progressIndex] = {
+          tool: toolName,
+          status: 'error',
+          message: result.message || result.error || 'Installation failed'
+        }
+      }
+    }
+    
+    // Refresh tools status
+    await checkTools()
+  } catch (error) {
+    const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+    if (progressIndex !== -1) {
+      installationProgress.value[progressIndex] = {
+        tool: toolName,
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Installation failed'
+      }
+    }
+  } finally {
+    installingTools.value = false
+    setTimeout(() => {
+      installationProgress.value = []
+    }, 5000)
+  }
+}
+
+const updateTool = async (toolName: string) => {
+  installingTools.value = true
+  installationProgress.value = []
+  
+  installationProgress.value.push({
+    tool: toolName,
+    status: 'pending',
+    message: 'Updating...'
+  })
+  
+  try {
+    const result = await scanService.installTool(toolName, true)
+    const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+    if (progressIndex !== -1) {
+      if (result.success) {
+        installationProgress.value[progressIndex] = {
+          tool: toolName,
+          status: 'success',
+          message: result.message || `Updated to ${result.version || 'latest version'}`
+        }
+      } else {
+        installationProgress.value[progressIndex] = {
+          tool: toolName,
+          status: 'error',
+          message: result.message || result.error || 'Update failed'
+        }
+      }
+    }
+    
+    // Refresh tools status
+    await checkTools()
+  } catch (error) {
+    const progressIndex = installationProgress.value.findIndex(p => p.tool === toolName)
+    if (progressIndex !== -1) {
+      installationProgress.value[progressIndex] = {
+        tool: toolName,
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Update failed'
+      }
+    }
+  } finally {
+    installingTools.value = false
+    setTimeout(() => {
+      installationProgress.value = []
+    }, 5000)
   }
 }
 

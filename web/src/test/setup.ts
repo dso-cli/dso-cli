@@ -1,12 +1,7 @@
-import { expect, afterEach } from 'vitest'
-import { cleanup } from '@testing-library/vue'
-import * as matchers from '@testing-library/jest-dom/matchers'
-
-// Extend Vitest's expect with jest-dom matchers
-expect.extend(matchers)
+import { afterEach } from 'vitest'
 
 // Cleanup after each test
 afterEach(() => {
-  cleanup()
+  // Cleanup if needed
 })
 

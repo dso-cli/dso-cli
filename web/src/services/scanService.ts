@@ -217,7 +217,43 @@ export const scanService = {
             }
           },
 
-          async getVersion(): Promise<string> {
+          async installTool(toolName: string, update: boolean = false): Promise<{ success: boolean; message?: string; error?: string; alreadyInstalled?: boolean; version?: string; canUpdate?: boolean }> {
+    try {
+      const response = await fetch('/api/tools/install', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tool: toolName, update })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Installation failed' }))
+        return { 
+          success: false, 
+          message: error.message || error.error || 'Installation failed',
+          error: error.error
+        }
+      }
+      
+      const data = await response.json()
+      return { 
+        success: data.success || false, 
+        message: data.message,
+        alreadyInstalled: data.alreadyInstalled || false,
+        version: data.version,
+        canUpdate: data.canUpdate || false
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error instanceof Error ? error.message : 'Installation failed',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  },
+
+  async getVersion(): Promise<string> {
             try {
               const response = await fetch('/api/version')
               if (!response.ok) {

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Sidebar from '../../components/Sidebar.vue'
-import { scanService } from '../../services/scanService'
 
 // Mock scanService
 vi.mock('../../services/scanService', () => ({

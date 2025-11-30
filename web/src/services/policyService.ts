@@ -3,7 +3,7 @@
  * Manages OPA policies and security rules
  */
 
-import type { OPAPolicy, SecurityPolicy, CICDWorkflow } from '../types'
+import type { OPAPolicy, CICDWorkflow } from '../types'
 
 export const policyService = {
   /**

@@ -5,33 +5,34 @@ import DOMPurify from 'dompurify'
 marked.setOptions({
   breaks: true,
   gfm: true,
-  headerIds: false, // Disable header IDs for security
-  mangle: false,
-  sanitize: false, // We'll use DOMPurify instead
-})
+  mangle: false
+} as any)
 
 // Custom renderer to add security
 const renderer = new marked.Renderer()
 
 // Override link renderer to add security
-renderer.link = (href: string, title: string | null, text: string) => {
+renderer.link = (({ href, title, text }: any) => {
   // Only allow safe protocols
   const safeProtocols = ['http:', 'https:', 'mailto:']
-  const url = new URL(href, 'https://example.com')
-  
-  if (!safeProtocols.includes(url.protocol)) {
-    return text // Return text without link if unsafe
+  try {
+    const url = new URL(href, 'https://example.com')
+    if (!safeProtocols.includes(url.protocol)) {
+      return text // Return text without link if unsafe
+    }
+  } catch {
+    return text
   }
   
   return `<a href="${DOMPurify.sanitize(href)}" target="_blank" rel="noopener noreferrer" ${title ? `title="${DOMPurify.sanitize(title)}"` : ''}>${text}</a>`
-}
+}) as any
 
 // Override code renderer to prevent XSS
-renderer.code = (code: string, language?: string) => {
-  const sanitizedCode = DOMPurify.sanitize(code)
-  const lang = language ? DOMPurify.sanitize(language) : ''
-  return `<pre><code class="language-${lang}">${sanitizedCode}</code></pre>`
-}
+renderer.code = (({ text, lang }: any) => {
+  const sanitizedCode = DOMPurify.sanitize(text)
+  const language = lang ? DOMPurify.sanitize(lang) : ''
+  return `<pre><code class="language-${language}">${sanitizedCode}</code></pre>`
+}) as any
 
 marked.use({ renderer })
 

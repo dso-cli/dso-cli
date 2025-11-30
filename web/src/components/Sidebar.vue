@@ -146,11 +146,47 @@ const RepoIcon = {
   `
 }
 
+const MonitoringIcon = {
+  template: `
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  `
+}
+
+const IntegrationsIcon = {
+  template: `
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  `
+}
+
+const AutoFixIcon = {
+  template: `
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  `
+}
+
+const ManualConfigIcon = {
+  template: `
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
+  `
+}
+
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
   { id: 'scan', label: 'Nouveau Scan', icon: ScanIcon },
+  { id: 'monitoring', label: 'Monitoring', icon: MonitoringIcon },
+  { id: 'integrations', label: 'Intégrations', icon: IntegrationsIcon },
   { id: 'history', label: 'Historique', icon: HistoryIcon },
   { id: 'chat', label: 'Assistant IA', icon: ChatIcon, badge: 'Nouveau' },
+  { id: 'autofix', label: 'Résolution Auto', icon: AutoFixIcon },
+  { id: 'manual-config', label: 'Config Manuelle', icon: ManualConfigIcon },
   { id: 'repos', label: 'Repositories', icon: RepoIcon },
   { id: 'config', label: 'Configuration', icon: ConfigIcon }
 ]

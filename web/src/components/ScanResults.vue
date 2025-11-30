@@ -72,7 +72,7 @@
             <button
               v-for="view in ['all', 'by-category', 'by-tool']"
               :key="view"
-              @click="viewMode = view"
+              @click="viewMode = view as 'all' | 'by-category' | 'by-tool'"
               :class="[
                 'px-3 py-1 rounded-lg text-xs font-medium transition-all',
                 viewMode === view
@@ -520,15 +520,16 @@ const getCategoryStats = (findings: Finding[]): string => {
   return `${critical}C ${high}H`
 }
 
-const showAllCategory = (category: string) => {
-  expandedCategory.value = expandedCategory.value === category ? null : category
-  viewMode.value = 'all'
-}
+// Functions kept for potential future use
+// const showAllCategory = (category: string) => {
+//   expandedCategory.value = expandedCategory.value === category ? null : category
+//   viewMode.value = 'all'
+// }
 
-const showAllTool = (tool: string) => {
-  expandedTool.value = expandedTool.value === tool ? null : tool
-  viewMode.value = 'all'
-}
+// const showAllTool = (tool: string) => {
+//   expandedTool.value = expandedTool.value === tool ? null : tool
+//   viewMode.value = 'all'
+// }
 
 const filteredFindings = computed(() => {
   let findings = props.results.findings || []
@@ -552,6 +553,7 @@ const filteredFindings = computed(() => {
   findings = [...findings].sort((a, b) => {
     const aVal = a[sortField.value as keyof Finding]
     const bVal = b[sortField.value as keyof Finding]
+    if (aVal === undefined || bVal === undefined) return 0
     if (aVal < bVal) return sortOrder.value
     if (aVal > bVal) return -sortOrder.value
     return 0
