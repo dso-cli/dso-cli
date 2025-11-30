@@ -45,6 +45,14 @@ features:
       src: /icons/package.svg
     title: CI/CD Integration
     details: Automatic generation of GitHub Actions and GitLab CI workflows.
+  - icon: 
+      src: /icons/eye.svg
+    title: Web Interface
+    details: Modern web UI with Vue.js for comprehensive project analysis and AI chat.
+  - icon: 
+      src: /icons/zap.svg
+    title: Comprehensive Toolset
+    details: 20+ DevSecOps tools integrated: SAST, Secrets, Dependencies, IaC, Containers, SBOM, Compliance.
 
 ---
 
@@ -93,6 +101,25 @@ The installation script automatically:
 - Checks/Installs Ollama
 - Downloads AI model **qwen2.5:7b** by default (if no models exist)
 - Optionally installs security tools (Trivy, gitleaks, etc.)
+
+## Web Interface
+
+DSO includes a modern web interface for comprehensive project analysis:
+
+```bash
+# Start the web UI
+cd web
+npm install
+npm run dev:full
+```
+
+Access the interface at **http://localhost:3000** with:
+- **Dashboard**: Overview of all scans and findings
+- **Real-time Scanning**: Live progress with console logs and timeline
+- **AI Chat**: Interactive chat with your security model
+- **Results View**: Multiple views (All, By Category, By Tool)
+- **Repository Integration**: Connect to GitHub or GitLab
+- **Configuration Panel**: Monitor all DevSecOps tools status
 
 ### Manual Installation
 

@@ -478,12 +478,41 @@ app.get('/api/check', async (req, res) => {
 })
 
 // Import security utilities
-const { rateLimit, validateChatMessage } = require('./server-utils/security')
+// Security utilities - inline for now
+const rateLimit = (maxRequests = 10, windowMs = 60000) => {
+  const requests = new Map()
+  return (req, res, next) => {
+    const ip = req.ip || req.connection.remoteAddress
+    const now = Date.now()
+    const userRequests = requests.get(ip) || []
+    const recentRequests = userRequests.filter(time => now - time < windowMs)
+    
+    if (recentRequests.length >= maxRequests) {
+      return res.status(429).json({ error: 'Too many requests' })
+    }
+    
+    recentRequests.push(now)
+    requests.set(ip, recentRequests)
+    next()
+  }
+}
+
+const validateChatMessage = (message) => {
+  if (!message || typeof message !== 'string') {
+    return false
+  }
+  if (message.length > 10000) {
+    return false
+  }
+  // Basic XSS prevention
+  const dangerousPatterns = [/<script/i, /javascript:/i, /onerror=/i, /onload=/i]
+  return !dangerousPatterns.some(pattern => pattern.test(message))
+}
 
 // Apply rate limiting to chat endpoint
-app.post('/api/chat', rateLimit({ windowMs: 15 * 60 * 1000, max: 50 }), async (req, res) => {
+app.post('/api/chat', rateLimit(50, 15 * 60 * 1000), async (req, res) => {
   try {
-    const { message, history = [] } = req.body
+    const { message, history = [], context = {} } = req.body
     
     // Validate and sanitize message
     const validation = validateChatMessage(message)
@@ -500,6 +529,27 @@ app.post('/api/chat', rateLimit({ windowMs: 15 * 60 * 1000, max: 50 }), async (r
     
     console.log(`[API] Chat request: ${sanitizedMessage.substring(0, 50)}...`)
     
+    // Build context from scan results if available
+    let contextInfo = ''
+    if (context?.findings && Array.isArray(context.findings) && context.findings.length > 0) {
+      contextInfo += `\n\nContexte du projet:\n`
+      contextInfo += `- Nombre de vulnérabilités détectées: ${context.findings.length}\n`
+      const bySeverity = context.findings.reduce((acc, f) => {
+        acc[f.severity] = (acc[f.severity] || 0) + 1
+        return acc
+      }, {})
+      contextInfo += `- Répartition: ${JSON.stringify(bySeverity)}\n`
+      if (context.findings.length <= 5) {
+        contextInfo += `- Détails:\n`
+        context.findings.slice(0, 5).forEach((f, idx) => {
+          contextInfo += `  ${idx + 1}. ${f.title || f.id} (${f.severity}) - ${f.file || 'N/A'}:${f.line || 'N/A'}\n`
+        })
+      }
+    }
+    if (context?.scanContext) {
+      contextInfo += `\nContexte du scan: ${context.scanContext}\n`
+    }
+    
     // Build context from history (sanitize each message)
     const sanitizedHistory = history.slice(0, 20).map(m => {
       if (typeof m !== 'object' || !m.role || !m.content) {
@@ -509,31 +559,8 @@ app.post('/api/chat', rateLimit({ windowMs: 15 * 60 * 1000, max: 50 }), async (r
       return sanitizedContent ? { role: m.role === 'user' ? 'user' : 'assistant', content: sanitizedContent } : null
     }).filter(Boolean)
     
-    const context = sanitizedHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')
-    
-    // Create SMART-optimized prompt for the AI
-    const prompt = `Tu es un assistant DevSecOps expert senior. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité de manière SMART (Spécifique, Mesurable, Atteignable, Pertinent, Temporellement défini).
-
-CONSIGNES SMART:
-- Spécifique: Donne des réponses précises et concrètes, pas de généralités
-- Mesurable: Inclus des métriques, des nombres, des seuils quantifiables
-- Atteignable: Propose des solutions réalistes et réalisables
-- Pertinent: Adapte tes conseils au contexte du projet et des vulnérabilités détectées
-- Temporellement défini: Indique des échéances et priorités claires
-
-FORMAT DE RÉPONSE:
-1. Résumé exécutif (2-3 phrases)
-2. Analyse détaillée avec contexte
-3. Actions prioritaires (numérotées, avec ordre de priorité)
-4. Métriques et seuils de sécurité
-5. Prochaines étapes avec échéances suggérées
-
-Contexte de la conversation:
-${context}
-
-Question de l'utilisateur: ${sanitizedMessage}
-
-Réponds en français, de manière professionnelle, claire et actionnable. Utilise le formatage Markdown pour structurer ta réponse (titres, listes, code, etc.).`
+    // Create enhanced prompt for the AI with context
+    const userPrompt = `${sanitizedMessage}${contextInfo}`
     
     // Call DSO CLI with a custom command or use Ollama directly
     // For now, we'll use a simple approach: call dso with a custom prompt
@@ -541,7 +568,31 @@ Réponds en français, de manière professionnelle, claire et actionnable. Utili
     
     // Use Ollama API directly for chat
     const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
-    const model = process.env.DSO_MODEL || 'llama3.1:8b'
+    
+    // Detect the actual model from Ollama (use the one from /api/check if available)
+    let model = process.env.DSO_MODEL || 'llama3.1:8b'
+    try {
+      const fetchFn = await getFetch()
+      const tagsResponse = await fetchFn(`${ollamaHost}/api/tags`, {
+        method: 'GET',
+        timeout: 3000
+      })
+      if (tagsResponse.ok) {
+        const tagsData = await tagsResponse.json()
+        if (tagsData.models && tagsData.models.length > 0) {
+          // Prefer configured model, otherwise use first available
+          const configuredModel = process.env.DSO_MODEL || 'llama3.1:8b'
+          const foundModel = tagsData.models.find(m => 
+            m.name === configuredModel || 
+            m.name.includes(configuredModel.split(':')[0])
+          )
+          model = foundModel ? foundModel.name : tagsData.models[0].name
+          console.log(`[API] Using Ollama model: ${model}`)
+        }
+      }
+    } catch (e) {
+      console.log(`[API] Could not detect model, using default: ${model}`)
+    }
     
     const fetchFn = await getFetch()
     const ollamaResponse = await fetchFn(`${ollamaHost}/api/chat`, {
@@ -554,15 +605,20 @@ Réponds en français, de manière professionnelle, claire et actionnable. Utili
         messages: [
           {
             role: 'system',
-            content: 'Tu es un assistant DevSecOps expert. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité. Réponds toujours en français de manière claire et actionnable.'
+            content: 'Tu es un assistant DevSecOps expert senior avec une expertise approfondie en sécurité applicative, infrastructure et développement sécurisé. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité de manière pratique et actionnable.\n\nIMPORTANT: Réponds TOUJOURS en français de manière claire, détaillée et professionnelle. Donne des réponses complètes et approfondies, pas juste des réponses courtes. Explique les concepts, donne des exemples concrets, propose des solutions pratiques et des commandes spécifiques à exécuter.\n\nFormat de réponse:\n- Commence par un résumé clair (2-3 phrases)\n- Explique en détail le problème ou la question\n- Donne des exemples concrets et des commandes spécifiques\n- Propose des solutions actionnables\n- Termine par des prochaines étapes claires'
           },
           ...sanitizedHistory,
           {
             role: 'user',
-            content: sanitizedMessage
+            content: userPrompt
           }
         ],
-        stream: false
+        stream: false,
+        options: {
+          temperature: 0.7,
+          top_p: 0.9,
+          num_predict: 2048  // Allow longer responses
+        }
       })
     })
     
@@ -675,7 +731,7 @@ Réponds en français.`
 })
 
 // Get recommendations (with SMART format)
-app.post('/api/chat/recommendations', rateLimit({ windowMs: 15 * 60 * 1000, max: 30 }), async (req, res) => {
+app.post('/api/chat/recommendations', rateLimit(30, 15 * 60 * 1000), async (req, res) => {
   try {
     const { scanResults } = req.body
     
@@ -764,77 +820,7 @@ Utilise le formatage Markdown. Réponds en français.`
   }
 })
 
-// Chat with AI
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message, context } = req.body
-    
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Message is required' })
-    }
-    
-    const dsoPath = await findDSOCLI()
-    
-    // Build context for AI
-    let contextPrompt = ''
-    if (context?.scanContext) {
-      contextPrompt += `Contexte du scan: ${context.scanContext}\n\n`
-    }
-    
-    if (context?.findings && context.findings.length > 0) {
-      contextPrompt += `Vulnérabilités détectées:\n`
-      context.findings.slice(0, 10).forEach((finding, idx) => {
-        contextPrompt += `${idx + 1}. ${finding.title} (${finding.severity}) - ${finding.file}:${finding.line}\n`
-      })
-      contextPrompt += '\n'
-    }
-    
-    // Create a prompt for the AI
-    const fullPrompt = `${contextPrompt}Question de l'utilisateur: ${message}\n\nRéponds en français de manière claire et professionnelle. Donne des conseils pratiques et des solutions concrètes.`
-    
-    // Call DSO to analyze (we'll use a simple approach with Ollama)
-    // For now, we'll use a direct Ollama API call
-    const ollamaUrl = process.env.OLLAMA_HOST || 'http://localhost:11434'
-    const model = process.env.DSO_MODEL || 'llama3.1:8b'
-    
-    const fetchFn = await getFetch()
-    const ollamaResponse = await fetchFn(`${ollamaUrl}/api/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert DevSecOps senior. Tu aides les développeurs à comprendre et corriger les problèmes de sécurité. Tu réponds toujours en français de manière claire, professionnelle et pratique. Tu donnes des conseils concrets et des solutions actionnables.'
-          },
-          {
-            role: 'user',
-            content: fullPrompt
-          }
-        ],
-        stream: false
-      })
-    })
-    
-    if (!ollamaResponse.ok) {
-      throw new Error('Ollama API error')
-    }
-    
-    const ollamaData = await ollamaResponse.json()
-    const response = ollamaData.message?.content || 'Désolé, je n\'ai pas pu générer de réponse.'
-    
-    res.json({ response })
-  } catch (error) {
-    console.error('[API] Chat error:', error)
-    res.status(500).json({ 
-      error: 'Chat failed',
-      message: error.message 
-    })
-  }
-})
+// Duplicate endpoint removed - using the one above with rate limiting
 
 // Normalize tool names (handle case variations)
 function normalizeToolName(name) {
@@ -876,64 +862,88 @@ app.get('/api/tools', async (req, res) => {
     
     console.log('[API] Tools output:', stdout.substring(0, 500))
     
-    // Parse tools from output
+    // Parse tools from output - new format with categories
     const tools = []
     const lines = stdout.split('\n')
-    let inInstalledSection = false
+    const toolMap = new Map() // To avoid duplicates
     
     for (const line of lines) {
       const trimmedLine = line.trim()
       
-      // Check for installed section
-      if (trimmedLine.includes('✅ Installed tools:') || trimmedLine.includes('✅ Installed:')) {
-        inInstalledSection = true
-        continue
-      }
-      
-      // Check for missing section or end of installed section
-      if (trimmedLine.includes('⚠️  Missing tools:') || 
-          trimmedLine.includes('⚠️  Missing') ||
-          trimmedLine.includes('💡') ||
+      // Skip empty lines, headers, and description/install lines
+      if (!trimmedLine || 
+          trimmedLine.includes('🔧 DevSecOps Tools Status') ||
+          trimmedLine.includes('💡 Install:') ||
+          trimmedLine.includes('💡 Use') ||
           trimmedLine.includes('🎉') ||
-          trimmedLine.includes('🔧')) {
-        inInstalledSection = false
+          trimmedLine.includes('📥') ||
+          trimmedLine.includes('Installed tools:') ||
+          trimmedLine.includes('Missing tools:') ||
+          trimmedLine.startsWith('      ') || // Description lines (indented with spaces)
+          trimmedLine.match(/^📦\s+[^:]+:\s*$/)) { // Category headers like "📦 SAST:"
         continue
       }
       
-      // Parse installed tools: "   • trivy (v0.45.0)" or "   • Trivy (0.45.0)"
-      if (inInstalledSection && trimmedLine.startsWith('•')) {
-        // Match: "• trivy (v0.45.0)" or "• Trivy (0.45.0)" or "• trivy"
-        const match = trimmedLine.match(/•\s+([a-zA-Z0-9-]+)(?:\s+\(([^)]+)\))?/)
-        if (match) {
-          const toolName = normalizeToolName(match[1])
-          let version = match[2] || null
-          // Clean version string (remove 'v' prefix if present)
-          if (version) {
-            version = version.replace(/^v/i, '').trim()
-          }
+      // Parse installed tools: "   ✅ npm (10.9.2)" or "   ✅ trivy"
+      // Must start with spaces and ✅, followed by tool name
+      const installedMatch = trimmedLine.match(/^\s+✅\s+([a-zA-Z0-9_-]+)(?:\s+\(([^)]+)\))?/)
+      if (installedMatch) {
+        const toolName = normalizeToolName(installedMatch[1])
+        let version = installedMatch[2] || null
+        if (version) {
+          version = version.replace(/^v/i, '').trim()
+        }
+        if (!toolMap.has(toolName)) {
           tools.push({
             name: toolName,
             installed: true,
             version: version
           })
-        }
-      } 
-      // Parse missing tools: "   • tfsec - Security scanner" or "   • TFSec - Terraform scanner"
-      else if (!inInstalledSection && trimmedLine.startsWith('•')) {
-        // Match: "• tfsec - Security scanner" or "• TFSec - Terraform scanner"
-        const match = trimmedLine.match(/•\s+([a-zA-Z0-9-]+)/)
-        if (match) {
-          const toolName = normalizeToolName(match[1])
-          // Only add if not already in tools list
-          const exists = tools.some(t => t.name === toolName)
-          if (!exists) {
-            tools.push({
-              name: toolName,
-              installed: false,
-              version: null
-            })
+          toolMap.set(toolName, true)
+        } else {
+          // Update existing tool
+          const existingTool = tools.find(t => t.name === toolName)
+          if (existingTool) {
+            existingTool.installed = true
+            existingTool.version = version
           }
         }
+        continue
+      }
+      
+      // Parse missing tools: "   ❌ trivy" or "   ❌ gitleaks"
+      // Must start with spaces and ❌, followed by tool name
+      const missingMatch = trimmedLine.match(/^\s+❌\s+([a-zA-Z0-9_-]+)/)
+      if (missingMatch) {
+        const toolName = normalizeToolName(missingMatch[1])
+        if (!toolMap.has(toolName)) {
+          tools.push({
+            name: toolName,
+            installed: false,
+            version: null
+          })
+          toolMap.set(toolName, true)
+        }
+        continue
+      }
+      
+      // Also support old format: "   • trivy (v0.45.0)" for backward compatibility
+      const oldFormatMatch = trimmedLine.match(/•\s+([a-zA-Z0-9_-]+)(?:\s+\(([^)]+)\))?/)
+      if (oldFormatMatch) {
+        const toolName = normalizeToolName(oldFormatMatch[1])
+        let version = oldFormatMatch[2] || null
+        if (version) {
+          version = version.replace(/^v/i, '').trim()
+        }
+        if (!toolMap.has(toolName)) {
+          tools.push({
+            name: toolName,
+            installed: !!version, // Assume installed if version is present
+            version: version
+          })
+          toolMap.set(toolName, true)
+        }
+        continue
       }
     }
     

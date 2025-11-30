@@ -28,7 +28,8 @@ export default defineConfig({
             { text: 'Architecture', link: '/guide/architecture' },
             { text: 'Ollama Integration', link: '/guide/ollama' },
             { text: 'Scanners', link: '/guide/scanners' },
-            { text: 'Interactive UI', link: '/guide/interactive-ui' }
+            { text: 'Interactive UI', link: '/guide/interactive-ui' },
+            { text: 'Web Interface', link: '/guide/web-interface' }
           ]
         }
       ],

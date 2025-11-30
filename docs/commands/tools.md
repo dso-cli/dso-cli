@@ -45,20 +45,34 @@ dso tools
 Output:
 
 ```
-🔧 Scan tools status
+🔧 DevSecOps Tools Status
 
-✅ Installed tools:
-   • trivy (v0.45.0)
-     Complete vulnerability scanner (SAST, dependencies, IaC)
-   • gitleaks (v8.18.0)
-     Secret detector in code
+📦 SAST:
+   ✅ trivy (v0.45.0)
+      Complete vulnerability scanner (SAST, dependencies, IaC, containers)
+   ❌ semgrep
+      Fast SAST scanner with 1000+ security rules
+      💡 Install: brew install semgrep
 
-⚠️  Missing tools:
-   • grype - Dependency scanner (complementary to Trivy)
-     💡 Installation: brew install grype
-   • tfsec - Security scanner for Terraform
-     💡 Installation: brew install tfsec
+📦 Dependencies:
+   ✅ npm (10.9.2)
+      Node.js package manager (for npm audit)
+   ❌ grype
+      Vulnerability scanner for container images and filesystems
+      💡 Install: brew install grype
+
+📦 Secrets:
+   ❌ gitleaks
+      Fast and accurate secret detector
+      💡 Install: brew install gitleaks
+
+📦 IaC:
+   ❌ tfsec
+      Security scanner for Terraform
+      💡 Install: brew install tfsec
 ```
+
+Tools are organized by category with installation instructions for missing tools.
 
 ### Interactive Installation
 
@@ -73,21 +87,62 @@ DSO will:
 
 ## Supported Tools
 
+DSO integrates **20+ DevSecOps tools** organized by category:
+
+### SAST (Static Application Security Testing)
+
+- **Trivy**: Complete vulnerability scanner (SAST, dependencies, IaC, containers) - **Recommended**
+- **Semgrep**: Fast SAST scanner with 1000+ security rules
+- **Bandit**: Python security linter
+- **ESLint**: JavaScript/TypeScript linter with security plugins
+- **Gosec**: Go security checker
+- **Brakeman**: Ruby on Rails security scanner
+
+### Dependencies (Software Composition Analysis)
+
+- **Grype**: Vulnerability scanner for container images and filesystems - **Recommended**
+- **npm**: Node.js package manager (for `npm audit`)
+- **pip-audit**: Python vulnerability auditor
+- **Snyk**: Multi-language dependency and container scanner
+- **OWASP Dependency-Check**: Enterprise dependency analysis
+
+### Secrets Detection
+
+- **Gitleaks**: Fast and accurate secret detector - **Recommended**
+- **TruffleHog**: Find secrets in git repositories
+- **detect-secrets**: Python-based secret detection with baseline support
+
+### IaC (Infrastructure as Code)
+
+- **TFSec**: Security scanner for Terraform - **Recommended**
+- **Checkov**: Infrastructure as Code security scanner (Terraform, CloudFormation, Kubernetes)
+- **Terrascan**: Detect compliance and security violations in IaC
+- **Kics**: Find security vulnerabilities, compliance issues in IaC
+
+### Containers
+
+- **Hadolint**: Dockerfile linter and security scanner
+- **Docker Bench Security**: Docker security best practices checker
+
+### SBOM (Software Bill of Materials)
+
+- **Syft**: Generate Software Bill of Materials (SBOM)
+
+### Compliance
+
+- **OPA**: Open Policy Agent for policy-based compliance
+
 ### Required
 
-No tool is strictly required. DSO works with available tools.
+No tool is strictly required. DSO works with any combination of available tools.
 
-### Recommended
+### Recommended Minimum
 
-- **Trivy**: Main scanner (most complete)
-- **gitleaks**: Secret detection
-- **grype**: Complementary dependency scanner
-- **tfsec**: For Terraform projects
-
-### Optional
-
-- **npm**: For `npm audit` (Node.js dependencies)
-- **pip-audit**: For Python dependencies
+For comprehensive coverage, install at least:
+- **Trivy**: Universal scanner (covers most aspects)
+- **Gitleaks**: Secret detection
+- **Grype**: Dependency scanning (complementary to Trivy)
+- **TFSec**: If using Terraform
 
 ## Manual Installation
 

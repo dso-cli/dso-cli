@@ -41,13 +41,25 @@ And DSO does **EVERYTHING** automatically:
 
 Uses Ollama with models like `qwen2.5:7b` (default), `llama3.1:8b`, `phi3`, or `mistral:7b` to analyze results. Everything works locally, no data is sent outside.
 
-### 🔍 Multiple Scanners
+### 🔍 Comprehensive DevSecOps Toolset
 
-Automatically detects and uses:
-- **Trivy**: Main scanner (SAST, dependencies, IaC)
-- **Grype**: Complementary dependency scanner
-- **gitleaks**: Secret detector
-- **tfsec**: Terraform scanner
+DSO integrates **20+ security tools** across all categories:
+
+**SAST (6 tools):** Trivy, Semgrep, Bandit, ESLint, Gosec, Brakeman
+
+**Dependencies (5 tools):** Grype, npm audit, pip-audit, Snyk, OWASP Dependency-Check
+
+**Secrets (3 tools):** Gitleaks, TruffleHog, detect-secrets
+
+**IaC (4 tools):** TFSec, Checkov, Terrascan, Kics
+
+**Containers (2 tools):** Hadolint, Docker Bench Security
+
+**SBOM (1 tool):** Syft
+
+**Compliance (1 tool):** OPA
+
+All tools are automatically detected and used when available. See [Scanners Guide](/guide/scanners.md) for details.
 
 ### 🔧 Smart Auto-Fix
 

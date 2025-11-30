@@ -136,8 +136,29 @@ git push
 
 With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
 
+## Web Interface
+
+DSO includes a modern web interface for comprehensive project analysis:
+
+```bash
+# Start the web UI
+cd web
+npm install
+npm run dev:full
+```
+
+Access at **http://localhost:3000** for:
+- Real-time scanning with progress tracking
+- Multiple result views (All, By Category, By Tool)
+- AI chat for security advice
+- Repository integration (GitHub/GitLab)
+- Configuration monitoring
+
+See the [Web Interface Guide](/guide/web-interface.md) for details.
+
 ## Next Steps
 
 - [Commands](/commands/): Discover all available commands
-- [Configuration](/configuration/): Configure DSO to your needs
+- [Scanners](/guide/scanners.md): Learn about all integrated tools
+- [Web Interface](/guide/web-interface.md): Use the graphical interface
 - [Examples](/examples/): See concrete examples
