@@ -30,21 +30,38 @@
               <div v-if="issue.solution" class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <div class="flex items-center justify-between mb-2">
                   <p class="text-sm font-medium text-emerald-900">Solution proposée:</p>
-                  <span v-if="issue.osInfo" class="text-xs px-2 py-1 bg-emerald-200 text-emerald-800 rounded-full">
-                    {{ issue.osInfo.osName }}
-                  </span>
+                  <div class="flex items-center gap-2">
+                    <span v-if="issue.osInfo" class="text-xs px-2 py-1 bg-emerald-200 text-emerald-800 rounded-full">
+                      {{ issue.osInfo.osName }}
+                    </span>
+                    <span v-if="issue.requiresSudo" class="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded-full">
+                      ⚠️ Permissions requises
+                    </span>
+                  </div>
                 </div>
-                <p class="text-sm text-emerald-800">{{ issue.solution }}</p>
+                <p class="text-sm text-emerald-800 mb-2">{{ issue.solution }}</p>
+                <div v-if="issue.permissionNote" class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                  <strong>Note:</strong> {{ issue.permissionNote }}
+                </div>
                 <div v-if="issue.commands && issue.commands.length > 0" class="mt-2">
                   <p class="text-xs font-medium text-emerald-900 mb-1">Commandes à exécuter:</p>
                   <div class="space-y-1">
-                    <code
+                    <div
                       v-for="(cmd, idx) in issue.commands"
                       :key="idx"
-                      class="block text-xs bg-emerald-100 text-emerald-900 p-2 rounded"
+                      class="flex items-center gap-2"
                     >
-                      {{ cmd }}
-                    </code>
+                      <code class="flex-1 text-xs bg-emerald-100 text-emerald-900 p-2 rounded">
+                        {{ cmd }}
+                      </code>
+                      <span
+                        v-if="issue.requiresSudo && (cmd.includes('sudo') || cmd.includes('apt-get') || cmd.includes('yum') || cmd.includes('pacman'))"
+                        class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded"
+                        title="Cette commande nécessite des permissions administrateur"
+                      >
+                        🔒
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -116,6 +133,8 @@ interface Issue {
   solution?: string
   commands?: string[]
   resolvedAt?: Date
+  requiresSudo?: boolean
+  permissionNote?: string
   osInfo?: {
     platform: string
     osName: string
@@ -158,6 +177,8 @@ const diagnoseIssue = async (issue: Issue) => {
     issue.solution = result.solution
     issue.commands = result.commands
     issue.osInfo = result.osInfo
+    issue.requiresSudo = result.requiresSudo
+    issue.permissionNote = result.permissionNote
     issue.status = 'solved'
   } catch (error) {
     console.error('Error diagnosing issue:', error)

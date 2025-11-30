@@ -1937,7 +1937,19 @@ app.post('/api/autofix/diagnose', async (req, res) => {
     // Detect operating system
     const osInfo = detectOS()
     
-    const prompt = `Système d'exploitation détecté: ${osInfo.osName} (${osInfo.platform})
+    // Détecter le type de problème
+    const isCommandNotFound = issue.description?.toLowerCase().includes('command not found') || 
+                              issue.description?.toLowerCase().includes('not found') ||
+                              issue.title?.toLowerCase().includes('not found')
+    const isPermissionError = issue.description?.toLowerCase().includes('permission denied') ||
+                              issue.description?.toLowerCase().includes('sudo') ||
+                              issue.description?.toLowerCase().includes('access denied')
+    
+    // Extraire le nom de l'outil si possible
+    const toolMatch = issue.title?.match(/(\w+)\s+(?:non\s+)?accessible|(\w+)\s+not\s+found/i)
+    const toolName = toolMatch ? (toolMatch[1] || toolMatch[2]) : 'tool'
+    
+    let prompt = `Système d'exploitation détecté: ${osInfo.osName} (${osInfo.platform})
 Gestionnaire de paquets: ${osInfo.packageManager}
 Shell: ${osInfo.shell}
 Séparateur de chemin: ${osInfo.pathSeparator}
@@ -1945,6 +1957,74 @@ Séparateur de chemin: ${osInfo.pathSeparator}
 Un problème a été détecté: ${issue.title}. 
 Description: ${issue.description}. 
 
+`
+
+    if (isCommandNotFound) {
+      prompt += `PROBLÈME IDENTIFIÉ: Commande non trouvée (command not found)
+L'outil "${toolName}" n'est pas installé ou n'est pas dans le PATH.
+
+SOLUTION REQUISE:
+1. Installer ${toolName} avec ${osInfo.packageManager}
+2. Vérifier l'installation
+3. Ajouter au PATH si nécessaire
+
+`
+      
+      // Commandes spécifiques selon l'outil et l'OS
+      if (toolName.toLowerCase() === 'trivy') {
+        if (osInfo.osType === 'macos') {
+          prompt += `Commandes d'installation pour macOS:
+- brew install trivy
+- Vérifier: trivy --version
+`
+        } else if (osInfo.osType === 'linux') {
+          prompt += `Commandes d'installation pour Linux:
+- sudo apt-get update && sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+- wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+- echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+- sudo apt-get update && sudo apt-get install -y trivy
+- Vérifier: trivy --version
+
+OU méthode alternative (plus simple):
+- curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+`
+        } else if (osInfo.osType === 'windows') {
+          prompt += `Commandes d'installation pour Windows:
+- winget install AquaSecurity.Trivy
+- OU scoop install trivy
+- OU choco install trivy
+- Vérifier: trivy --version
+`
+        }
+      } else {
+        prompt += `Installer ${toolName} avec ${osInfo.packageManager}:\n`
+      }
+    }
+    
+    if (isPermissionError) {
+      prompt += `PROBLÈME IDENTIFIÉ: Erreur de permissions
+Des privilèges administrateur sont nécessaires.
+
+SOLUTION REQUISE:
+`
+      if (osInfo.osType === 'macos' || osInfo.osType === 'linux') {
+        prompt += `1. Demander les permissions sudo si nécessaire
+2. Utiliser sudo pour les commandes nécessitant des privilèges élevés
+3. Vérifier les permissions des fichiers/répertoires
+
+IMPORTANT: Pour ${osInfo.osName}, vous devrez peut-être entrer votre mot de passe administrateur.
+`
+      } else if (osInfo.osType === 'windows') {
+        prompt += `1. Exécuter PowerShell ou CMD en tant qu'administrateur
+2. Cliquer droit sur PowerShell/CMD > "Exécuter en tant qu'administrateur"
+3. Réessayer la commande
+
+IMPORTANT: Pour Windows, vous devez avoir les droits administrateur.
+`
+      }
+    }
+    
+    prompt += `
 Analyse ce problème et propose une solution détaillée avec les commandes à exécuter pour le résoudre.
 IMPORTANT: Les commandes doivent être adaptées au système ${osInfo.osName}:
 - Utiliser ${osInfo.packageManager} comme gestionnaire de paquets
@@ -1952,8 +2032,14 @@ IMPORTANT: Les commandes doivent être adaptées au système ${osInfo.osName}:
 - Utiliser ${osInfo.pathSeparator} comme séparateur de chemin
 - Pour Windows: utiliser PowerShell ou CMD selon le contexte
 - Pour macOS/Linux: utiliser bash
+${isPermissionError ? `- Inclure sudo si nécessaire pour ${osInfo.osName}` : ''}
 
-Réponds en format JSON avec: { "solution": "description détaillée", "commands": ["cmd1", "cmd2"] }
+Réponds en format JSON avec: { 
+  "solution": "description détaillée de la solution", 
+  "commands": ["cmd1", "cmd2"],
+  "requiresSudo": ${isPermissionError ? 'true' : 'false'},
+  "permissionNote": "${isPermissionError ? `Pour ${osInfo.osName}, vous devrez peut-être entrer votre mot de passe administrateur.` : 'Aucune permission spéciale requise.'}"
+}
 Les commandes doivent être exécutables directement sur ${osInfo.osName}.`
     
     const fetchFn = await getFetch()
@@ -1982,11 +2068,17 @@ Les commandes doivent être exécutables directement sur ${osInfo.osName}.`
       }
     } catch {}
     
+    // Extraire requiresSudo et permissionNote du JSON parsé
+    const requiresSudo = parsed.requiresSudo || false
+    const permissionNote = parsed.permissionNote || ''
+    
     res.json({ 
       success: true, 
       solution: parsed.solution, 
       commands: parsed.commands || [],
-      osInfo: osInfo
+      osInfo: osInfo,
+      requiresSudo: requiresSudo,
+      permissionNote: permissionNote
     })
   } catch (error) {
     res.status(500).json({ success: false, error: error.message })

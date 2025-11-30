@@ -7,6 +7,8 @@ export interface Issue {
   solution?: string
   commands?: string[]
   resolvedAt?: Date
+  requiresSudo?: boolean
+  permissionNote?: string
   osInfo?: {
     platform: string
     osName: string
@@ -17,7 +19,7 @@ export interface Issue {
 }
 
 export const autofixService = {
-  async diagnoseIssue(issue: { title: string; description: string }): Promise<{ solution: string; commands: string[]; osInfo?: any }> {
+  async diagnoseIssue(issue: { title: string; description: string }): Promise<{ solution: string; commands: string[]; osInfo?: any; requiresSudo?: boolean; permissionNote?: string }> {
     const response = await fetch('/api/autofix/diagnose', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -31,7 +33,9 @@ export const autofixService = {
     return {
       solution: data.solution || 'Aucune solution trouvée',
       commands: data.commands || [],
-      osInfo: data.osInfo
+      osInfo: data.osInfo,
+      requiresSudo: data.requiresSudo || false,
+      permissionNote: data.permissionNote
     }
   },
 
