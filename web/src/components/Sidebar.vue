@@ -1,6 +1,6 @@
 <template>
   <aside :class="[
-    'fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white transition-all duration-300 z-50',
+    'fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white transition-all duration-300 z-50 shadow-2xl border-r border-slate-700/50',
     isOpen ? 'w-64' : 'w-20'
   ]">
     <!-- Logo and Toggle -->
@@ -37,10 +37,10 @@
           :key="item.id"
           @click="selectItem(item.id)"
           :class="[
-            'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group',
+            'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden',
             activeItem === item.id
-              ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg'
-              : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+              ? 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+              : 'text-slate-300 hover:bg-slate-700/50 hover:text-white hover:shadow-md'
           ]"
         >
           <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps, onMounted } from 'vue'
+import { ref, watch, defineEmits, defineProps, onMounted } from 'vue'
 import { scanService } from '../services/scanService'
 
 interface NavItem {
@@ -169,6 +169,13 @@ const selectItem = (id: string) => {
   activeItem.value = id
   emit('select', id)
 }
+
+// Watch for external changes to activeItem
+watch(() => props.activeItem, (newValue) => {
+  if (newValue && newValue !== activeItem.value) {
+    activeItem.value = newValue
+  }
+}, { immediate: true })
 
 onMounted(async () => {
   try {

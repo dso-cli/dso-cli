@@ -2,6 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Markdown styling for chat messages */
+.prose {
+  @apply text-slate-700;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply font-bold text-slate-900 mt-4 mb-2;
+}
+
+.prose h1 {
+  @apply text-2xl;
+}
+
+.prose h2 {
+  @apply text-xl;
+}
+
+.prose h3 {
+  @apply text-lg;
+}
+
+.prose p {
+  @apply mb-3 leading-relaxed;
+}
+
+.prose ul, .prose ol {
+  @apply mb-3 ml-6;
+}
+
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose code {
+  @apply bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.prose pre {
+  @apply bg-slate-100 border border-slate-200 rounded-lg p-4 overflow-x-auto mb-3;
+}
+
+.prose pre code {
+  @apply bg-transparent text-slate-800 p-0;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-emerald-400 pl-4 italic text-slate-600 my-3;
+}
+
+.prose a {
+  @apply text-emerald-600 hover:text-emerald-700 underline;
+}
+
+.prose strong {
+  @apply font-bold text-slate-900;
+}
+
+.prose em {
+  @apply italic;
+}
+
+.prose table {
+  @apply w-full border-collapse mb-3;
+}
+
+.prose th, .prose td {
+  @apply border border-slate-300 px-3 py-2;
+}
+
+.prose th {
+  @apply bg-slate-100 font-semibold;
+}
+
 @layer base {
   body {
     @apply bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50 text-slate-800 font-sans antialiased;

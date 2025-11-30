@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col h-full bg-white rounded-xl shadow-lg border border-slate-200">
+  <div class="flex flex-col h-full bg-gradient-to-br from-white via-emerald-50/30 to-blue-50/30 rounded-xl shadow-xl border border-slate-200/50 backdrop-blur-sm">
     <!-- Header -->
-    <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-gradient-to-r from-emerald-50 to-blue-50">
+    <div class="flex items-center justify-between p-4 border-b border-slate-200/50 bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-emerald-500/10 backdrop-blur-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center shadow-md">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Messages -->
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent">
       <!-- Welcome Message -->
       <div v-if="messages.length === 0" class="text-center py-8">
         <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -63,17 +63,49 @@
         </div>
         
         <div :class="[
-          'max-w-[80%] rounded-2xl px-4 py-3 shadow-sm',
+          'max-w-[80%] rounded-2xl px-4 py-3 shadow-md transition-all duration-200',
           message.role === 'user'
-            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
-            : 'bg-white text-slate-900 border border-slate-200'
+            ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-500 text-white shadow-emerald-500/20'
+            : 'bg-white/90 backdrop-blur-sm text-slate-900 border border-slate-200/50 shadow-slate-200/50'
         ]">
-          <div class="text-sm whitespace-pre-wrap">{{ message.content }}</div>
+          <div 
+            v-if="message.role === 'assistant'"
+            class="text-sm prose prose-sm max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-code:text-emerald-600 prose-code:bg-emerald-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-100 prose-pre:border prose-pre:border-slate-200 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline"
+            v-html="renderMarkdownInTemplate(message.content)"
+          ></div>
+          <div 
+            v-else
+            class="text-sm whitespace-pre-wrap"
+          >{{ message.content }}</div>
           <div :class="[
             'text-xs mt-1',
             message.role === 'user' ? 'text-emerald-100' : 'text-slate-500'
           ]">
             {{ formatTime(message.timestamp) }}
+          </div>
+          
+          <!-- Actions proposées -->
+          <div v-if="message.role === 'assistant' && message.actions && message.actions.length > 0" class="mt-3 flex flex-wrap gap-2">
+            <button
+              v-for="(action, actionIndex) in message.actions"
+              :key="actionIndex"
+              @click="executeAction(action)"
+              class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-1.5"
+            >
+              <svg v-if="action.icon === 'scan'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <svg v-else-if="action.icon === 'fix'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg v-else-if="action.icon === 'export'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              {{ action.label }}
+            </button>
           </div>
         </div>
 
@@ -102,10 +134,18 @@
     </div>
 
     <!-- Input Area -->
-    <div class="p-4 border-t border-slate-200 bg-white">
-      <!-- Context Info -->
-      <div v-if="scanContext" class="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
-        <span class="font-semibold">Contexte:</span> {{ scanContext }}
+    <div class="p-4 border-t border-slate-200/50 bg-white/80 backdrop-blur-sm">
+          <!-- Context Info -->
+      <div v-if="scanContext" class="mb-3 p-3 bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200/50 rounded-xl text-xs text-blue-800 shadow-sm">
+        <div class="flex items-start gap-2">
+          <svg class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <span class="font-semibold text-blue-900">Contexte du scan:</span>
+            <p class="text-blue-700 mt-1">{{ scanContext }}</p>
+          </div>
+        </div>
       </div>
 
       <!-- Suggestions -->
@@ -123,14 +163,14 @@
       <!-- Input -->
       <div class="flex gap-2">
         <div class="flex-1 relative">
-          <textarea
+            <textarea
             v-model="inputText"
             @keydown.enter.exact.prevent="handleEnter"
             @keydown.enter.shift.exact="inputText += '\n'"
             placeholder="Posez votre question ou demandez des conseils..."
             rows="1"
-            class="w-full px-4 py-3 pr-12 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none transition-all"
-            :class="isTyping ? 'opacity-50 cursor-not-allowed' : ''"
+            class="w-full px-4 py-3 pr-12 border border-slate-300/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-400 resize-none transition-all bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md"
+            :class="isTyping ? 'opacity-50 cursor-not-allowed' : 'hover:border-emerald-300'"
             :disabled="isTyping"
             ref="inputRef"
           ></textarea>
@@ -152,16 +192,32 @@
 <script setup lang="ts">
 import { ref, nextTick, watch, onMounted } from 'vue'
 import { chatService } from '../services/chatService'
+import { renderMarkdown, sanitizeInput, isInputSafe } from '../utils/markdown'
+
+// Expose renderMarkdown for template
+const renderMarkdownInTemplate = (content: string) => renderMarkdown(content)
+
+interface ChatAction {
+  label: string
+  command: string
+  icon?: string
+}
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  actions?: ChatAction[]
 }
 
 const props = defineProps<{
   scanContext?: string
   findings?: any[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'action', action: ChatAction): void
+  (e: 'navigate', view: string): void
 }>()
 
 const messages = ref<Message[]>([])
@@ -228,16 +284,34 @@ const sendMessage = async (text: string) => {
       findings: props.findings
     })
 
+    // Extract actions from response if available
+    let actions: ChatAction[] = []
+    let responseText = ''
+    
+    if (typeof response === 'object' && response !== null && 'response' in response) {
+      responseText = response.response || ''
+      if (response.actions && Array.isArray(response.actions)) {
+        actions = response.actions.map((a: any) => ({
+          label: a.label || 'Action',
+          command: a.command || '',
+          icon: getActionIcon(a.command || '')
+        }))
+      }
+    } else {
+      responseText = typeof response === 'string' ? response : String(response)
+    }
+
     const assistantMessage: Message = {
       role: 'assistant',
-      content: response,
-      timestamp: new Date()
+      content: responseText,
+      timestamp: new Date(),
+      actions: actions.length > 0 ? actions : undefined
     }
 
     messages.value.push(assistantMessage)
     
     // Generate new suggestions based on response
-    generateSuggestions(response)
+    generateSuggestions(responseText)
     
     scrollToBottom()
   } catch (error) {
@@ -284,6 +358,48 @@ const checkConnection = async () => {
     isConnected.value = status.connected
   } catch (error) {
     isConnected.value = false
+  }
+}
+
+const getActionIcon = (command: string): string => {
+  if (command.includes('scan')) return 'scan'
+  if (command.includes('fix')) return 'fix'
+  if (command.includes('export')) return 'export'
+  return 'default'
+}
+
+const executeAction = async (action: ChatAction) => {
+  // Emit action event to parent
+  emit('action', action)
+  
+  // Add user message showing the action
+  const actionMessage: Message = {
+    role: 'user',
+    content: `Exécution: ${action.label}`,
+    timestamp: new Date()
+  }
+  messages.value.push(actionMessage)
+  scrollToBottom()
+  
+  // Execute the action based on command
+  try {
+    if (action.command === 'scan') {
+      emit('navigate', 'scan')
+    } else if (action.command === 'fix') {
+      // Trigger fix action
+      emit('action', action)
+    } else if (action.command === 'export') {
+      // Trigger export action
+      emit('action', action)
+    }
+  } catch (error) {
+    const errorMessage: Message = {
+      role: 'assistant',
+      content: `Erreur lors de l'exécution de l'action: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+      timestamp: new Date()
+    }
+    messages.value.push(errorMessage)
+    scrollToBottom()
   }
 }
 

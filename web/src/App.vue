@@ -1,32 +1,29 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50 flex">
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/30 flex">
     <!-- Sidebar -->
-    <Sidebar :active-item="activeView" @navigate="handleNavigation" />
+    <Sidebar :active-item="activeView" @select="handleNavigation" />
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col" :style="{ marginLeft: sidebarOpen ? '256px' : '80px' }">
+    <div class="flex-1 flex flex-col transition-all duration-300" :style="{ marginLeft: sidebarOpen ? '256px' : '80px' }">
       <!-- Top Bar -->
-      <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-40">
+      <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-40">
         <div class="px-6 py-4">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h1 class="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
                 {{ pageTitle }}
               </h1>
-              <p class="text-sm text-gray-500 mt-1">{{ pageSubtitle }}</p>
+              <p class="text-sm text-gray-600 mt-1 font-medium">{{ pageSubtitle }}</p>
             </div>
             <div class="flex items-center gap-3">
               <button
-                @click="showChat = true"
-                class="relative p-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+                @click="handleNavigation('chat')"
+                class="relative p-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
                 title="Chat avec l'IA"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                <span v-if="unreadMessages > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold">
-                  {{ unreadMessages }}
-                </span>
               </button>
             </div>
           </div>
@@ -46,8 +43,8 @@
             <ScanOptions @scan="handleScanWithOptions" />
           </div>
 
-          <!-- Repo View -->
-          <div v-if="activeView === 'repo'">
+          <!-- Repos View -->
+          <div v-if="activeView === 'repos'">
             <RepoSelector @scan="handleRepoScan" @toast="showToast" @close="handleNavigation('dashboard')" />
           </div>
 
@@ -56,7 +53,7 @@
             <Dashboard
               @new-scan="handleNavigation('scan')"
               @scan-local="handleNavigation('scan')"
-              @scan-repo="handleNavigation('repo')"
+              @scan-repo="handleNavigation('repos')"
               @view-config="handleNavigation('config')"
               @view-scan="viewScan"
             />
@@ -112,8 +109,34 @@
         </div>
       </div>
 
+          <!-- Scan Results View -->
+          <div v-if="activeView === 'results' && scanResults && !scanning">
+            <ScanResults :results="scanResults" :analysis="analysis" @toast="showToast" />
+          </div>
+
+          <!-- Chat View -->
+          <div v-if="activeView === 'chat'" class="h-[calc(100vh-200px)]">
+            <Chat 
+              :scan-context="scanContext"
+              :findings="scanResults?.findings"
+              @action="handleChatAction"
+              @navigate="handleNavigation"
+            />
+          </div>
+
+          <!-- History View -->
+          <div v-if="activeView === 'history'">
+            <div class="card text-center py-12">
+              <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-lg font-medium text-gray-600 mb-2">Historique des scans</p>
+              <p class="text-sm text-gray-500">L'historique sera disponible après configuration de Supabase</p>
+            </div>
+          </div>
+
           <!-- Console and Timeline -->
-          <div v-if="scanning || scanResults" class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div v-if="(scanning || scanResults) && activeView !== 'chat' && activeView !== 'results'" class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Timeline ref="timelineRef" />
             <Console ref="consoleRef" />
           </div>
@@ -121,16 +144,13 @@
       </main>
     </div>
 
-    <!-- Chat Modal -->
-    <ChatModal v-if="showChat" @close="showChat = false" />
-
     <!-- Toast Notifications -->
     <Toast ref="toastRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import ScanResults from './components/ScanResults.vue'
 import Toast from './components/Toast.vue'
 import Console from './components/Console.vue'
@@ -140,7 +160,7 @@ import ScanOptions from './components/ScanOptions.vue'
 import ConfigPanel from './components/ConfigPanel.vue'
 import Dashboard from './components/Dashboard.vue'
 import Sidebar from './components/Sidebar.vue'
-import ChatModal from './components/ChatModal.vue'
+import Chat from './components/Chat.vue'
 import { scanService } from './services/scanService'
 import { repoService } from './services/repoService'
 import { supabaseService } from './services/supabaseService'
@@ -153,9 +173,13 @@ const scanStatus = ref<string>('Initializing scan...')
 const scanProgress = ref<number>(0)
 const activeView = ref<string>('dashboard')
 const sidebarOpen = ref<boolean>(true)
-const showChat = ref<boolean>(false)
-const unreadMessages = ref<number>(0)
 const currentScanPath = ref<string>('.')
+const scanContext = computed(() => {
+  if (scanResults.value) {
+    return `Scan récent: ${scanResults.value.summary.total} vulnérabilités détectées (${scanResults.value.summary.critical} critiques, ${scanResults.value.summary.high} élevées)`
+  }
+  return undefined
+})
 const toastRef = ref<InstanceType<typeof Toast> | null>(null)
 const consoleRef = ref<InstanceType<typeof Console> | null>(null)
 const timelineRef = ref<InstanceType<typeof Timeline> | null>(null)
@@ -167,7 +191,8 @@ const pageTitle = computed(() => {
     case 'results': return 'Résultats du Scan'
     case 'history': return 'Historique'
     case 'config': return 'Configuration'
-    case 'repo': return 'Connecter un Repository'
+    case 'repos': return 'Repositories'
+    case 'chat': return 'Assistant IA'
     default: return 'DSO - DevSecOps Oracle'
   }
 })
@@ -179,7 +204,8 @@ const pageSubtitle = computed(() => {
     case 'results': return 'Analysez les résultats de votre scan'
     case 'history': return 'Consultez l\'historique de vos scans'
     case 'config': return 'Configurez vos outils et paramètres'
-    case 'repo': return 'Connectez-vous à GitHub ou GitLab'
+    case 'repos': return 'Connectez-vous à GitHub ou GitLab'
+    case 'chat': return 'Posez vos questions et obtenez des conseils'
     default: return 'Plateforme d\'analyse de sécurité'
   }
 })
@@ -192,9 +218,10 @@ const handleNavigation = (view: string) => {
     activeView.value = 'results'
   }
   
-  // Clear views when navigating away
-  if (view !== 'scan') {
-    // Reset scan-related views
+  // When starting a new scan, clear results
+  if (view === 'scan' && !scanning.value) {
+    scanResults.value = null
+    analysis.value = null
   }
 }
 
@@ -242,6 +269,9 @@ const handleRepoScan = async (data: { provider: 'github' | 'gitlab', repo: any }
     
     scanProgress.value = 100
     showToast('success', 'Scan complete', `Found ${results.summary.total} issues`)
+    
+    // Navigate to results view
+    activeView.value = 'results'
   } catch (error) {
     console.error('Repo scan error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -257,9 +287,8 @@ const handleRepoScan = async (data: { provider: 'github' | 'gitlab', repo: any }
 }
 
 const handleScanWithOptions = async (options: { path: string; format: string; verbose: boolean; exclude?: string }) => {
-  showScanOptions.value = false
   currentScanPath.value = options.path
-  await startScan(options.path)
+  await startScan(options.path, options)
 }
 
 const startScan = async (path: string = '.', options?: { format?: string; verbose?: boolean; exclude?: string }): Promise<void> => {
@@ -267,7 +296,6 @@ const startScan = async (path: string = '.', options?: { format?: string; verbos
   scanResults.value = null
   analysis.value = null
   scanProgress.value = 0
-  showScanOptions.value = false
   
   let scanRecord: any = null
   let projectRecord: any = null
@@ -513,6 +541,9 @@ const startScan = async (path: string = '.', options?: { format?: string; verbos
     }
     
     showToast('success', 'Scan complete', `Found ${results.summary.total} issues`)
+    
+    // Navigate to results view
+    activeView.value = 'results'
   } catch (error) {
     console.error('Scan error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -549,6 +580,52 @@ const startScan = async (path: string = '.', options?: { format?: string; verbos
   } finally {
     scanning.value = false
     scanProgress.value = 0
+  }
+}
+
+const handleChatAction = async (action: { label: string; command: string }) => {
+  console.log('Chat action:', action)
+  
+  try {
+    if (action.command === 'scan') {
+      // Navigate to scan view
+      handleNavigation('scan')
+      showToast('info', 'Action', 'Lancement d\'un nouveau scan...')
+    } else if (action.command === 'fix') {
+      // Apply auto-fixes if we have scan results
+      if (scanResults.value && scanResults.value.findings) {
+        const fixableFindings = scanResults.value.findings.filter(f => f.fixable)
+        if (fixableFindings.length > 0) {
+          showToast('loading', 'Application des correctifs', `Correction de ${fixableFindings.length} problèmes...`)
+          // Trigger fix for all fixable findings
+          for (const finding of fixableFindings.slice(0, 5)) { // Limit to 5 fixes at a time
+            try {
+              await scanService.autoFix(finding)
+            } catch (error) {
+              console.error('Fix error:', error)
+            }
+          }
+          showToast('success', 'Correctifs appliqués', `${fixableFindings.length} problèmes corrigés`)
+        } else {
+          showToast('info', 'Aucun correctif disponible', 'Aucun problème ne peut être corrigé automatiquement')
+        }
+      } else {
+        showToast('warning', 'Aucun scan disponible', 'Veuillez d\'abord lancer un scan')
+      }
+    } else if (action.command === 'export') {
+      // Export scan results
+      if (scanResults.value) {
+        await scanService.exportResults(scanResults.value, 'json')
+        showToast('success', 'Export réussi', 'Résultats exportés en JSON')
+      } else {
+        showToast('warning', 'Aucun résultat à exporter', 'Veuillez d\'abord lancer un scan')
+      }
+    } else {
+      showToast('info', 'Action', `Exécution: ${action.label}`)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
+    showToast('error', 'Erreur d\'action', errorMessage)
   }
 }
 

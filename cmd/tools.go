@@ -21,34 +21,60 @@ Useful to verify that all scanners are available.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		installed, missing := tools.CheckTools(!toolsAll)
 
-		fmt.Println("🔧 Scan tools status")
+		fmt.Println("🔧 DevSecOps Tools Status")
 		fmt.Println()
 
-		if len(installed) > 0 {
-			fmt.Println("✅ Installed tools:")
-			for _, tool := range installed {
-				fmt.Printf("   • %s", tool.Name)
-				if tool.Version != "" {
+		// Group tools by category
+		categories := map[string][]tools.Tool{
+			"SAST":           {},
+			"Dependencies":   {},
+			"Secrets":        {},
+			"IaC":            {},
+			"Containers":     {},
+			"SBOM":           {},
+			"Compliance":     {},
+			"Linting":        {},
+		}
+
+		// Categorize tools
+		for _, tool := range append(installed, missing...) {
+			category := tools.GetToolCategory(tool.Name)
+			if category != "" {
+				categories[category] = append(categories[category], tool)
+			} else {
+				categories["Other"] = append(categories["Other"], tool)
+			}
+		}
+
+		// Display by category
+		for category, toolList := range categories {
+			if len(toolList) == 0 {
+				continue
+			}
+
+			fmt.Printf("📦 %s:\n", category)
+			for _, tool := range toolList {
+				status := "❌"
+				if tool.Installed {
+					status = "✅"
+				}
+				fmt.Printf("   %s %s", status, tool.Name)
+				if tool.Installed && tool.Version != "" {
 					fmt.Printf(" (%s)", tool.Version)
 				}
 				fmt.Println()
 				if tool.Description != "" {
-					fmt.Printf("     %s\n", tool.Description)
+					fmt.Printf("      %s\n", tool.Description)
+				}
+				if !tool.Installed && tool.InstallCmd != "" {
+					fmt.Printf("      💡 Install: %s\n", tool.InstallCmd)
 				}
 			}
 			fmt.Println()
 		}
 
+		// Installation prompt
 		if len(missing) > 0 {
-			fmt.Println("⚠️  Missing tools:")
-			for _, tool := range missing {
-				fmt.Printf("   • %s - %s\n", tool.Name, tool.Description)
-				if tool.InstallCmd != "" {
-					fmt.Printf("     💡 Installation: %s\n", tool.InstallCmd)
-				}
-			}
-			fmt.Println()
-
 			if toolsInstall {
 				fmt.Println("📥 Interactive installation of missing tools...")
 				for _, tool := range missing {

@@ -318,18 +318,46 @@ app.post('/api/fix', async (req, res) => {
 app.get('/api/version', async (req, res) => {
   try {
     const dsoPath = await findDSOCLI()
-    const { stdout } = await execAsync(`"${dsoPath}" --version`, {
+    const { stdout, stderr } = await execAsync(`"${dsoPath}" --version`, {
       timeout: 5000
     })
-    // Extract version from output like "dso version 0.1.0" or "0.1.0"
-    const versionMatch = stdout.match(/(\d+\.\d+\.\d+)/)
-    const version = versionMatch ? versionMatch[1] : stdout.trim()
+    
+    console.log('[API] Version output:', stdout)
+    
+    // Extract version from various formats:
+    // - "dso version 0.1.0"
+    // - "0.1.0"
+    // - "DSO CLI version 0.1.0"
+    // - "v0.1.0"
+    let version = null
+    
+    // Try multiple patterns
+    const patterns = [
+      /(?:dso|DSO)[\s]+(?:version|Version)[\s]+v?(\d+\.\d+\.\d+)/i,
+      /v?(\d+\.\d+\.\d+)/,
+      /version[\s]+v?(\d+\.\d+\.\d+)/i
+    ]
+    
+    for (const pattern of patterns) {
+      const match = stdout.match(pattern)
+      if (match && match[1]) {
+        version = match[1]
+        break
+      }
+    }
+    
+    // Fallback: use trimmed output if no pattern matches
+    if (!version) {
+      version = stdout.trim().replace(/^v/i, '') || 'Unknown'
+    }
+    
     res.json({ version })
   } catch (error) {
     console.error('[API] Version error:', error)
-    res.status(500).json({ 
-      error: 'Failed to get version',
-      message: error.message 
+    // Return a default version on error instead of 500
+    res.json({ 
+      version: 'Unknown',
+      error: error.message 
     })
   }
 })
@@ -337,21 +365,106 @@ app.get('/api/version', async (req, res) => {
 // Check Ollama status
 app.get('/api/check', async (req, res) => {
   try {
-    const dsoPath = await findDSOCLI()
-    const { stdout, stderr } = await execAsync(`"${dsoPath}" check`, {
-      timeout: 10000
-    })
+    // First, try direct Ollama API check (faster and more reliable)
+    let connected = false
+    let model = null
     
-    // Parse output to extract status
-    const connected = !stdout.includes('❌ Failed') && !stdout.includes('connection refused')
-    const modelMatch = stdout.match(/Configured model: (.+)/)
-    const model = modelMatch ? modelMatch[1].trim() : null
+    try {
+      const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
+      const fetchFn = await getFetch()
+      const testResponse = await fetchFn(`${ollamaHost}/api/tags`, {
+        method: 'GET',
+        timeout: 3000
+      })
+      
+      if (testResponse.ok) {
+        connected = true
+        const data = await testResponse.json()
+        // Get the first model or use configured/default
+        if (data.models && data.models.length > 0) {
+          // Try to find configured model first
+          const configuredModel = process.env.DSO_MODEL || 'llama3.1:8b'
+          const foundModel = data.models.find(m => m.name === configuredModel || m.name.includes(configuredModel.split(':')[0]))
+          model = foundModel ? foundModel.name : data.models[0].name
+        } else {
+          model = process.env.DSO_MODEL || 'llama3.1:8b'
+        }
+      }
+    } catch (e) {
+      console.log('[API] Direct Ollama check failed, trying DSO CLI:', e.message)
+    }
+    
+    // If direct check failed, try DSO CLI check
+    if (!connected) {
+      try {
+        const dsoPath = await findDSOCLI()
+        const { stdout, stderr } = await execAsync(`"${dsoPath}" check`, {
+          timeout: 10000
+        })
+        
+        console.log('[API] DSO check output:', stdout.substring(0, 500))
+        
+        // Parse output to extract status - handle multiple formats
+        if (stdout) {
+          // Check for positive indicators
+          const positivePatterns = [
+            /✅.*OK/i,
+            /✅.*connected/i,
+            /connected.*✅/i,
+            /ollama.*running/i,
+            /model.*available/i,
+            /Everything is ready/i,
+            /🎉.*ready/i
+          ]
+          
+          // Check for negative indicators
+          const negativePatterns = [
+            /❌.*failed/i,
+            /connection.*refused/i,
+            /not.*connected/i,
+            /Error:/i
+          ]
+          
+          const hasPositive = positivePatterns.some(p => p.test(stdout))
+          const hasNegative = negativePatterns.some(p => p.test(stdout))
+          
+          // Connected if we have positive indicators and no negative ones
+          if (hasPositive && !hasNegative) {
+            connected = true
+          }
+          
+          // Try to extract model name from various patterns
+          const modelPatterns = [
+            /Configured model[:\s]+([a-zA-Z0-9.:_-]+)/i,
+            /model[:\s]+([a-zA-Z0-9.:_-]+)/i,
+            /using[:\s]+model[:\s]+([a-zA-Z0-9.:_-]+)/i,
+            /👉\s+([a-zA-Z0-9.:_-]+)/i, // Arrow marker in model list
+            /([a-z0-9]+:[0-9]+b)/i
+          ]
+          
+          for (const pattern of modelPatterns) {
+            const match = stdout.match(pattern)
+            if (match && match[1]) {
+              model = match[1].trim()
+              break
+            }
+          }
+          
+          // If no model found but connected, try to get from environment or default
+          if (connected && !model) {
+            model = process.env.DSO_MODEL || 'llama3.1:8b'
+          }
+        }
+      } catch (error) {
+        console.error('[API] DSO check error:', error.message)
+      }
+    }
     
     res.json({
       connected,
-      model,
-      output: stdout,
-      error: stderr || null
+      model: model || (connected ? (process.env.DSO_MODEL || 'llama3.1:8b') : null),
+      output: null,
+      error: connected ? null : 'Ollama is not running or not accessible'
     })
   } catch (error) {
     console.error('[API] Check error:', error)
@@ -359,36 +472,68 @@ app.get('/api/check', async (req, res) => {
       connected: false,
       model: null,
       error: error.message,
-      output: error.stdout || ''
+      output: null
     })
   }
 })
 
-// Chat with AI
-app.post('/api/chat', async (req, res) => {
+// Import security utilities
+const { rateLimit, validateChatMessage } = require('./server-utils/security')
+
+// Apply rate limiting to chat endpoint
+app.post('/api/chat', rateLimit({ windowMs: 15 * 60 * 1000, max: 50 }), async (req, res) => {
   try {
     const { message, history = [] } = req.body
-    const dsoPath = await findDSOCLI()
     
-    if (!message || !message.trim()) {
-      return res.status(400).json({ error: 'Message is required' })
+    // Validate and sanitize message
+    const validation = validateChatMessage(message)
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error })
     }
     
-    console.log(`[API] Chat request: ${message.substring(0, 50)}...`)
+    const sanitizedMessage = validation.sanitized
     
-    // Build context from history
-    const context = history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')
+    // Validate history
+    if (!Array.isArray(history) || history.length > 20) {
+      return res.status(400).json({ error: 'Invalid history format or too long' })
+    }
     
-    // Create a prompt for the AI
-    const prompt = `Tu es un assistant DevSecOps expert. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité.
+    console.log(`[API] Chat request: ${sanitizedMessage.substring(0, 50)}...`)
+    
+    // Build context from history (sanitize each message)
+    const sanitizedHistory = history.slice(0, 20).map(m => {
+      if (typeof m !== 'object' || !m.role || !m.content) {
+        return null
+      }
+      const sanitizedContent = sanitizeInput(m.content, 2000)
+      return sanitizedContent ? { role: m.role === 'user' ? 'user' : 'assistant', content: sanitizedContent } : null
+    }).filter(Boolean)
+    
+    const context = sanitizedHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')
+    
+    // Create SMART-optimized prompt for the AI
+    const prompt = `Tu es un assistant DevSecOps expert senior. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité de manière SMART (Spécifique, Mesurable, Atteignable, Pertinent, Temporellement défini).
+
+CONSIGNES SMART:
+- Spécifique: Donne des réponses précises et concrètes, pas de généralités
+- Mesurable: Inclus des métriques, des nombres, des seuils quantifiables
+- Atteignable: Propose des solutions réalistes et réalisables
+- Pertinent: Adapte tes conseils au contexte du projet et des vulnérabilités détectées
+- Temporellement défini: Indique des échéances et priorités claires
+
+FORMAT DE RÉPONSE:
+1. Résumé exécutif (2-3 phrases)
+2. Analyse détaillée avec contexte
+3. Actions prioritaires (numérotées, avec ordre de priorité)
+4. Métriques et seuils de sécurité
+5. Prochaines étapes avec échéances suggérées
 
 Contexte de la conversation:
 ${context}
 
-Question de l'utilisateur: ${message}
+Question de l'utilisateur: ${sanitizedMessage}
 
-Réponds de manière claire, concise et actionnable. Si tu peux proposer des actions concrètes, mentionne-les.
-Réponds en français.`
+Réponds en français, de manière professionnelle, claire et actionnable. Utilise le formatage Markdown pour structurer ta réponse (titres, listes, code, etc.).`
     
     // Call DSO CLI with a custom command or use Ollama directly
     // For now, we'll use a simple approach: call dso with a custom prompt
@@ -411,13 +556,10 @@ Réponds en français.`
             role: 'system',
             content: 'Tu es un assistant DevSecOps expert. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité. Réponds toujours en français de manière claire et actionnable.'
           },
-          ...history.map(m => ({
-            role: m.role === 'user' ? 'user' : 'assistant',
-            content: m.content
-          })),
+          ...sanitizedHistory,
           {
             role: 'user',
-            content: message
+            content: sanitizedMessage
           }
         ],
         stream: false
@@ -532,23 +674,56 @@ Réponds en français.`
   }
 })
 
-// Get recommendations
-app.post('/api/chat/recommendations', async (req, res) => {
+// Get recommendations (with SMART format)
+app.post('/api/chat/recommendations', rateLimit({ windowMs: 15 * 60 * 1000, max: 30 }), async (req, res) => {
   try {
     const { scanResults } = req.body
     
-    if (!scanResults) {
+    if (!scanResults || typeof scanResults !== 'object') {
       return res.json({ recommendations: 'Aucun résultat de scan disponible pour générer des recommandations.' })
     }
     
-    const prompt = `Basé sur ces résultats de scan de sécurité, donne des recommandations prioritaires:
-Total: ${scanResults.summary?.total || 0} vulnérabilités
-Critiques: ${scanResults.summary?.critical || 0}
-Élevées: ${scanResults.summary?.high || 0}
-Moyennes: ${scanResults.summary?.medium || 0}
-Faibles: ${scanResults.summary?.low || 0}
+    // Validate and sanitize scan results
+    const summary = {
+      total: parseInt(scanResults.summary?.total) || 0,
+      critical: parseInt(scanResults.summary?.critical) || 0,
+      high: parseInt(scanResults.summary?.high) || 0,
+      medium: parseInt(scanResults.summary?.medium) || 0,
+      low: parseInt(scanResults.summary?.low) || 0,
+      fixable: parseInt(scanResults.summary?.fixable) || 0,
+      exploitable: parseInt(scanResults.summary?.exploitable) || 0
+    }
+    
+    const prompt = `Tu es un expert DevSecOps qui donne des recommandations de sécurité prioritaires en format SMART.
 
-Réponds en français avec des recommandations claires et actionnables, priorisées par importance.`
+Résultats du scan:
+- Total: ${summary.total} vulnérabilités
+- Critiques: ${summary.critical} (priorité immédiate)
+- Élevées: ${summary.high} (priorité haute)
+- Moyennes: ${summary.medium} (priorité moyenne)
+- Faibles: ${summary.low} (priorité basse)
+- Corrigeables automatiquement: ${summary.fixable}
+- Exploitables: ${summary.exploitable}
+
+Format de réponse SMART:
+1. **Recommandations prioritaires** (top 5)
+   - Pour chaque recommandation, indique:
+     - Spécificité: Quoi faire exactement
+     - Mesurabilité: Comment mesurer le progrès
+     - Atteignabilité: Comment y arriver
+     - Pertinence: Pourquoi c'est important
+     - Temporalité: Quand le faire
+
+2. **Plan d'action par phase**
+   - Phase 1 (0-48h): Actions critiques
+   - Phase 2 (3-7 jours): Actions importantes
+   - Phase 3 (7-14 jours): Améliorations continues
+
+3. **Métriques de suivi**
+   - Objectifs quantifiables
+   - Seuils d'alerte
+
+Utilise le formatage Markdown. Réponds en français.`
     
     const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
     const model = process.env.DSO_MODEL || 'llama3.1:8b'
@@ -661,13 +836,45 @@ app.post('/api/chat', async (req, res) => {
   }
 })
 
+// Normalize tool names (handle case variations)
+function normalizeToolName(name) {
+  const nameMap = {
+    'trivy': 'Trivy',
+    'grype': 'Grype',
+    'gitleaks': 'Gitleaks',
+    'tfsec': 'TFSec',
+    'TFSec': 'TFSec',
+    'Tfsec': 'TFSec',
+    'semgrep': 'Semgrep',
+    'bandit': 'Bandit',
+    'eslint': 'ESLint',
+    'gosec': 'Gosec',
+    'brakeman': 'Brakeman',
+    'snyk': 'Snyk',
+    'dependency-check': 'dependency-check',
+    'trufflehog': 'TruffleHog',
+    'truffle-hog': 'TruffleHog',
+    'detect-secrets': 'detect-secrets',
+    'checkov': 'Checkov',
+    'terrascan': 'Terrascan',
+    'kics': 'Kics',
+    'hadolint': 'Hadolint',
+    'docker-bench-security': 'docker-bench-security',
+    'syft': 'Syft',
+    'opa': 'OPA'
+  }
+  return nameMap[name.toLowerCase()] || name
+}
+
 // Get tools status
 app.get('/api/tools', async (req, res) => {
   try {
     const dsoPath = await findDSOCLI()
-    const { stdout } = await execAsync(`"${dsoPath}" tools`, {
+    const { stdout, stderr } = await execAsync(`"${dsoPath}" tools`, {
       timeout: 10000
     })
+    
+    console.log('[API] Tools output:', stdout.substring(0, 500))
     
     // Parse tools from output
     const tools = []
@@ -675,40 +882,78 @@ app.get('/api/tools', async (req, res) => {
     let inInstalledSection = false
     
     for (const line of lines) {
-      if (line.includes('✅ Installed tools:')) {
+      const trimmedLine = line.trim()
+      
+      // Check for installed section
+      if (trimmedLine.includes('✅ Installed tools:') || trimmedLine.includes('✅ Installed:')) {
         inInstalledSection = true
         continue
       }
-      if (line.includes('⚠️  Missing tools:') || line.includes('💡')) {
+      
+      // Check for missing section or end of installed section
+      if (trimmedLine.includes('⚠️  Missing tools:') || 
+          trimmedLine.includes('⚠️  Missing') ||
+          trimmedLine.includes('💡') ||
+          trimmedLine.includes('🎉') ||
+          trimmedLine.includes('🔧')) {
         inInstalledSection = false
         continue
       }
       
-      if (inInstalledSection && line.trim().startsWith('•')) {
-        // Parse: "   • Trivy (0.45.0)"
-        const match = line.match(/•\s+(\w+)(?:\s+\(([^)]+)\))?/)
+      // Parse installed tools: "   • trivy (v0.45.0)" or "   • Trivy (0.45.0)"
+      if (inInstalledSection && trimmedLine.startsWith('•')) {
+        // Match: "• trivy (v0.45.0)" or "• Trivy (0.45.0)" or "• trivy"
+        const match = trimmedLine.match(/•\s+([a-zA-Z0-9-]+)(?:\s+\(([^)]+)\))?/)
         if (match) {
+          const toolName = normalizeToolName(match[1])
+          let version = match[2] || null
+          // Clean version string (remove 'v' prefix if present)
+          if (version) {
+            version = version.replace(/^v/i, '').trim()
+          }
           tools.push({
-            name: match[1],
+            name: toolName,
             installed: true,
-            version: match[2] || null
+            version: version
           })
         }
-      } else if (!inInstalledSection && line.trim().startsWith('•')) {
-        // Parse missing tools: "   • TFSec - Terraform scanner"
-        const match = line.match(/•\s+(\w+)/)
+      } 
+      // Parse missing tools: "   • tfsec - Security scanner" or "   • TFSec - Terraform scanner"
+      else if (!inInstalledSection && trimmedLine.startsWith('•')) {
+        // Match: "• tfsec - Security scanner" or "• TFSec - Terraform scanner"
+        const match = trimmedLine.match(/•\s+([a-zA-Z0-9-]+)/)
         if (match) {
-          tools.push({
-            name: match[1],
-            installed: false,
-            version: null
-          })
+          const toolName = normalizeToolName(match[1])
+          // Only add if not already in tools list
+          const exists = tools.some(t => t.name === toolName)
+          if (!exists) {
+            tools.push({
+              name: toolName,
+              installed: false,
+              version: null
+            })
+          }
         }
       }
     }
     
-    // Ensure we have all expected tools
-    const expectedTools = ['Trivy', 'Grype', 'Gitleaks', 'TFSec']
+    // Ensure we have all expected tools with normalized names (comprehensive list)
+    const expectedTools = [
+      // SAST
+      'Trivy', 'Semgrep', 'Bandit', 'ESLint', 'Gosec', 'Brakeman',
+      // Dependencies
+      'Grype', 'npm', 'pip-audit', 'Snyk', 'dependency-check',
+      // Secrets
+      'Gitleaks', 'TruffleHog', 'detect-secrets',
+      // IaC
+      'TFSec', 'Checkov', 'Terrascan', 'Kics',
+      // Containers
+      'Hadolint', 'docker-bench-security',
+      // SBOM
+      'Syft',
+      // Compliance
+      'OPA'
+    ]
     const foundToolNames = tools.map(t => t.name)
     expectedTools.forEach(toolName => {
       if (!foundToolNames.includes(toolName)) {
@@ -720,12 +965,30 @@ app.get('/api/tools', async (req, res) => {
       }
     })
     
+    // Sort tools by name for consistency
+    tools.sort((a, b) => {
+      const order = ['Trivy', 'Grype', 'Gitleaks', 'TFSec']
+      const aIndex = order.indexOf(a.name)
+      const bIndex = order.indexOf(b.name)
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+      if (aIndex !== -1) return -1
+      if (bIndex !== -1) return 1
+      return a.name.localeCompare(b.name)
+    })
+    
+    console.log('[API] Parsed tools:', JSON.stringify(tools, null, 2))
+    
     res.json({ tools })
   } catch (error) {
     console.error('[API] Tools error:', error)
-    res.status(500).json({ 
-      error: 'Failed to get tools status',
-      message: error.message 
+    // Return default tools list on error
+    res.json({ 
+      tools: [
+        { name: 'Trivy', installed: false, version: null },
+        { name: 'Grype', installed: false, version: null },
+        { name: 'Gitleaks', installed: false, version: null },
+        { name: 'TFSec', installed: false, version: null }
+      ]
     })
   }
 })

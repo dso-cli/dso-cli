@@ -36,20 +36,56 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 	hasPython := detectFileType(path, "*.py", "requirements.txt", "Pipfile")
 	hasJava := detectFileType(path, "*.java", "pom.xml", "build.gradle")
 
-	// Prepare steps
+	// Prepare steps with extended scanners
 	steps := []struct {
 		name    string
 		enabled bool
 		scan    func() ([]Finding, error)
 	}{
-		{"Scanning secrets", true, func() ([]Finding, error) { return scanSecrets(path) }},
-		{"SAST Go", hasGo, func() ([]Finding, error) { return scanSAST(path, "go") }},
-		{"SAST JavaScript/TypeScript", hasJS, func() ([]Finding, error) { return scanSAST(path, "javascript") }},
-		{"SAST Python", hasPython, func() ([]Finding, error) { return scanSAST(path, "python") }},
-		{"SAST Java", hasJava, func() ([]Finding, error) { return scanSAST(path, "java") }},
-		{"Scanning dependencies (SCA)", true, func() ([]Finding, error) { return scanDependencies(path) }},
-		{"Scanning Docker", hasDocker, func() ([]Finding, error) { return scanDocker(path) }},
-		{"Scanning Terraform", hasTerraform, func() ([]Finding, error) { return scanTerraform(path) }},
+		{"Scanning secrets (comprehensive)", true, func() ([]Finding, error) { 
+			// Use extended secret scanning
+			extendedFindings, _ := scanSecretsExtended(path)
+			// Also include original scan
+			originalFindings, _ := scanSecrets(path)
+			// Merge and deduplicate
+			allFindings := append(extendedFindings, originalFindings...)
+			return deduplicateFindings(allFindings), nil
+		}},
+		{"SAST Go", hasGo, func() ([]Finding, error) { 
+			extendedFindings, _ := scanSASTExtended(path, "go")
+			originalFindings, _ := scanSAST(path, "go")
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"SAST JavaScript/TypeScript", hasJS, func() ([]Finding, error) { 
+			extendedFindings, _ := scanSASTExtended(path, "javascript")
+			originalFindings, _ := scanSAST(path, "javascript")
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"SAST Python", hasPython, func() ([]Finding, error) { 
+			extendedFindings, _ := scanSASTExtended(path, "python")
+			originalFindings, _ := scanSAST(path, "python")
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"SAST Java", hasJava, func() ([]Finding, error) { 
+			extendedFindings, _ := scanSASTExtended(path, "java")
+			originalFindings, _ := scanSAST(path, "java")
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"Scanning dependencies (SCA)", true, func() ([]Finding, error) { 
+			extendedFindings, _ := scanDependenciesExtended(path)
+			originalFindings, _ := scanDependencies(path)
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"Scanning Docker", hasDocker, func() ([]Finding, error) { 
+			extendedFindings, _ := scanContainersExtended(path)
+			originalFindings, _ := scanDocker(path)
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
+		{"Scanning Terraform", hasTerraform, func() ([]Finding, error) { 
+			extendedFindings, _ := scanIaCExtended(path)
+			originalFindings, _ := scanTerraform(path)
+			return deduplicateFindings(append(extendedFindings, originalFindings...)), nil
+		}},
 		{"Scanning Kubernetes", hasK8s, func() ([]Finding, error) { return scanKubernetes(path) }},
 	}
 
@@ -382,4 +418,17 @@ func mapSeverity(s string) Severity {
 	default:
 		return SeverityInfo
 	}
+}
+
+// deduplicateFindings removes duplicate findings based on ID
+func deduplicateFindings(findings []Finding) []Finding {
+	seen := make(map[string]bool)
+	var unique []Finding
+	for _, finding := range findings {
+		if !seen[finding.ID] {
+			seen[finding.ID] = true
+			unique = append(unique, finding)
+		}
+	}
+	return unique
 }

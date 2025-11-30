@@ -63,10 +63,27 @@
       </div>
     </div>
 
-    <!-- Findings Table -->
+    <!-- Findings by Category -->
     <div class="card">
       <div class="mb-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <h3 class="text-lg font-semibold text-gray-900">Security Findings</h3>
+        <div class="flex items-center gap-3">
+          <h3 class="text-lg font-semibold text-gray-900">Security Findings</h3>
+          <div class="flex gap-2">
+            <button
+              v-for="view in ['all', 'by-category', 'by-tool']"
+              :key="view"
+              @click="viewMode = view"
+              :class="[
+                'px-3 py-1 rounded-lg text-xs font-medium transition-all',
+                viewMode === view
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              {{ view === 'all' ? 'All' : view === 'by-category' ? 'By Category' : 'By Tool' }}
+            </button>
+          </div>
+        </div>
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button
             @click="exportResults('json')"
@@ -113,7 +130,142 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <!-- View by Category -->
+      <div v-if="viewMode === 'by-category'" class="space-y-6">
+        <div v-for="(categoryFindings, category) in findingsByCategory" :key="category" v-show="categoryFindings.length > 0" class="border-b border-gray-200 pb-6 last:border-b-0">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-md font-semibold text-gray-900 flex items-center gap-2">
+              <span class="text-lg">{{ getCategoryIcon(category) }}</span>
+              {{ category }} ({{ categoryFindings.length }})
+            </h4>
+            <span :class="getCategoryBadgeClass(category)" class="text-xs">
+              {{ getCategoryStats(categoryFindings) }}
+            </span>
+          </div>
+          <div class="space-y-2">
+            <div
+              v-for="finding in (expandedCategory === category ? categoryFindings : categoryFindings.slice(0, 10))"
+              :key="finding.id"
+              class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-emerald-300 transition-colors"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span :class="getSeverityBadgeClass(finding.severity)" class="text-xs">
+                      {{ finding.severity }}
+                    </span>
+                    <span class="text-xs text-gray-500 font-mono">{{ finding.tool }}</span>
+                  </div>
+                  <div class="text-sm font-medium text-gray-900 mb-1">{{ finding.title }}</div>
+                  <div class="text-xs text-gray-600 mb-2 line-clamp-2">{{ finding.description }}</div>
+                  <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ finding.file }}:{{ finding.line }}</code>
+                </div>
+                <div class="flex gap-2 ml-4">
+                  <button
+                    @click="viewFinding(finding)"
+                    class="text-xs px-2 py-1 text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Details
+                  </button>
+                  <button
+                    v-if="finding.fixable"
+                    @click="autoFix(finding)"
+                    class="text-xs px-2 py-1 text-green-600 hover:text-green-800 font-medium"
+                  >
+                    Fix
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              v-if="categoryFindings.length > 10 && expandedCategory !== category"
+              @click="expandedCategory = category"
+              class="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              Show all {{ categoryFindings.length }} findings →
+            </button>
+            <button
+              v-else-if="expandedCategory === category && categoryFindings.length > 10"
+              @click="expandedCategory = null"
+              class="text-sm text-gray-600 hover:text-gray-700 font-medium"
+            >
+              Show less
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View by Tool -->
+      <div v-else-if="viewMode === 'by-tool'" class="space-y-6">
+        <div v-for="(toolFindings, tool) in findingsByTool" :key="tool" class="border-b border-gray-200 pb-6 last:border-b-0">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-md font-semibold text-gray-900 flex items-center gap-2">
+              <span class="text-emerald-600 font-mono text-sm bg-emerald-50 px-2 py-1 rounded">{{ tool }}</span>
+              ({{ toolFindings.length }} findings)
+            </h4>
+            <div class="flex gap-2">
+              <span v-for="sev in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']" :key="sev" class="text-xs">
+                <span :class="getSeverityBadgeClass(sev)" class="text-xs mr-1">
+                  {{ toolFindings.filter(f => f.severity === sev).length }}
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div
+              v-for="finding in (expandedTool === tool ? toolFindings : toolFindings.slice(0, 10))"
+              :key="finding.id"
+              class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-emerald-300 transition-colors"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span :class="getSeverityBadgeClass(finding.severity)" class="text-xs">
+                      {{ finding.severity }}
+                    </span>
+                    <span v-if="finding.type" class="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded">{{ finding.type }}</span>
+                  </div>
+                  <div class="text-sm font-medium text-gray-900 mb-1">{{ finding.title }}</div>
+                  <div class="text-xs text-gray-600 mb-2 line-clamp-2">{{ finding.description }}</div>
+                  <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ finding.file }}:{{ finding.line }}</code>
+                </div>
+                <div class="flex gap-2 ml-4">
+                  <button
+                    @click="viewFinding(finding)"
+                    class="text-xs px-2 py-1 text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Details
+                  </button>
+                  <button
+                    v-if="finding.fixable"
+                    @click="autoFix(finding)"
+                    class="text-xs px-2 py-1 text-green-600 hover:text-green-800 font-medium"
+                  >
+                    Fix
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              v-if="toolFindings.length > 10 && expandedTool !== tool"
+              @click="expandedTool = tool"
+              class="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              Show all {{ toolFindings.length }} findings →
+            </button>
+            <button
+              v-else-if="expandedTool === tool && toolFindings.length > 10"
+              @click="expandedTool = null"
+              class="text-sm text-gray-600 hover:text-gray-700 font-medium"
+            >
+              Show less
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Default Table View -->
+      <div v-else class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -129,6 +281,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="sortOrder === 1 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'" />
                 </svg>
               </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tool</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -150,9 +303,13 @@
                 <div class="text-sm text-gray-500">{{ finding.description }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
+                <span v-if="finding.type" class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">{{ finding.type }}</span>
+                <span v-else class="text-xs text-gray-400">-</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
                 <code class="text-sm bg-gray-100 px-2 py-1 rounded">{{ finding.file }}:{{ finding.line }}</code>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                 {{ finding.tool }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -274,8 +431,104 @@ const showDetailDialog = ref<boolean>(false)
 const selectedFinding = ref<Finding | null>(null)
 const sortField = ref<string>('severity')
 const sortOrder = ref<number>(-1)
+const viewMode = ref<'all' | 'by-category' | 'by-tool'>('all')
+const expandedCategory = ref<string | null>(null)
+const expandedTool = ref<string | null>(null)
 const currentPage = ref<number>(1)
 const pageSize = ref<number>(20)
+
+// Categorize findings by type
+const findingsByCategory = computed(() => {
+  const categories: Record<string, Finding[]> = {
+    'SAST': [],
+    'SECRET': [],
+    'DEPENDENCY': [],
+    'IAC': [],
+    'CONTAINER': [],
+    'Other': []
+  }
+  
+  props.results.findings?.forEach(finding => {
+    const type = finding.type?.toUpperCase() || 'Other'
+    if (categories[type]) {
+      categories[type].push(finding)
+    } else {
+      categories['Other'].push(finding)
+    }
+  })
+  
+  // Sort each category by severity
+  Object.keys(categories).forEach(cat => {
+    categories[cat].sort((a, b) => {
+      const severityOrder: Record<string, number> = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 }
+      return (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4)
+    })
+  })
+  
+  return categories
+})
+
+// Group findings by tool
+const findingsByTool = computed(() => {
+  const tools: Record<string, Finding[]> = {}
+  
+  props.results.findings?.forEach(finding => {
+    if (!tools[finding.tool]) {
+      tools[finding.tool] = []
+    }
+    tools[finding.tool].push(finding)
+  })
+  
+  // Sort each tool's findings by severity
+  Object.keys(tools).forEach(tool => {
+    tools[tool].sort((a, b) => {
+      const severityOrder: Record<string, number> = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 }
+      return (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4)
+    })
+  })
+  
+  return tools
+})
+
+const getCategoryIcon = (category: string): string => {
+  const icons: Record<string, string> = {
+    'SAST': '🔍',
+    'SECRET': '🔐',
+    'DEPENDENCY': '📦',
+    'IAC': '🏗️',
+    'CONTAINER': '🐳',
+    'Other': '📋'
+  }
+  return icons[category] || '📋'
+}
+
+const getCategoryBadgeClass = (category: string): string => {
+  const classes: Record<string, string> = {
+    'SAST': 'badge badge-medium',
+    'SECRET': 'badge badge-critical',
+    'DEPENDENCY': 'badge badge-high',
+    'IAC': 'badge badge-medium',
+    'CONTAINER': 'badge badge-high',
+    'Other': 'badge badge-low'
+  }
+  return classes[category] || 'badge badge-low'
+}
+
+const getCategoryStats = (findings: Finding[]): string => {
+  const critical = findings.filter(f => f.severity === 'CRITICAL').length
+  const high = findings.filter(f => f.severity === 'HIGH').length
+  return `${critical}C ${high}H`
+}
+
+const showAllCategory = (category: string) => {
+  expandedCategory.value = expandedCategory.value === category ? null : category
+  viewMode.value = 'all'
+}
+
+const showAllTool = (tool: string) => {
+  expandedTool.value = expandedTool.value === tool ? null : tool
+  viewMode.value = 'all'
+}
 
 const filteredFindings = computed(() => {
   let findings = props.results.findings || []

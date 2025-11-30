@@ -16,8 +16,10 @@ export interface Finding {
   line: number
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
   tool: string
+  type?: string // SAST, SECRET, DEPENDENCY, IAC, CONTAINER
   fixable: boolean
   exploitable: boolean
+  cvss?: number
 }
 
 export interface ScanResults {

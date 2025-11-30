@@ -5,7 +5,31 @@ interface ChatContext {
   findings?: any[]
 }
 
+interface ChatHistoryEntry {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+// In-memory conversation history (use localStorage in production for persistence)
+let conversationHistory: ChatHistoryEntry[] = []
+
 export const chatService = {
+  getHistory(): ChatHistoryEntry[] {
+    return conversationHistory
+  },
+  
+  addToHistory(role: 'user' | 'assistant', content: string): void {
+    conversationHistory.push({ role, content })
+    // Keep only last 20 messages
+    if (conversationHistory.length > 20) {
+      conversationHistory = conversationHistory.slice(-20)
+    }
+  },
+  
+  clearHistory(): void {
+    conversationHistory = []
+  },
+  
   async checkConnection(): Promise<{ connected: boolean; model?: string }> {
     try {
       const result = await scanService.checkOllama()
@@ -20,6 +44,9 @@ export const chatService = {
 
   async sendMessage(message: string, context?: ChatContext): Promise<string> {
     try {
+      // Include conversation history for context
+      const history = this.getHistory()
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -27,6 +54,7 @@ export const chatService = {
         },
         body: JSON.stringify({
           message,
+          history: history.slice(-10), // Last 10 messages for context
           context: {
             scanContext: context?.scanContext,
             findings: context?.findings?.slice(0, 10) // Limit to 10 findings for context
@@ -40,12 +68,35 @@ export const chatService = {
       }
 
       const data = await response.json()
-      return data.response || data.message || 'Désolé, je n\'ai pas pu générer de réponse.'
+      const aiResponse = data.response || data.message || 'Désolé, je n\'ai pas pu générer de réponse.'
+      const actions = data.actions || []
+      
+      // Add to history
+      this.addToHistory('user', message)
+      this.addToHistory('assistant', aiResponse)
+      
+      // Return response with actions if available
+      if (actions.length > 0) {
+        return {
+          response: aiResponse,
+          actions: actions
+        }
+      }
+      
+      return aiResponse
     } catch (error) {
       console.error('Chat API error:', error)
       
+      // Check if it's a rate limit error
+      if (error instanceof Error && error.message.includes('429')) {
+        return '⚠️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.'
+      }
+      
       // Fallback: Generate a helpful response based on keywords
-      return this.generateFallbackResponse(message, context)
+      const fallbackResponse = this.generateFallbackResponse(message, context)
+      this.addToHistory('user', message)
+      this.addToHistory('assistant', fallbackResponse)
+      return fallbackResponse
     }
   },
 
@@ -69,33 +120,94 @@ ${context?.findings && context.findings.length > 0
   : ''}`
     }
     
-    // Vulnerability explanation
+    // Vulnerability explanation with SMART format
     if (lowerMessage.includes('vulnérabilité') || lowerMessage.includes('vulnerability') || lowerMessage.includes('explique')) {
       if (context?.findings && context.findings.length > 0) {
         const critical = context.findings.filter((f: any) => f.severity === 'CRITICAL')
         const high = context.findings.filter((f: any) => f.severity === 'HIGH')
+        const medium = context.findings.filter((f: any) => f.severity === 'MEDIUM')
+        const low = context.findings.filter((f: any) => f.severity === 'LOW')
         
-        return `D'après votre scan, vous avez :
-- ${critical.length} vulnérabilités **critiques** : nécessitent une attention immédiate
-- ${high.length} vulnérabilités **élevées** : doivent être corrigées rapidement
+        return `## 📊 Analyse des vulnérabilités (SMART)
 
-Les vulnérabilités critiques sont généralement :
-- Des secrets exposés (clés API, mots de passe)
-- Des dépendances avec des CVE critiques
-- Des configurations de sécurité manquantes
+### État actuel du projet
+- **Critiques**: ${critical.length} (impact: élevé, probabilité: élevée)
+- **Élevées**: ${high.length} (impact: moyen-élevé, probabilité: moyenne-élevée)
+- **Moyennes**: ${medium.length} (impact: moyen, probabilité: variable)
+- **Faibles**: ${low.length} (impact: faible, probabilité: faible)
 
-Je recommande de commencer par corriger les vulnérabilités critiques avec \`dso fix --auto\` pour les problèmes automatiquement corrigeables.`
+### 🎯 Plan d'action SMART
+
+#### Phase 1: Vulnérabilités critiques (Priorité 1)
+- **Spécifique**: Corriger ${critical.length} vulnérabilités critiques
+- **Mesurable**: Réduire de ${critical.length} à 0
+- **Atteignable**: Utiliser \`dso fix --auto\` + corrections manuelles
+- **Pertinent**: Impact direct sur la sécurité
+- **Temporel**: **24-48 heures** maximum
+
+**Types de vulnérabilités critiques courantes:**
+- Secrets exposés (clés API, tokens, mots de passe)
+- Dépendances avec CVE critiques (CVSS ≥ 9.0)
+- Configurations de sécurité manquantes (headers, CORS, etc.)
+
+#### Phase 2: Vulnérabilités élevées (Priorité 2)
+- **Spécifique**: Corriger ${high.length} vulnérabilités élevées
+- **Mesurable**: Réduire de ${high.length} à 0
+- **Atteignable**: Corrections progressives
+- **Pertinent**: Réduction du risque global
+- **Temporel**: **7 jours**
+
+### 📈 Métriques de suivi
+- **Taux de correction**: 0% → 100% (objectif)
+- **Temps moyen de correction**: Mesurer et optimiser
+- **Réduction du risque**: Calculer le score de risque avant/après
+
+### 🔧 Actions immédiates
+1. \`dso fix --auto .\` pour les corrections automatiques
+2. Examiner chaque vulnérabilité critique manuellement
+3. Prioriser selon l'exploitabilité et l'impact business`
       }
       
-      return `Une vulnérabilité est une faiblesse dans votre code qui peut être exploitée par des attaquants. 
+      return `## 🔍 Qu'est-ce qu'une vulnérabilité ? (SMART)
 
-Les types courants incluent :
-- **Secrets exposés** : Clés API, tokens, mots de passe dans le code
-- **Dépendances vulnérables** : Bibliothèques avec des CVE connues
-- **Configurations incorrectes** : Headers de sécurité manquants, permissions trop permissives
-- **Code vulnérable** : Injection SQL, XSS, etc.
+### Définition
+Une **vulnérabilité** est une faiblesse dans votre code, configuration ou dépendances qui peut être exploitée par des attaquants.
 
-Utilisez \`dso audit .\` pour détecter ces problèmes dans votre projet.`
+### Types de vulnérabilités (classés par priorité)
+
+#### 1. Secrets exposés (CRITICAL)
+- **Spécifique**: Clés API, tokens, mots de passe dans le code
+- **Impact**: Accès non autorisé, compromission complète
+- **Mesurable**: Nombre de secrets exposés
+- **Correction**: Retirer immédiatement, utiliser des variables d'environnement
+
+#### 2. Dépendances vulnérables (CRITICAL à HIGH)
+- **Spécifique**: Bibliothèques avec CVE connues
+- **Impact**: Exploitation de failles connues
+- **Mesurable**: CVSS score (0-10), nombre de dépendances affectées
+- **Correction**: Mise à jour vers version sécurisée
+
+#### 3. Configurations incorrectes (MEDIUM à HIGH)
+- **Spécifique**: Headers de sécurité manquants, CORS trop permissif
+- **Impact**: Exposition à des attaques courantes
+- **Mesurable**: Nombre de configurations à corriger
+- **Correction**: Appliquer les bonnes pratiques de sécurité
+
+#### 4. Code vulnérable (Variable)
+- **Spécifique**: Injection SQL, XSS, CSRF, etc.
+- **Impact**: Dépend de la vulnérabilité
+- **Mesurable**: Nombre de points d'injection
+- **Correction**: Refactoring sécurisé
+
+### 🎯 Objectif SMART
+- **Spécifique**: Réduire à 0 vulnérabilités critiques
+- **Mesurable**: Suivre le nombre par sévérité
+- **Atteignable**: Utiliser DSO pour détection et correction
+- **Pertinent**: Amélioration continue de la sécurité
+- **Temporel**: Corrections critiques dans 48h, autres dans 7-14 jours
+
+### 📊 Détection
+Utilisez \`dso audit .\` pour obtenir une analyse complète et quantifiée de votre projet.`
     }
     
     // Fix advice

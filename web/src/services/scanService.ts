@@ -254,15 +254,44 @@ export const scanService = {
 
           async getToolsStatus(): Promise<Array<{ name: string; installed: boolean; version?: string }>> {
             try {
-              const response = await fetch('/api/tools')
+              const response = await fetch('/api/tools', {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              })
+              
+              // Even if response is not ok, try to parse the JSON (it might contain default tools list)
+              const data = await response.json().catch(() => ({ 
+                tools: [
+                  { name: 'Trivy', installed: false, version: undefined },
+                  { name: 'Grype', installed: false, version: undefined },
+                  { name: 'Gitleaks', installed: false, version: undefined },
+                  { name: 'TFSec', installed: false, version: undefined }
+                ]
+              }))
+              
               if (!response.ok) {
-                throw new Error('Failed to get tools status')
+                console.warn('Tools status API error:', data.error || data.message)
+                // Return default tools list instead of empty array
+                return data.tools || [
+                  { name: 'Trivy', installed: false, version: undefined },
+                  { name: 'Grype', installed: false, version: undefined },
+                  { name: 'Gitleaks', installed: false, version: undefined },
+                  { name: 'TFSec', installed: false, version: undefined }
+                ]
               }
-              const data = await response.json()
+              
               return data.tools || []
             } catch (error) {
               console.error('Tools status API error:', error)
-              return []
+              // Return default tools list instead of empty array
+              return [
+                { name: 'Trivy', installed: false, version: undefined },
+                { name: 'Grype', installed: false, version: undefined },
+                { name: 'Gitleaks', installed: false, version: undefined },
+                { name: 'TFSec', installed: false, version: undefined }
+              ]
             }
           },
 
