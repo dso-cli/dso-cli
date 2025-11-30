@@ -1,0 +1,102 @@
+# DSO Ignore Patterns
+# Directories and files to exclude from security scans
+
+# Dependencies
+node_modules/
+vendor/
+venv/
+__pycache__/
+.pip/
+.npm/
+.yarn/
+bower_components/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+target/
+bin/
+obj/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitignore
+
+# Temporary files
+*.tmp
+*.log
+*.cache
+.cache/
+.tmp/
+temp/
+tmp/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Pipfile.lock
+poetry.lock
+Gemfile.lock
+go.sum
+
+# Documentation builds
+docs/_build/
+docs/.vitepress/dist/
+site/
+
+# Coverage reports
+coverage/
+.nyc_output/
+*.coverage
+
+# Test outputs
+.test/
+*.test
+*.out
+
+# Environment files (but scan for secrets in them)
+.env.local
+.env.*.local
+
+# Large binary files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.dmg
+*.iso
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+

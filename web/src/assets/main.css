@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50 text-slate-800 font-sans antialiased;
+    min-height: 100vh;
+  }
+  
+  * {
+    @apply border-slate-200;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-105 active:scale-95;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 focus:ring-emerald-500 shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-blue-800 to-blue-900 text-white hover:from-blue-900 hover:to-blue-950 focus:ring-blue-800;
+  }
+  
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-6 transition-all duration-300 hover:shadow-xl;
+  }
+  
+  .input {
+    @apply w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white/80;
+  }
+  
+  .progress-bar {
+    @apply w-full h-3 bg-slate-200 rounded-full overflow-hidden shadow-inner;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-blue-500 transition-all duration-500 ease-out rounded-full relative;
+  }
+  
+  .progress-fill::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-sm;
+  }
+  
+  .badge-critical {
+    @apply bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md;
+  }
+  
+  .badge-high {
+    @apply bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md;
+  }
+  
+  .badge-medium {
+    @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-md;
+  }
+  
+  .badge-low {
+    @apply bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md;
+  }
+}

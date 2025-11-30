@@ -115,7 +115,17 @@ func scanSecrets(path string) ([]Finding, error) {
 
 	// Try with gitleaks
 	if _, err := exec.LookPath("gitleaks"); err == nil {
-		cmd := exec.Command("gitleaks", "detect", "--source", path, "--no-git", "--format", "json")
+		// Use --no-git and exclude common directories
+		cmd := exec.Command("gitleaks", "detect", "--source", path, "--no-git", 
+			"--format", "json",
+			"--exclude-path", "node_modules",
+			"--exclude-path", "vendor",
+			"--exclude-path", "dist",
+			"--exclude-path", "build",
+			"--exclude-path", ".git",
+			"--exclude-path", ".cache",
+			"--exclude-path", "temp",
+			"--exclude-path", "tmp")
 		output, err := cmd.Output()
 		if err != nil && len(output) > 0 {
 			// gitleaks returns an error code if secrets are found
@@ -164,7 +174,8 @@ func scanDependencies(path string) ([]Finding, error) {
 
 	// Grype as complement
 	if _, err := exec.LookPath("grype"); err == nil {
-		cmd := exec.Command("grype", path, "-o", "json")
+		// Grype automatically respects .gitignore, but we can add exclusions
+		cmd := exec.Command("grype", path, "-o", "json", "--exclude", "node_modules", "--exclude", "vendor", "--exclude", "dist", "--exclude", "build")
 		output, err := cmd.Output()
 		if err == nil && len(output) > 0 {
 			var grypeResults struct {
@@ -272,7 +283,37 @@ func scanWithTrivy(path string, scanType string, extraArgs ...string) ([]Finding
 		return nil, fmt.Errorf("trivy not found. Install it: https://aquasecurity.github.io/trivy/")
 	}
 
+	// Common directories to skip
+	skipDirs := []string{
+		"node_modules",
+		"vendor",
+		"dist",
+		"build",
+		".git",
+		".cache",
+		"temp",
+		"tmp",
+		"venv",
+		"__pycache__",
+		".pip",
+		".npm",
+		".yarn",
+		"bower_components",
+		".pnp",
+		"out",
+		"target",
+		"bin",
+		"obj",
+		"coverage",
+		".nyc_output",
+		"logs",
+	}
+
 	args := []string{scanType, path, "--format", "json", "--quiet"}
+	// Add skip directories
+	for _, dir := range skipDirs {
+		args = append(args, "--skip-dirs", dir)
+	}
 	args = append(args, extraArgs...)
 
 	cmd := exec.Command("trivy", args...)
