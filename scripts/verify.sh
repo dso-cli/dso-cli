@@ -113,7 +113,17 @@ echo ""
 
 # Check documentation
 echo "📚 Checking documentation..."
-for doc in README.md INSTALL.md BUILD.md LICENSE; do
+for doc in README.md LICENSE; do
+    if [ -f "$doc" ]; then
+        echo "  ✅ $doc exists"
+    else
+        echo "  ⚠️  $doc missing"
+    fi
+done
+
+# Check additional documentation
+echo "📚 Checking additional documentation..."
+for doc in docs/additional/INSTALL.md docs/additional/BUILD.md; do
     if [ -f "$doc" ]; then
         echo "  ✅ $doc exists"
     else

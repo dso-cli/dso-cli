@@ -447,29 +447,106 @@ install_globally_auto() {
                 if sudo cp dso /usr/local/bin/ 2>/dev/null; then
                     sudo chmod +x /usr/local/bin/dso
                     echo -e "${GREEN}✅ DSO installed globally in /usr/local/bin${NC}"
-                    echo -e "${BLUE}   You can now use 'dso' from anywhere${NC}"
+                    echo -e "${GREEN}✅ You can now use 'dso' command directly!${NC}"
                 # Fallback to user directories (no sudo needed)
                 elif [ -d "$HOME/go/bin" ]; then
                     cp dso "$HOME/go/bin/"
                     chmod +x "$HOME/go/bin/dso"
                     echo -e "${GREEN}✅ DSO installed in $HOME/go/bin${NC}"
-                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/go/bin${NC}"
-                    echo -e "${BLUE}   Or use: dso --version${NC}"
+                    
+                    # Check if ~/go/bin is in PATH
+                    if ! echo "$PATH" | grep -q "$HOME/go/bin"; then
+                        echo -e "${YELLOW}⚠️  Adding ~/go/bin to PATH...${NC}"
+                        # Detect shell and add to appropriate config file
+                        if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+                            if ! grep -q "$HOME/go/bin" "$HOME/.zshrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/go/bin"' >> "$HOME/.zshrc"
+                                echo -e "${GREEN}✅ Added to ~/.zshrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.zshrc${NC}"
+                            fi
+                        elif [ -n "$BASH_VERSION" ] || [ -f "$HOME/.bashrc" ]; then
+                            if ! grep -q "$HOME/go/bin" "$HOME/.bashrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/go/bin"' >> "$HOME/.bashrc"
+                                echo -e "${GREEN}✅ Added to ~/.bashrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.bashrc${NC}"
+                            fi
+                        else
+                            if ! grep -q "$HOME/go/bin" "$HOME/.profile" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/go/bin"' >> "$HOME/.profile"
+                                echo -e "${GREEN}✅ Added to ~/.profile${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.profile${NC}"
+                            fi
+                        fi
+                        # Add to current session
+                        export PATH="$PATH:$HOME/go/bin"
+                    fi
+                    echo -e "${GREEN}✅ You can now use 'dso' command directly!${NC}"
                 elif [ -d "$HOME/.local/bin" ]; then
                     cp dso "$HOME/.local/bin/"
                     chmod +x "$HOME/.local/bin/dso"
                     echo -e "${GREEN}✅ DSO installed in $HOME/.local/bin${NC}"
-                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin${NC}"
-                    echo -e "${BLUE}   Or use: dso --version${NC}"
+                    
+                    # Check if ~/.local/bin is in PATH
+                    if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+                        echo -e "${YELLOW}⚠️  Adding ~/.local/bin to PATH...${NC}"
+                        # Detect shell and add to appropriate config file
+                        if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.zshrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.zshrc"
+                                echo -e "${GREEN}✅ Added to ~/.zshrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.zshrc${NC}"
+                            fi
+                        elif [ -n "$BASH_VERSION" ] || [ -f "$HOME/.bashrc" ]; then
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.bashrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.bashrc"
+                                echo -e "${GREEN}✅ Added to ~/.bashrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.bashrc${NC}"
+                            fi
+                        else
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.profile" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.profile"
+                                echo -e "${GREEN}✅ Added to ~/.profile${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.profile${NC}"
+                            fi
+                        fi
+                        # Add to current session
+                        export PATH="$PATH:$HOME/.local/bin"
+                    fi
+                    echo -e "${GREEN}✅ You can now use 'dso' command directly!${NC}"
                 else
                     # Create ~/.local/bin if it doesn't exist
                     mkdir -p "$HOME/.local/bin"
                     cp dso "$HOME/.local/bin/"
                     chmod +x "$HOME/.local/bin/dso"
                     echo -e "${GREEN}✅ DSO installed in $HOME/.local/bin${NC}"
-                    echo -e "${BLUE}   Add to PATH: export PATH=\$PATH:\$HOME/.local/bin${NC}"
-                    echo -e "${BLUE}   Or add to ~/.bashrc or ~/.zshrc:${NC}"
-                    echo -e "${BLUE}   echo 'export PATH=\$PATH:\$HOME/.local/bin' >> ~/.bashrc${NC}"
+                    
+                    # Check if ~/.local/bin is in PATH
+                    if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+                        echo -e "${YELLOW}⚠️  Adding ~/.local/bin to PATH...${NC}"
+                        # Detect shell and add to appropriate config file
+                        if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.zshrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.zshrc"
+                                echo -e "${GREEN}✅ Added to ~/.zshrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.zshrc${NC}"
+                            fi
+                        elif [ -n "$BASH_VERSION" ] || [ -f "$HOME/.bashrc" ]; then
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.bashrc" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.bashrc"
+                                echo -e "${GREEN}✅ Added to ~/.bashrc${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.bashrc${NC}"
+                            fi
+                        else
+                            if ! grep -q "$HOME/.local/bin" "$HOME/.profile" 2>/dev/null; then
+                                echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.profile"
+                                echo -e "${GREEN}✅ Added to ~/.profile${NC}"
+                                echo -e "${YELLOW}💡 Run: source ~/.profile${NC}"
+                            fi
+                        fi
+                        # Add to current session
+                        export PATH="$PATH:$HOME/.local/bin"
+                    fi
+                    echo -e "${GREEN}✅ You can now use 'dso' command directly!${NC}"
                 fi
             fi
             ;;
@@ -625,15 +702,24 @@ main() {
     echo -e "${GREEN}🎉 Installation completed!${NC}"
     echo ""
     echo -e "${BLUE}To use DSO:${NC}"
-    if [ -f "dso" ]; then
+    if command_exists dso; then
+        echo -e "  ${GREEN}dso audit .${NC}        # Run security audit"
+        echo -e "  ${GREEN}dso audit . -i${NC}     # Interactive TUI mode"
+    elif [ -f "dso" ]; then
         echo -e "  ${GREEN}./dso audit .${NC}"
     elif [ -f "dso.exe" ]; then
         echo -e "  ${GREEN}.\dso.exe audit .${NC}"
     fi
     echo ""
     echo -e "${BLUE}Verify installation:${NC}"
-    echo -e "  ${GREEN}./dso check${NC}        # Check Ollama"
-    echo -e "  ${GREEN}./dso tools${NC}       # Check scanners"
+    if command_exists dso; then
+        echo -e "  ${GREEN}dso check${NC}         # Check Ollama"
+        echo -e "  ${GREEN}dso tools${NC}         # Check scanners"
+        echo -e "  ${GREEN}dso --version${NC}     # Check version"
+    else
+        echo -e "  ${GREEN}./dso check${NC}        # Check Ollama"
+        echo -e "  ${GREEN}./dso tools${NC}       # Check scanners"
+    fi
     echo ""
 }
 

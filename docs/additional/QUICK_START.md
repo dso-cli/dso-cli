@@ -77,5 +77,5 @@ After installation:
 ollama pull llama3.1:8b
 ```
 
-For more help, see [INSTALL.md](INSTALL.md) or [docs/guide/installation.md](docs/guide/installation.md).
+For more help, see [INSTALL.md](INSTALL.md) or [../guide/installation.md](../guide/installation.md).
 

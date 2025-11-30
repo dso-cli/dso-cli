@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/dso-cli/dso-cli/internal/scanner"
@@ -34,7 +35,7 @@ type Fix struct {
 }
 
 // Analyze analyzes scan results with AI and returns the analysis result.
-func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult, error) {
+func Analyze(results *scanner.ScanResults, projectPath string) (analysis *AnalysisResult, err error) {
 	client := NewOllamaClient()
 
 	// Load the system prompt
@@ -54,8 +55,8 @@ func Analyze(results *scanner.ScanResults, projectPath string) (*AnalysisResult,
 	return parseAIResponse(response, results)
 }
 
-// ExplainVulnerability explains a specific vulnerability
-func ExplainVulnerability(vulnID string, projectPath string) (string, error) {
+// ExplainVulnerability explains a specific vulnerability and returns the explanation.
+func ExplainVulnerability(vulnID string, projectPath string) (explanation string, err error) {
 	client := NewOllamaClient()
 
 	prompt := fmt.Sprintf(`You are a senior DevSecOps engineer. A developer asks you why this vulnerability is critical or if it's a false positive.
@@ -135,9 +136,11 @@ Respond in JSON with this structure:
 func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) string {
 	var sb strings.Builder
 	sb.WriteString("Project: " + projectPath + "\n")
-	sb.WriteString("Total findings: " + fmt.Sprintf("%d", results.Summary.Total) + "\n")
-	sb.WriteString(fmt.Sprintf("Critical: %d, High: %d, Medium: %d, Low: %d\n\n",
-		results.Summary.Critical, results.Summary.High, results.Summary.Medium, results.Summary.Low))
+	sb.WriteString("Total findings: " + strconv.Itoa(results.Summary.Total) + "\n")
+	sb.WriteString("Critical: " + strconv.Itoa(results.Summary.Critical) +
+		", High: " + strconv.Itoa(results.Summary.High) +
+		", Medium: " + strconv.Itoa(results.Summary.Medium) +
+		", Low: " + strconv.Itoa(results.Summary.Low) + "\n\n")
 
 	// Group by severity
 	critical := []scanner.Finding{}
@@ -192,7 +195,7 @@ func formatScanResultsForAI(results *scanner.ScanResults, projectPath string) st
 }
 
 // parseAIResponse parses the AI response and returns the analysis result.
-func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisResult, error) {
+func parseAIResponse(response string, results *scanner.ScanResults) (result *AnalysisResult, err error) {
 	// Try to parse as JSON first
 	response = strings.TrimSpace(response)
 
@@ -201,9 +204,10 @@ func parseAIResponse(response string, results *scanner.ScanResults) (*AnalysisRe
 	jsonEnd := strings.LastIndex(response, "}")
 	if jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart {
 		jsonStr := response[jsonStart : jsonEnd+1]
-		var result AnalysisResult
-		if err := json.Unmarshal([]byte(jsonStr), &result); err == nil {
-			return &result, nil
+		var parsedResult AnalysisResult
+		if err = json.Unmarshal([]byte(jsonStr), &parsedResult); err == nil {
+			result = &parsedResult
+			return
 		}
 	}
 

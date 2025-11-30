@@ -28,7 +28,6 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 	}
 
 	// Automatic file type detection
-	tracker.StartStep(0, "Detecting technologies")
 	hasDocker := detectFileType(path, "Dockerfile", "docker-compose.yml", "*.dockerfile")
 	hasTerraform := detectFileType(path, "*.tf", "*.tfvars")
 	hasK8s := detectFileType(path, "*.yaml", "*.yml")
@@ -36,9 +35,6 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 	hasJS := detectFileType(path, "*.js", "*.ts", "package.json")
 	hasPython := detectFileType(path, "*.py", "requirements.txt", "Pipfile")
 	hasJava := detectFileType(path, "*.java", "pom.xml", "build.gradle")
-	tracker.CompleteStep(0, 0)
-
-	stepIndex := 1
 
 	// Prepare steps
 	steps := []struct {
@@ -65,20 +61,19 @@ func RunFullScanInteractive(path string, interactive bool, tracker *ProgressTrac
 	}
 
 	// Execute scans
+	enabledStepIndex := 0
 	for _, step := range steps {
 		if !step.enabled {
 			continue
 		}
-		tracker.StartStep(stepIndex-1, step.name)
+		tracker.StartStep(enabledStepIndex, step.name)
 		if findings, err := step.scan(); err == nil {
 			results.Findings = append(results.Findings, findings...)
-			tracker.CompleteStep(stepIndex-1, len(findings))
-		} else {
-			if interactive {
-				fmt.Printf("\r[%d/%d] ⚠️  %s (error: %v)\n", stepIndex, tracker.totalSteps, step.name, err)
-			}
+			tracker.CompleteStep(enabledStepIndex, len(findings))
+		} else if interactive {
+			fmt.Printf("\r[%d/%d] ⚠️  %s (error: %v)\n", enabledStepIndex+1, tracker.totalSteps, step.name, err)
 		}
-		stepIndex++
+		enabledStepIndex++
 	}
 
 	results.CalculateSummary()

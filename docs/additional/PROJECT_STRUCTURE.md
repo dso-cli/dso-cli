@@ -36,8 +36,10 @@ dso/
 ├── examples/                  # Exemples de projets de test
 │
 ├── README.md                  # Documentation principale
-├── INSTALL.md                 # Guide d'installation
-├── CONTRIBUTING.md            # Guide de contribution
+├── docs/
+│   ├── additional/
+│   │   ├── INSTALL.md         # Guide d'installation
+│   │   └── CONTRIBUTING.md    # Guide de contribution
 ├── LICENSE                    # Licence MIT
 └── .gitignore                 # Fichiers à ignorer
 ```

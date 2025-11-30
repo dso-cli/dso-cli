@@ -17,22 +17,32 @@ hero:
       link: https://github.com/dso-cli/dso-cli
 
 features:
-  - icon: 🔒
+  - icon: 
+      src: /icons/lock.svg
     title: 100% Local
     details: No data is sent outside. Everything works locally with Ollama for AI.
-  - icon: 🧠
+  - icon: 
+      src: /icons/brain.svg
     title: Local AI
     details: Intelligent analysis of results with Ollama. No internet connection needed for analysis.
-  - icon: ⚡
+  - icon: 
+      src: /icons/zap.svg
     title: Zero Configuration
     details: Automatic detection of languages, frameworks and tools. Works immediately.
-  - icon: 🔧
+  - icon: 
+      src: /icons/wrench.svg
     title: Auto-Fix
     details: Automatic correction of safe issues with interactive confirmation.
-  - icon: 👀
+  - icon: 
+      src: /icons/palette.svg
+    title: Interactive UI
+    details: Beautiful TUI with navigation, filtering, and real-time search for exploring scan results.
+  - icon: 
+      src: /icons/eye.svg
     title: Continuous Monitoring
     details: Watch mode to monitor your repo and detect new issues.
-  - icon: 📦
+  - icon: 
+      src: /icons/package.svg
     title: CI/CD Integration
     details: Automatic generation of GitHub Actions and GitLab CI workflows.
 
@@ -78,11 +88,11 @@ install.bat
 ```
 
 The installation script automatically:
-- ✅ Checks/Installs Go (if missing)
-- ✅ Builds DSO binary
-- ✅ Checks/Installs Ollama
-- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
-- ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
+- Checks/Installs Go (if missing)
+- Builds DSO binary
+- Checks/Installs Ollama
+- Downloads AI model **qwen2.5:7b** by default (if no models exist)
+- Optionally installs security tools (Trivy, gitleaks, etc.)
 
 ### Manual Installation
 

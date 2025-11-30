@@ -145,5 +145,5 @@ CLAUDE_MODEL=claude-3-sonnet
 - Configuration files use YAML for flexibility
 - Error handling and fallbacks are important for production use
 
-For detailed implementation plans, see [ROADMAP.md](https://github.com/dso-cli/dso-cli/blob/main/ROADMAP.md) in the repository root.
+For detailed implementation plans, see [ROADMAP.md](../additional/ROADMAP.md).
 

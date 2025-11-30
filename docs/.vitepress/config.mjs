@@ -27,7 +27,8 @@ export default defineConfig({
           items: [
             { text: 'Architecture', link: '/guide/architecture' },
             { text: 'Ollama Integration', link: '/guide/ollama' },
-            { text: 'Scanners', link: '/guide/scanners' }
+            { text: 'Scanners', link: '/guide/scanners' },
+            { text: 'Interactive UI', link: '/guide/interactive-ui' }
           ]
         }
       ],
@@ -83,11 +84,11 @@ export default defineConfig({
     },
     
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/isma-dev/dso' }
+      { icon: 'github', link: 'https://github.com/dso-cli/dso-cli' }
     ],
     
     footer: {
-      message: 'Made with ❤️ for DevSecOps engineers',
+      message: 'Made with love for DevSecOps engineers',
       copyright: 'Copyright © 2024 DSO Contributors'
     },
     

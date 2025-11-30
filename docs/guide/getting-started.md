@@ -19,16 +19,31 @@ dso tools
 Run your first audit on your project:
 
 ```bash
+# Standard mode
 dso audit .
+
+# Interactive TUI mode (recommended)
+dso audit . --interactive
 ```
 
 DSO will:
-1. 🔍 Scan your code (SAST, secrets, dependencies, IaC)
-2. 🧠 Analyze results with local AI
-3. 📊 Give you an intelligent summary
+1. Scan your code (SAST, secrets, dependencies, IaC)
+2. Analyze results with local AI
+3. Give you an intelligent summary
+4. Display results in an interactive UI (if `--interactive` is used)
+
+### Interactive UI Mode
+
+When using `--interactive` or `-i`, DSO launches a beautiful TUI (Terminal User Interface) with:
+
+- **Navigation tabs**: Summary, Top Fixes, Critical, High, All Findings
+- **Real-time search**: Filter findings as you type
+- **Progress bars**: Visual representation of severity distribution
+- **Keyboard shortcuts**: Navigate efficiently with `Tab`, `↑`, `↓`, `/`, `q`
 
 ### Example Output
 
+**Standard Mode:**
 ```
 🔒 DSO - DevSecOps Oracle
 

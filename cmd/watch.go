@@ -88,7 +88,7 @@ func init() {
 }
 
 // findNewFindings finds findings that weren't in the previous scan
-func findNewFindings(old, new *scanner.ScanResults) []scanner.Finding {
+func findNewFindings(old, current *scanner.ScanResults) []scanner.Finding {
 	newFindings := []scanner.Finding{}
 
 	// Create a map of old findings for quick comparison
@@ -99,7 +99,7 @@ func findNewFindings(old, new *scanner.ScanResults) []scanner.Finding {
 	}
 
 	// Find new ones
-	for _, f := range new.Findings {
+	for _, f := range current.Findings {
 		key := fmt.Sprintf("%s:%s:%d", f.ID, f.File, f.Line)
 		if !oldMap[key] {
 			newFindings = append(newFindings, f)

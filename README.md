@@ -16,7 +16,7 @@ npm run dev
 
 Access at `http://localhost:5173`
 
-**Platform-specific instructions:** See [PLATFORMS.md](PLATFORMS.md) for detailed installation guides for Windows, macOS, Ubuntu, Debian, and other Linux distributions.
+**Platform-specific instructions:** See [PLATFORMS.md](docs/additional/PLATFORMS.md) for detailed installation guides for Windows, macOS, Ubuntu, Debian, and other Linux distributions.
 
 ## 🚀 Installation
 
@@ -175,13 +175,28 @@ dso tools --install
 ### Complete audit
 
 ```bash
+# Standard mode (text output)
 dso audit .
+
+# Interactive TUI mode (recommended)
+dso audit . --interactive
+# or
+dso audit . -i
+
+# JSON output
+dso audit . --format json
 ```
 
 Analyzes your repo and gives you:
 - A clear summary of real risk
 - The 3-5 priority fixes
 - Exact commands to run
+
+**Interactive TUI Features:**
+- Navigate through tabs (Summary, Top Fixes, Critical, High, All Findings)
+- Real-time search and filtering
+- Progress bars for severity statistics
+- Keyboard shortcuts (Tab/→ for next tab, Shift+Tab/← for previous, q to quit)
 
 ### Auto-fix
 

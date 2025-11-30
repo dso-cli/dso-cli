@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	auditFormat  string
-	auditVerbose bool
+	auditFormat     string
+	auditVerbose    bool
+	auditInteractive bool
 )
 
 var auditCmd = &cobra.Command{
@@ -88,12 +89,20 @@ and analyzes results with local AI to give you the 3-5 critical issues.`,
 		}
 
 		// Phase 3: Display
-		fmt.Println()
-		ui.PrintBeautifulSummary(summary, results, auditFormat == "json")
+		if auditInteractive && auditFormat != "json" {
+			if err := ui.ShowInteractiveUI(summary, results); err != nil {
+				fmt.Fprintf(os.Stderr, "Error displaying interactive UI: %v\n", err)
+				ui.PrintBeautifulSummary(summary, results, false)
+			}
+		} else {
+			fmt.Println()
+			ui.PrintBeautifulSummary(summary, results, auditFormat == "json")
+		}
 	},
 }
 
 func init() {
 	auditCmd.Flags().StringVarP(&auditFormat, "format", "f", "text", "Output format (text, json)")
 	auditCmd.Flags().BoolVarP(&auditVerbose, "verbose", "v", false, "Verbose mode")
+	auditCmd.Flags().BoolVarP(&auditInteractive, "interactive", "i", false, "Interactive TUI mode")
 }

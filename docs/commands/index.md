@@ -9,7 +9,11 @@ DSO provides a comprehensive set of commands for security auditing, fixing, and 
 Run a complete security audit with AI analysis.
 
 ```bash
+# Standard mode
 dso audit .
+
+# Interactive TUI mode (recommended)
+dso audit . --interactive
 ```
 
 ### [`fix`](./fix.md)

@@ -341,7 +341,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### Platform-specific Installation
 
-For detailed platform-specific instructions, see [PLATFORMS.md](https://github.com/dso-cli/dso-cli/blob/main/PLATFORMS.md) in the repository root.
+For detailed platform-specific instructions, see [PLATFORMS.md](../additional/PLATFORMS.md).
 
 ## About the Developer
 

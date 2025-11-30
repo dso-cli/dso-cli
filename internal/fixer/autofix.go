@@ -67,7 +67,9 @@ func fixSecret(finding scanner.Finding, projectPath string, auto bool) (string, 
 	}
 
 	// Remove the line
-	newLines := append(lines[:finding.Line-1], lines[finding.Line:]...)
+	newLines := make([]string, 0, len(lines)-1)
+	newLines = append(newLines, lines[:finding.Line-1]...)
+	newLines = append(newLines, lines[finding.Line:]...)
 	newContent := strings.Join(newLines, "\n")
 
 	// Write file

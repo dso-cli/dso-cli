@@ -31,6 +31,29 @@ dso audit .
 dso audit --format json .
 ```
 
+### `--interactive, -i`
+
+Interactive TUI mode with navigation and filtering:
+
+```bash
+# Launch interactive UI
+dso audit . --interactive
+# or
+dso audit . -i
+```
+
+**Interactive UI Features:**
+- Navigate through tabs (Summary, Top Fixes, Critical, High, All Findings)
+- Real-time search and filtering
+- Progress bars for severity statistics
+- Keyboard shortcuts:
+  - `Tab` / `→` : Next tab
+  - `Shift+Tab` / `←` : Previous tab
+  - `↑` / `k` : Move up
+  - `↓` / `j` : Move down
+  - `/` : Search (in lists)
+  - `q` / `Ctrl+C` : Quit
+
 ### `--verbose, -v`
 
 Verbose mode with additional details:

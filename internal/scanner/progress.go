@@ -44,10 +44,14 @@ func (pt *ProgressTracker) StartStep(stepIndex int, name string) {
 // CompleteStep marks a step as completed
 func (pt *ProgressTracker) CompleteStep(stepIndex int, findings int) {
 	if pt.interactive {
+		stepName := "Step"
+		if stepIndex >= 0 && stepIndex < len(pt.stepNames) {
+			stepName = pt.stepNames[stepIndex]
+		}
 		if findings > 0 {
-			fmt.Printf("\r[%d/%d] ✅ %s (%d findings)\n", stepIndex+1, pt.totalSteps, pt.stepNames[stepIndex], findings)
+			fmt.Printf("\r[%d/%d] ✅ %s (%d findings)\n", stepIndex+1, pt.totalSteps, stepName, findings)
 		} else {
-			fmt.Printf("\r[%d/%d] ✅ %s\n", stepIndex+1, pt.totalSteps, pt.stepNames[stepIndex])
+			fmt.Printf("\r[%d/%d] ✅ %s\n", stepIndex+1, pt.totalSteps, stepName)
 		}
 	}
 }

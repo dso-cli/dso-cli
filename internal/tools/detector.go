@@ -107,19 +107,17 @@ func getVersion(command string) string {
 	return version
 }
 
-// CheckTools checks tools and returns missing ones
-func CheckTools(requiredOnly bool) ([]Tool, []Tool) {
+// CheckTools checks tools and returns installed and missing tools.
+func CheckTools(requiredOnly bool) (installed []Tool, missing []Tool) {
 	allTools := DetectTools()
-	installed := []Tool{}
-	missing := []Tool{}
+	installed = []Tool{}
+	missing = []Tool{}
 
 	for _, tool := range allTools {
 		if tool.Installed {
 			installed = append(installed, tool)
-		} else {
-			if !requiredOnly || tool.Required {
-				missing = append(missing, tool)
-			}
+		} else if !requiredOnly || tool.Required {
+			missing = append(missing, tool)
 		}
 	}
 

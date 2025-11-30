@@ -5,8 +5,11 @@ Concrete examples of using DSO in different scenarios.
 ## Example 1: Node.js Project Audit
 
 ```bash
-# Complete audit
+# Complete audit (standard mode)
 dso audit .
+
+# Interactive TUI mode (recommended)
+dso audit . --interactive
 
 # Typical result
 # 🔴 1 critical: GitHub token secret in .env
