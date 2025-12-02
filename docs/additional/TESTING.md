@@ -1,8 +1,8 @@
-# 🧪 Guide de Test - DSO CLI
+# Guide de Test - DSO CLI
 
 Ce document décrit comment tester DSO CLI de manière complète.
 
-## 📋 Types de Tests
+## Types de Tests
 
 ### 1. Tests Unitaires Go
 
@@ -89,7 +89,7 @@ Les tests E2E couvrent :
 - Gestion des intégrations
 - Monitoring des services
 
-## 🚀 Tests Automatisés
+## Tests Automatisés
 
 ### Avec Make
 
@@ -109,7 +109,7 @@ Les tests sont automatiquement exécutés sur :
 
 Voir `.github/workflows/test.yml` pour les détails.
 
-## 📊 Couverture de Code
+## Couverture de Code
 
 ### Go
 
@@ -154,14 +154,14 @@ npm run dev:full
 2. Ouvrir `http://localhost:3000`
 
 3. Tester les fonctionnalités :
-   - Dashboard
-   - Nouveau scan
-   - Assistant IA
-   - AutoFix
-   - Intégrations
-   - Monitoring
+ - Dashboard
+ - Nouveau scan
+ - Assistant IA
+ - AutoFix
+ - Intégrations
+ - Monitoring
 
-## 🐛 Débogage
+## Débogage
 
 ### Tests Go qui échouent
 
@@ -203,7 +203,7 @@ Tester un endpoint :
 curl http://localhost:3001/api/monitoring/services
 ```
 
-## ✅ Checklist de Test
+## Checklist de Test
 
 Avant de commit :
 
@@ -222,7 +222,7 @@ Avant un release :
 - [ ] Documentation à jour
 - [ ] Changelog mis à jour
 
-## 📝 Écrire de Nouveaux Tests
+## Écrire de Nouveaux Tests
 
 ### Test Go
 
@@ -232,16 +232,16 @@ package scanner
 import "testing"
 
 func TestFunctionName(t *testing.T) {
-    // Arrange
-    input := "test"
-    
-    // Act
-    result := FunctionName(input)
-    
-    // Assert
-    if result != "expected" {
-        t.Errorf("Expected %s, got %s", "expected", result)
-    }
+ // Arrange
+ input := "test"
+ 
+ // Act
+ result := FunctionName(input)
+ 
+ // Assert
+ if result != "expected" {
+ t.Errorf("Expected %s, got %s", "expected", result)
+ }
 }
 ```
 
@@ -253,10 +253,10 @@ import { mount } from '@vue/test-utils'
 import Component from './Component.vue'
 
 describe('Component', () => {
-  it('should render correctly', () => {
-    const wrapper = mount(Component)
-    expect(wrapper.text()).toContain('Expected text')
-  })
+ it('should render correctly', () => {
+ const wrapper = mount(Component)
+ expect(wrapper.text()).toContain('Expected text')
+ })
 })
 ```
 
@@ -266,12 +266,12 @@ describe('Component', () => {
 import { test, expect } from '@playwright/test'
 
 test('should do something', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.locator('h1')).toBeVisible()
+ await page.goto('/')
+ await expect(page.locator('h1')).toBeVisible()
 })
 ```
 
-## 🎯 Objectifs de Couverture
+## Objectifs de Couverture
 
 - **Go** : > 70% de couverture
 - **TypeScript/Vue** : > 60% de couverture

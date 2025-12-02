@@ -1,6 +1,6 @@
-# 🤝 Guide de Contribution
+# Guide de Contribution
 
-Merci de ton intérêt pour contribuer à DSO ! 🎉
+Merci de ton intérêt pour contribuer à DSO ! 
 
 ## Comment Contribuer
 
@@ -104,5 +104,5 @@ Ouvre une issue pour discuter de tes idées avant de commencer à coder !
 
 ## Code de Conduite
 
-Sois respectueux, inclusif et constructif. On est tous là pour apprendre et améliorer DSO ensemble. 💪
+Sois respectueux, inclusif et constructif. On est tous là pour apprendre et améliorer DSO ensemble. 
 

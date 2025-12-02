@@ -1,6 +1,6 @@
 # 🗄️ Configuration Supabase pour DSO
 
-## 📋 Vue d'ensemble
+## Vue d'ensemble
 
 Supabase est utilisé pour :
 - **Suivi des scans** : Historique complet de tous les scans
@@ -8,7 +8,7 @@ Supabase est utilisé pour :
 - **Collaboration** : Partage de résultats d'équipe
 - **Persistance** : Sauvegarde des résultats et analyses
 
-## 🚀 Configuration
+## Configuration
 
 ### 1. Créer un projet Supabase
 
@@ -25,21 +25,21 @@ Supabase est utilisé pour :
 ### 3. Configurer les variables d'environnement
 
 1. Copiez `.env.example` vers `.env` :
-   ```bash
-   cp .env.example .env
-   ```
+ ```bash
+ cp .env.example .env
+ ```
 
 2. Remplissez les valeurs :
-   ```env
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   ```
+ ```env
+ VITE_SUPABASE_URL=https://your-project.supabase.co
+ VITE_SUPABASE_ANON_KEY=your-anon-key
+ ```
 
 ### 4. Vérifier la configuration
 
 L'interface web détectera automatiquement si Supabase est configuré. Si ce n'est pas le cas, elle fonctionnera en mode local sans persistance.
 
-## 📊 Structure de la base de données
+## Structure de la base de données
 
 ### Tables principales
 
@@ -52,20 +52,20 @@ L'interface web détectera automatiquement si Supabase est configuré. Si ce n'e
 - **top_fixes** : Corrections prioritaires
 - **scan_history** : Historique pour analytics
 
-## 🔒 Sécurité
+## Sécurité
 
 - **Row Level Security (RLS)** activé sur toutes les tables
 - Les utilisateurs ne voient que leurs propres données
 - Authentification via Supabase Auth
 
-## 📈 Analytics disponibles
+## Analytics disponibles
 
 - Statistiques de scans (30 derniers jours)
 - Tendances des vulnérabilités
 - Temps moyen de scan
 - Taux de correction
 
-## 🎯 Utilisation
+## Utilisation
 
 Une fois configuré, Supabase est utilisé automatiquement :
 - Chaque scan est sauvegardé

@@ -4,15 +4,15 @@ Interface web moderne et performante pour DSO (DevSecOps Oracle).
 
 ## ✨ Caractéristiques
 
-- 🎨 **Design moderne** : Interface élégante avec Tailwind CSS
+- **Design moderne** : Interface élégante avec Tailwind CSS
 - ⚡ **Performant** : Optimisé pour la vitesse et la réactivité
-- 📊 **Dashboard complet** : Vue d'ensemble avec statistiques
+- **Dashboard complet** : Vue d'ensemble avec statistiques
 - 🔍 **Scans avancés** : Options de scan personnalisables
-- 📈 **Analytics** : Suivi et tendances avec Supabase
+- **Analytics** : Suivi et tendances avec Supabase
 - 💾 **Persistance** : Sauvegarde automatique des résultats
-- 🎯 **Facile à utiliser** : Interface intuitive et bien documentée
+- **Facile à utiliser** : Interface intuitive et bien documentée
 
-## 🚀 Installation
+## Installation
 
 ```bash
 # Installer les dépendances
@@ -23,7 +23,7 @@ cp .env.example .env
 # Remplir VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
 ```
 
-## 🎯 Utilisation
+## Utilisation
 
 ### Mode développement complet
 
@@ -46,13 +46,13 @@ npm run dev
 npm run server
 ```
 
-## 📋 Prérequis
+## Prérequis
 
 - Node.js 18+
 - DSO CLI installé et dans le PATH
 - (Optionnel) Projet Supabase configuré
 
-## 🎨 Fonctionnalités
+## Fonctionnalités
 
 ### Dashboard
 - Vue d'ensemble des scans
@@ -78,7 +78,7 @@ npm run server
 - Statut des outils de scan
 - Version DSO CLI
 
-## 📊 Supabase (Optionnel)
+## Supabase (Optionnel)
 
 Pour activer la persistance et les analytics :
 
@@ -88,20 +88,20 @@ Pour activer la persistance et les analytics :
 
 Voir [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) pour plus de détails.
 
-## 🎯 Performance
+## Performance
 
 - **Lazy loading** : Composants chargés à la demande
 - **Optimisations** : Code splitting et tree shaking
 - **Caching** : Mise en cache des résultats
 - **Compression** : Assets optimisés
 
-## 📚 Documentation
+## Documentation
 
 - [PROJECT_PURPOSE.md](../docs/PROJECT_PURPOSE.md) : À quoi sert DSO
 - [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) : Configuration Supabase
 - [../README.md](../README.md) : Documentation principale
 
-## 🛠️ Technologies
+## Technologies
 
 - **Vue.js 3** : Framework frontend
 - **TypeScript** : Typage statique
@@ -110,14 +110,14 @@ Voir [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) pour plus de détails.
 - **Express.js** : API backend
 - **Vite** : Build tool
 
-## 🎨 Design
+## Design
 
 - **Couleurs** : Emerald (vert) et Dark Blue (bleu foncé)
 - **Typographie** : Système de polices natif
 - **Animations** : Transitions fluides
 - **Responsive** : Mobile-first design
 
-## 📈 Roadmap
+## Roadmap
 
 - [ ] Mode sombre
 - [ ] Notifications en temps réel

@@ -1,28 +1,28 @@
-# 🎯 À quoi sert DSO et qui en a besoin ?
+# À quoi sert DSO et qui en a besoin ?
 
-## 📋 Vue d'ensemble
+## Vue d'ensemble
 
 **DSO (DevSecOps Oracle)** est un assistant de sécurité DevSecOps alimenté par l'IA locale qui parle comme un ingénieur sécurité senior assis à côté de vous.
 
-## 🎯 À quoi sert DSO ?
+## À quoi sert DSO ?
 
 ### Problème résolu
 
 Les outils de sécurité existants sont souvent :
-- ❌ **Trop verbeux** : Des milliers de faux positifs
-- ❌ **Pas contextuels** : Ne comprennent pas votre projet
-- ❌ **Configuration complexe** : Nécessitent beaucoup de configuration
-- ❌ **Envoi de données** : Envoient votre code à l'extérieur
-- ❌ **Pas d'IA** : Pas d'analyse intelligente des résultats
+- **Trop verbeux** : Des milliers de faux positifs
+- **Pas contextuels** : Ne comprennent pas votre projet
+- **Configuration complexe** : Nécessitent beaucoup de configuration
+- **Envoi de données** : Envoient votre code à l'extérieur
+- **Pas d'IA** : Pas d'analyse intelligente des résultats
 
 ### Solution DSO
 
 DSO résout ces problèmes en étant :
-- ✅ **Intelligent** : IA locale analyse et filtre les résultats
-- ✅ **Contextuel** : Comprend votre projet et vous donne les 3-5 problèmes qui comptent vraiment
-- ✅ **Local** : 100% local, zéro fuite de code
-- ✅ **Simple** : Une commande, zéro configuration
-- ✅ **Complet** : SAST, secrets, dépendances, IaC, Docker, Kubernetes
+- **Intelligent** : IA locale analyse et filtre les résultats
+- **Contextuel** : Comprend votre projet et vous donne les 3-5 problèmes qui comptent vraiment
+- **Local** : 100% local, zéro fuite de code
+- **Simple** : Une commande, zéro configuration
+- **Complet** : SAST, secrets, dépendances, IaC, Docker, Kubernetes
 
 ## 👥 Qui a besoin de DSO ?
 
@@ -35,10 +35,10 @@ DSO résout ces problèmes en étant :
 - Veulent éviter les faux positifs
 
 **Comment DSO les aide :**
-- ✅ Scan rapide en une commande : `dso audit .`
-- ✅ Correction automatique des problèmes sûrs
-- ✅ Explications claires des vulnérabilités
-- ✅ Pas besoin de configuration
+- Scan rapide en une commande : `dso audit .`
+- Correction automatique des problèmes sûrs
+- Explications claires des vulnérabilités
+- Pas besoin de configuration
 
 **Cas d'usage :**
 ```bash
@@ -61,10 +61,10 @@ dso why CVE-2024-12345
 - Partage de résultats avec l'équipe
 
 **Comment DSO les aide :**
-- ✅ Intégration CI/CD (GitHub Actions, GitLab CI)
-- ✅ Interface web pour visualisation d'équipe
-- ✅ Suivi des scans dans Supabase
-- ✅ Génération de politiques de sécurité
+- Intégration CI/CD (GitHub Actions, GitLab CI)
+- Interface web pour visualisation d'équipe
+- Suivi des scans dans Supabase
+- Génération de politiques de sécurité
 
 **Cas d'usage :**
 ```bash
@@ -78,7 +78,7 @@ dso watch --interval 10m .
 dso policy --type opa .
 ```
 
-### 3. **DevSecOps Engineers** 🔒
+### 3. **DevSecOps Engineers** 
 
 **Problèmes qu'ils rencontrent :**
 - Trop d'outils à gérer
@@ -87,11 +87,11 @@ dso policy --type opa .
 - Reporting et métriques
 
 **Comment DSO les aide :**
-- ✅ Unifie tous les scanners (Trivy, Grype, Gitleaks, TFSec)
-- ✅ Analyse IA contextuelle
-- ✅ Dashboard web avec métriques
-- ✅ Export des résultats (JSON, CSV)
-- ✅ Suivi historique dans Supabase
+- Unifie tous les scanners (Trivy, Grype, Gitleaks, TFSec)
+- Analyse IA contextuelle
+- Dashboard web avec métriques
+- Export des résultats (JSON, CSV)
+- Suivi historique dans Supabase
 
 **Cas d'usage :**
 ```bash
@@ -105,7 +105,7 @@ dso sbom --format cyclonedx . > sbom.json
 dso watch --interval 5m .
 ```
 
-### 4. **Startups et PME** 🚀
+### 4. **Startups et PME** 
 
 **Problèmes qu'ils rencontrent :**
 - Budget limité pour les outils sécurité
@@ -114,11 +114,11 @@ dso watch --interval 5m .
 - Conformité nécessaire (SOC2, ISO27001)
 
 **Comment DSO les aide :**
-- ✅ **100% gratuit et open-source**
-- ✅ Pas besoin d'équipe sécurité dédiée
-- ✅ Simple à utiliser
-- ✅ Génération de rapports pour audits
-- ✅ SBOM pour compliance
+- **100% gratuit et open-source**
+- Pas besoin d'équipe sécurité dédiée
+- Simple à utiliser
+- Génération de rapports pour audits
+- SBOM pour compliance
 
 **Cas d'usage :**
 ```bash
@@ -141,11 +141,11 @@ dso policy --type opa . > security-policy.rego
 - Intégration avec outils existants
 
 **Comment DSO les aide :**
-- ✅ Interface web centralisée
-- ✅ Base de données Supabase pour suivi
-- ✅ API REST pour intégration
-- ✅ Export de données pour SIEM
-- ✅ Dashboard avec métriques
+- Interface web centralisée
+- Base de données Supabase pour suivi
+- API REST pour intégration
+- Export de données pour SIEM
+- Dashboard avec métriques
 
 **Cas d'usage :**
 - Interface web pour visualiser tous les scans
@@ -153,7 +153,7 @@ dso policy --type opa . > security-policy.rego
 - Base de données pour historique et métriques
 - Rapports automatisés
 
-## 📊 Statistiques d'utilisation typiques
+## Statistiques d'utilisation typiques
 
 ### Développeur Individuel
 - **Fréquence** : 2-3 fois par semaine
@@ -170,7 +170,7 @@ dso policy --type opa . > security-policy.rego
 - **Temps économisé** : 50+ heures/semaine
 - **Vulnérabilités détectées** : 500+ par organisation
 
-## 🎯 Valeur apportée
+## Valeur apportée
 
 ### Temps économisé
 - **Configuration** : 0h (vs 5-10h avec autres outils)
@@ -187,7 +187,7 @@ dso policy --type opa . > security-policy.rego
 - **Expertise** : Réduite (IA remplace partiellement l'expert)
 - **Temps** : Économie de 20-50 heures/semaine
 
-## 🚀 Conclusion
+## Conclusion
 
 DSO est l'outil idéal pour **toute personne ou organisation** qui :
 - Veut améliorer sa sécurité sans complexité
@@ -196,5 +196,5 @@ DSO est l'outil idéal pour **toute personne ou organisation** qui :
 - Préfère les solutions open-source et locales
 - A besoin d'analyse intelligente des résultats
 
-**DSO = Sécurité DevSecOps pour tous, par tous, avec IA locale** 🎯
+**DSO = Sécurité DevSecOps pour tous, par tous, avec IA locale** 
 

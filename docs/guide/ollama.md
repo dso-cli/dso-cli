@@ -94,9 +94,9 @@ ollama pull phi3
 ### Other Options
 
 ```bash
-ollama pull mistral:7b    # ~4.1 GB - Good balance
-ollama pull gemma:7b      # ~5.2 GB - Google's model
-ollama pull llama3.1:70b  # ~40 GB - Best quality (requires more RAM)
+ollama pull mistral:7b # ~4.1 GB - Good balance
+ollama pull gemma:7b # ~5.2 GB - Google's model
+ollama pull llama3.1:70b # ~40 GB - Best quality (requires more RAM)
 ```
 
 ## Configuration
@@ -153,7 +153,7 @@ Add to your shell profile:
 
 **macOS / Linux** (`~/.zshrc` or `~/.bashrc`):
 ```bash
-export DSO_MODEL=qwen2.5:7b  # Default model
+export DSO_MODEL=qwen2.5:7b # Default model
 export OLLAMA_HOST=http://localhost:11434
 ```
 
@@ -180,9 +180,9 @@ dso check
 ```
 
 This verifies:
-- ✅ Ollama connection
-- ✅ Available models
-- ✅ Configured model is installed
+- Ollama connection
+- Available models
+- Configured model is installed
 
 ## How DSO Uses Ollama
 
@@ -295,22 +295,22 @@ DSO maintains conversation context for better analysis. This is handled automati
 For CI/CD, you can:
 
 1. **Install Ollama in CI**:
-   ```yaml
-   - name: Install Ollama
-     run: curl -fsSL https://ollama.ai/install.sh | sh
-   ```
+ ```yaml
+ - name: Install Ollama
+ run: curl -fsSL https://ollama.ai/install.sh | sh
+ ```
 
 2. **Download Model**:
-   ```yaml
-   - name: Pull model
-     run: ollama pull qwen2.5:7b
-   ```
+ ```yaml
+ - name: Pull model
+ run: ollama pull qwen2.5:7b
+ ```
 
 3. **Run DSO**:
-   ```yaml
-   - name: Run audit
-     run: dso audit . --format json
-   ```
+ ```yaml
+ - name: Run audit
+ run: dso audit . --format json
+ ```
 
 **Note**: CI environments may have limited resources. Consider using smaller models or running without AI analysis.
 

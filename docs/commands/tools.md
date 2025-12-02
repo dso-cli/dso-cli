@@ -11,10 +11,10 @@ dso tools [options]
 ## Description
 
 The `tools` command:
-- ✅ Detects installed tools (Trivy, grype, gitleaks, tfsec, etc.)
-- 📦 Displays versions
-- ⚠️ Lists missing tools
-- 🔧 Offers interactive installation
+- Detects installed tools (Trivy, grype, gitleaks, tfsec, etc.)
+- Displays versions
+- Lists missing tools
+- Offers interactive installation
 
 ## Options
 
@@ -45,31 +45,31 @@ dso tools
 Output:
 
 ```
-🔧 DevSecOps Tools Status
+ DevSecOps Tools Status
 
-📦 SAST:
-   ✅ trivy (v0.45.0)
-      Complete vulnerability scanner (SAST, dependencies, IaC, containers)
-   ❌ semgrep
-      Fast SAST scanner with 1000+ security rules
-      💡 Install: brew install semgrep
+ SAST:
+ trivy (v0.45.0)
+ Complete vulnerability scanner (SAST, dependencies, IaC, containers)
+ semgrep
+ Fast SAST scanner with 1000+ security rules
+ Install: brew install semgrep
 
-📦 Dependencies:
-   ✅ npm (10.9.2)
-      Node.js package manager (for npm audit)
-   ❌ grype
-      Vulnerability scanner for container images and filesystems
-      💡 Install: brew install grype
+ Dependencies:
+ npm (10.9.2)
+ Node.js package manager (for npm audit)
+ grype
+ Vulnerability scanner for container images and filesystems
+ Install: brew install grype
 
-📦 Secrets:
-   ❌ gitleaks
-      Fast and accurate secret detector
-      💡 Install: brew install gitleaks
+ Secrets:
+ gitleaks
+ Fast and accurate secret detector
+ Install: brew install gitleaks
 
-📦 IaC:
-   ❌ tfsec
-      Security scanner for Terraform
-      💡 Install: brew install tfsec
+ IaC:
+ tfsec
+ Security scanner for Terraform
+ Install: brew install tfsec
 ```
 
 Tools are organized by category with installation instructions for missing tools.

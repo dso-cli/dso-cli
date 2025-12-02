@@ -6,9 +6,9 @@ This document outlines planned bonus features that can be implemented in ~1 hour
 
 ## 1. `dso pr` - Automated Pull Request Creation
 
-**Estimated Time:** ~1 hour  
-**Priority:** High  
-**Status:** 📋 Planned
+**Estimated Time:** ~1 hour 
+**Priority:** High 
+**Status:** Planned
 
 ### Description
 Automatically create a GitHub Pull Request with security fixes applied by DSO.
@@ -17,9 +17,9 @@ Automatically create a GitHub Pull Request with security fixes applied by DSO.
 - Detect fixes applied by `dso fix --auto`
 - Create a new branch with fixes
 - Generate PR description with:
-  - Summary of fixes applied
-  - Security findings addressed
-  - Before/after comparisons
+ - Summary of fixes applied
+ - Security findings addressed
+ - Before/after comparisons
 - Use GitHub CLI (`gh`) or GitHub API
 - Support for GitHub and GitLab
 
@@ -40,9 +40,9 @@ dso pr --base main --title "Security fixes from DSO audit"
 
 ## 2. `dso watch` - Real-time Monitoring with Notifications
 
-**Estimated Time:** ~1 hour  
-**Priority:** Medium  
-**Status:** 📋 Planned
+**Estimated Time:** ~1 hour 
+**Priority:** Medium 
+**Status:** Planned
 
 ### Description
 Continuously monitor the repository and send notifications to Slack/Teams when new security issues are detected.
@@ -74,22 +74,22 @@ dso watch . --notify-config ~/.dso/notify.yaml
 ```yaml
 # ~/.dso/notify.yaml
 slack:
-  webhook_url: "https://hooks.slack.com/services/..."
-  enabled: true
-  severity_threshold: "high"  # only notify on high/critical
+ webhook_url: "https://hooks.slack.com/services/..."
+ enabled: true
+ severity_threshold: "high" # only notify on high/critical
 
 teams:
-  webhook_url: "https://outlook.office.com/webhook/..."
-  enabled: true
+ webhook_url: "https://outlook.office.com/webhook/..."
+ enabled: true
 ```
 
 ---
 
 ## 3. Support for Gemini/Claude API
 
-**Estimated Time:** ~1 hour  
-**Priority:** Low (Ollama is sufficient for most users)  
-**Status:** 📋 Planned
+**Estimated Time:** ~1 hour 
+**Priority:** Low (Ollama is sufficient for most users) 
+**Status:** Planned
 
 ### Description
 Add support for cloud-based AI models (Google Gemini, Anthropic Claude) for users who want more powerful analysis or don't want to run Ollama locally.
@@ -121,7 +121,7 @@ dso audit . --ai auto
 ### Configuration
 ```yaml
 # ~/.dso/config
-AI_PROVIDER=gemini  # or claude, ollama
+AI_PROVIDER=gemini # or claude, ollama
 GEMINI_API_KEY=your-key
 CLAUDE_API_KEY=your-key
 GEMINI_MODEL=gemini-pro

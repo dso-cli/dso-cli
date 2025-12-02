@@ -1,10 +1,18 @@
-# 🔒 DSO - DevSecOps Oracle
+# DSO - DevSecOps Oracle
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://golang.org/)
+[![GitHub release](https://img.shields.io/github/release/dso-cli/dso-cli.svg)](https://github.com/dso-cli/dso-cli/releases)
+[![GitHub issues](https://img.shields.io/github/issues/dso-cli/dso-cli)](https://github.com/dso-cli/dso-cli/issues)
+[![GitHub stars](https://img.shields.io/github/stars/dso-cli/dso-cli?style=social)](https://github.com/dso-cli/dso-cli/stargazers)
 
 A DevSecOps CLI assistant powered by local AI that talks to you like a senior security engineer sitting next to you.
 
-**Developed by:** Ismail MOUYAHADA
+**Developed by:** [Ismail MOUYAHADA](https://github.com/isma-dev)
 
-## 📚 Documentation
+> **100% Local • Zero Configuration • AI-Powered Security Analysis**
+
+## Documentation
 
 Complete documentation available with VitePress and Catppuccin theme:
 
@@ -16,9 +24,16 @@ npm run dev
 
 Access at `http://localhost:5173`
 
-**Platform-specific instructions:** See [PLATFORMS.md](docs/additional/PLATFORMS.md) for detailed installation guides for Windows, macOS, Ubuntu, Debian, and other Linux distributions.
+**Documentation Index:** See [DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md) for a complete list of all documentation.
 
-## 🚀 Installation
+**Quick Links:**
+- [Quick Start Guide](docs/additional/QUICK_START.md) - Get started in minutes
+- [Installation Guide](docs/additional/INSTALL.md) - Detailed setup instructions
+- [Platform-Specific Guides](docs/additional/PLATFORMS.md) - Windows, macOS, Linux instructions
+- [Testing Guide](docs/additional/TESTING.md) - How to test DSO
+- [Commands Reference](docs/commands/index.md) - All CLI commands
+
+## Installation
 
 ### One-Command Installation (Recommended)
 
@@ -50,12 +65,12 @@ install.bat
 ```
 
 The installation script automatically:
-- ✅ Checks/Installs Go (if missing)
-- ✅ Builds DSO binary
-- ✅ Installs DSO globally (available as `dso` command)
-- ✅ Checks/Installs Ollama
-- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
-- ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
+- Checks/Installs Go (if missing)
+- Builds DSO binary
+- Installs DSO globally (available as `dso` command)
+- Checks/Installs Ollama
+- Downloads AI model **qwen2.5:7b** by default (if no models exist)
+- Optionally installs security tools (Trivy, gitleaks, etc.)
 
 ### Native Package Installation
 
@@ -120,7 +135,7 @@ ollama pull phi3          # ~2.3 GB - Lightweight
 ollama pull mistral:7b    # ~4.1 GB
 ```
 
-## 📦 External Dependencies (optional but recommended)
+## External Dependencies (optional but recommended)
 
 DSO automatically detects available tools and adapts. Install them for complete analysis:
 
@@ -170,7 +185,7 @@ Or use DSO's interactive tool installer:
 dso tools --install
 ```
 
-## 🎯 Usage
+## Usage
 
 ### Complete audit
 
@@ -290,49 +305,49 @@ dso ci --provider github .
 dso ci --provider gitlab .
 ```
 
-## 🎨 Example Output
+## Example Output
 
 ```
-🔒 DSO - DevSecOps Oracle
+DSO - DevSecOps Oracle
 
-📊 Summary
+Summary
 ────────────────────────────────────────────────────────────
   You have 127 alerts but only 3 are critical and exploitable in prod.
 
-📈 Statistics
+Statistics
 ────────────────────────────────────────────────────────────
   Total: 127 findings
-  🔴 Critical: 3
-  🟠 High: 12
-  🟡 Medium: 45
-  🔵 Low: 67
-  ✅ Fixable: 89
-  ⚠️  Exploitable: 3
+  Critical: 3
+  High: 12
+  Medium: 45
+  Low: 67
+  Fixable: 89
+  Exploitable: 3
 
-💼 Business Impact
+Business Impact
 ────────────────────────────────────────────────────────────
   The 3 critical vulnerabilities are in public exposed endpoints.
   Risk of user data exfiltration.
 
-🔧 Top Priority Fixes
+Top Priority Fixes
 ────────────────────────────────────────────────────────────
 
-❌ 1. Hardcoded AWS key in frontend/.env.production
-   📁 frontend/.env.production:12
+1. Hardcoded AWS key in frontend/.env.production
+   frontend/.env.production:12
    Secret detected in a versioned file
    
    sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
 
-❌ 2. XSS in src/components/Search.tsx
-   📁 src/components/Search.tsx:45
+2. XSS in src/components/Search.tsx
+   src/components/Search.tsx:45
    React useEffect unprotected against injection
    
    [patch to apply...]
 
-💡 Ready to fix this in 2 min? Run: dso fix --auto
+Ready to fix this in 2 min? Run: dso fix --auto
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### AI Model
 
@@ -373,11 +388,11 @@ dso check
 ```
 
 This command checks:
-- ✅ Connection to Ollama
-- ✅ Available models
-- ✅ Configured model is installed
+- Connection to Ollama
+- Available models
+- Configured model is installed
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 dso/
@@ -395,13 +410,13 @@ dso/
 └── templates/        # System prompts
 ```
 
-## 🔒 Security
+## Security
 
 - **100% local**: No data is sent outside
 - **Zero configuration**: Automatic detection of languages and frameworks
 - **Confirmation required**: Destructive fixes ask for confirmation
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Install dependencies
@@ -427,7 +442,7 @@ go build -o dso
 go install
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Tests Go
 ```bash
@@ -458,15 +473,17 @@ npm run test:e2e
 npm run test:e2e:ui
 ```
 
-### Tests d'intégration API
-Les tests d'intégration API sont inclus dans les tests E2E et vérifient :
-- ✅ Détection des problèmes (`/api/autofix/issues`)
-- ✅ Configuration des outils (`/api/tools/config`)
-- ✅ Diagnostic des services (`/api/monitoring/services/diagnose`)
-- ✅ Statut des services (`/api/monitoring/services`)
-- ✅ Gestion des intégrations (`/api/integrations`)
+### API Integration Tests
+API integration tests are included in E2E tests and verify:
+- Issue detection (`/api/autofix/issues`)
+- Tool configuration (`/api/tools/config`)
+- Service diagnosis (`/api/monitoring/services/diagnose`)
+- Service status (`/api/monitoring/services`)
+- Integration management (`/api/integrations`)
 
-## 📝 TODO / Roadmap
+For detailed testing information, see [Testing Guide](docs/additional/TESTING.md).
+
+## TODO / Roadmap
 
 - [ ] TUI interface with bubbletea
 - [ ] Slack/Teams integration
@@ -475,14 +492,35 @@ Les tests d'intégration API sont inclus dans les tests E2E et vérifient :
 - [ ] Optional web dashboard
 - [ ] Export to Jira, Linear, etc.
 
-## 🤝 Contributing
+## Contributing
 
-PRs are welcome! For major changes, please open an issue first.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-## 📄 License
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](.github/SECURITY.md)
 
-MIT
+For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Ollama](https://ollama.ai) for local AI capabilities
+- All the security tools integrated (Trivy, gitleaks, etc.)
+- The open-source community for inspiration and support
+
+## Support
+
+- [Report a Bug](https://github.com/dso-cli/dso-cli/issues/new?template=bug_report.md)
+- [Request a Feature](https://github.com/dso-cli/dso-cli/issues/new?template=feature_request.md)
+- [Discussions](https://github.com/dso-cli/dso-cli/discussions)
+- [Security Issues](.github/SECURITY.md)
 
 ---
 
-**Made with ❤️ for DevSecOps engineers who are tired of false positives**
+**Made with dedication for DevSecOps engineers who are tired of false positives**
+
+**Developed by Ismail MOUYAHADA**

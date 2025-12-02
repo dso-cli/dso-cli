@@ -1,47 +1,47 @@
-# 📁 Structure du Projet DSO
+# Structure du Projet DSO
 
 ```
 dso/
-├── main.go                    # Point d'entrée
-├── go.mod                     # Dépendances Go
-├── Makefile                   # Commandes de build
-├── install.sh                 # Script d'installation
+├── main.go # Point d'entrée
+├── go.mod # Dépendances Go
+├── Makefile # Commandes de build
+├── install.sh # Script d'installation
 │
-├── cmd/                       # Commandes CLI (Cobra)
-│   ├── root.go               # Commande racine
-│   ├── audit.go              # dso audit
-│   ├── fix.go                # dso fix
-│   ├── why.go                # dso why
-│   └── pr.go                 # dso pr
+├── cmd/ # Commandes CLI (Cobra)
+│ ├── root.go # Commande racine
+│ ├── audit.go # dso audit
+│ ├── fix.go # dso fix
+│ ├── why.go # dso why
+│ └── pr.go # dso pr
 │
 ├── internal/
-│   ├── scanner/              # Scanners de sécurité
-│   │   ├── scanner.go       # Orchestration des scans
-│   │   └── models.go         # Structures de données
-│   │
-│   ├── llm/                  # Intégration IA locale
-│   │   ├── ollama.go         # Client Ollama
-│   │   └── prompts.go        # Gestion des prompts
-│   │
-│   ├── fixer/                # Auto-correction
-│   │   ├── autofix.go        # Application des correctifs
-│   │   └── patcher.go        # Gestion des patches
-│   │
-│   └── ui/                   # Interface terminal
-│       └── rich.go           # Affichage avec lipgloss
+│ ├── scanner/ # Scanners de sécurité
+│ │ ├── scanner.go # Orchestration des scans
+│ │ └── models.go # Structures de données
+│ │
+│ ├── llm/ # Intégration IA locale
+│ │ ├── ollama.go # Client Ollama
+│ │ └── prompts.go # Gestion des prompts
+│ │
+│ ├── fixer/ # Auto-correction
+│ │ ├── autofix.go # Application des correctifs
+│ │ └── patcher.go # Gestion des patches
+│ │
+│ └── ui/ # Interface terminal
+│ └── rich.go # Affichage avec lipgloss
 │
-├── templates/                 # Templates de prompts
-│   └── prompt_system.txt     # Prompt système pour l'IA
+├── templates/ # Templates de prompts
+│ └── prompt_system.txt # Prompt système pour l'IA
 │
-├── examples/                  # Exemples de projets de test
+├── examples/ # Exemples de projets de test
 │
-├── README.md                  # Documentation principale
+├── README.md # Documentation principale
 ├── docs/
-│   ├── additional/
-│   │   ├── INSTALL.md         # Guide d'installation
-│   │   └── CONTRIBUTING.md    # Guide de contribution
-├── LICENSE                    # Licence MIT
-└── .gitignore                 # Fichiers à ignorer
+│ ├── additional/
+│ │ ├── INSTALL.md # Guide d'installation
+│ │ └── CONTRIBUTING.md # Guide de contribution
+├── LICENSE # Licence MIT
+└── .gitignore # Fichiers à ignorer
 ```
 
 ## Flux d'Exécution

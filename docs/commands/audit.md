@@ -47,12 +47,12 @@ dso audit . -i
 - Real-time search and filtering
 - Progress bars for severity statistics
 - Keyboard shortcuts:
-  - `Tab` / `→` : Next tab
-  - `Shift+Tab` / `←` : Previous tab
-  - `↑` / `k` : Move up
-  - `↓` / `j` : Move down
-  - `/` : Search (in lists)
-  - `q` / `Ctrl+C` : Quit
+ - `Tab` / `→` : Next tab
+ - `Shift+Tab` / `←` : Previous tab
+ - `↑` / `k` : Move up
+ - `↓` / `j` : Move down
+ - `/` : Search (in lists)
+ - `q` / `Ctrl+C` : Quit
 
 ### `--verbose, -v`
 
@@ -92,60 +92,60 @@ dso audit ./src
 ### Text Format
 
 ```
-🔒 DSO - DevSecOps Oracle
+ DSO - DevSecOps Oracle
 
-📊 Summary
+ Summary
 ────────────────────────────────────────────────────────────
-  You have 127 alerts but only 3 are critical and exploitable in prod.
+ You have 127 alerts but only 3 are critical and exploitable in prod.
 
-📈 Statistics
+ Statistics
 ────────────────────────────────────────────────────────────
-  Total: 127 findings
-  🔴 Critical: 3
-  🟠 High: 12
-  🟡 Medium: 45
-  🔵 Low: 67
-  ✅ Fixable: 89
-  ⚠️  Exploitable: 3
+ Total: 127 findings
+ Critical: 3
+ High: 12
+ Medium: 45
+ Low: 67
+ Fixable: 89
+ Exploitable: 3
 
-💼 Business Impact
+ Business Impact
 ────────────────────────────────────────────────────────────
-  The 3 critical vulnerabilities are in public exposed endpoints.
+ The 3 critical vulnerabilities are in public exposed endpoints.
 
-🔧 Top Priority Fixes
+ Top Priority Fixes
 ────────────────────────────────────────────────────────────
 
-❌ 1. Hardcoded AWS key in frontend/.env.production
-   📁 frontend/.env.production:12
-   Secret detected in a versioned file
-   
-   sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
+ 1. Hardcoded AWS key in frontend/.env.production
+ frontend/.env.production:12
+ Secret detected in a versioned file
+ 
+ sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
 ```
 
 ### JSON Format
 
 ```json
 {
-  "analysis": {
-    "summary": "You have 127 alerts but only 3 are critical...",
-    "critical": ["issue 1", "issue 2"],
-    "high": ["issue 3"],
-    "top_fixes": [
-      {
-        "title": "Hardcoded AWS key",
-        "file": "frontend/.env.production",
-        "line": 12,
-        "command": "sed -i '12d' frontend/.env.production"
-      }
-    ]
-  },
-  "results": {
-    "summary": {
-      "total": 127,
-      "critical": 3,
-      "high": 12
-    }
-  }
+ "analysis": {
+ "summary": "You have 127 alerts but only 3 are critical...",
+ "critical": ["issue 1", "issue 2"],
+ "high": ["issue 3"],
+ "top_fixes": [
+ {
+ "title": "Hardcoded AWS key",
+ "file": "frontend/.env.production",
+ "line": 12,
+ "command": "sed -i '12d' frontend/.env.production"
+ }
+ ]
+ },
+ "results": {
+ "summary": {
+ "total": 127,
+ "critical": 3,
+ "high": 12
+ }
+ }
 }
 ```
 

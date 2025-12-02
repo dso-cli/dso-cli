@@ -1,127 +1,126 @@
-# 🧠 Intégration Ollama - Documentation Technique
+# 🧠 Ollama Integration - Technical Documentation
 
-## Vue d'ensemble
+## Overview
 
-DSO utilise Ollama pour l'analyse IA locale des résultats de scan. L'intégration est complète et robuste avec support de l'API chat moderne.
+DSO uses Ollama for local AI analysis of scan results. The integration is complete and robust with support for the modern chat API.
 
-## Fonctionnalités
+## Features
 
-### ✅ API Chat Moderne
+### Modern Chat API
 
-DSO utilise l'API `/api/chat` d'Ollama (au lieu de `/api/generate`) pour :
-- Meilleure gestion du contexte
-- Support des conversations multi-tours
-- Format plus standardisé
+DSO uses Ollama's `/api/chat` API (instead of `/api/generate`) for:
+- Better context management
+- Multi-turn conversation support
+- More standardized format
 
-### ✅ Streaming (optionnel)
+### Streaming (optional)
 
-Support du streaming pour afficher la progression en temps réel :
+Streaming support to display progress in real-time:
 
 ```go
 client.GenerateStream(prompt, func(chunk string) {
-    fmt.Print(chunk) // Affiche au fur et à mesure
+ fmt.Print(chunk) // Display as it comes
 })
 ```
 
-### ✅ Gestion d'erreurs robuste
+### Robust error handling
 
-- Retry automatique pour les connexions
-- Messages d'erreur clairs avec solutions
-- Vérification préalable de la disponibilité
+- Automatic retry for connections
+- Clear error messages with solutions
+- Pre-availability check
 
-### ✅ Configuration flexible
+### Flexible configuration
 
-- **Modèle** : Variable `DSO_MODEL` (défaut: `llama3.1:8b`)
-- **URL** : Variable `OLLAMA_HOST` (défaut: `http://localhost:11434`)
-- Détection automatique des modèles disponibles
+- **Model**: `DSO_MODEL` variable (default: `llama3.1:8b`)
+- **URL**: `OLLAMA_HOST` variable (default: `http://localhost:11434`)
+- Automatic detection of available models
 
-### ✅ Téléchargement automatique
+### Automatic download
 
-Si le modèle configuré n'est pas installé, DSO le télécharge automatiquement avec affichage de la progression.
+If the configured model is not installed, DSO automatically downloads it with progress display.
 
 ## Architecture
 
 ```
 cmd/audit.go
-    ↓
+ ↓
 internal/llm/prompts.go (Analyze)
-    ↓
+ ↓
 internal/llm/ollama.go (OllamaClient)
-    ↓
+ ↓
 Ollama API (/api/chat)
 ```
 
-## Utilisation
+## Usage
 
-### Client de base
+### Basic client
 
 ```go
 client := llm.NewOllamaClient()
-response, err := client.Generate("Analyse ces résultats...")
+response, err := client.Generate("Analyze these results...")
 ```
 
-### Avec contexte
+### With context
 
 ```go
 context := []map[string]string{
-    {"role": "system", "content": "Tu es un expert sécurité"},
-    {"role": "user", "content": "Question précédente"},
+ {"role": "system", "content": "You are a security expert"},
+ {"role": "user", "content": "Previous question"},
 }
-response, err := client.GenerateWithContext("Nouvelle question", context)
+response, err := client.GenerateWithContext("New question", context)
 ```
 
 ### Streaming
 
 ```go
 response, err := client.GenerateStream(prompt, func(chunk string) {
-    fmt.Print(chunk)
-    os.Stdout.Sync()
+ fmt.Print(chunk)
+ os.Stdout.Sync()
 })
 ```
 
-## Commandes CLI
+## CLI Commands
 
 ### `dso check`
 
-Vérifie l'état d'Ollama :
-- Connexion
-- Modèles disponibles
-- Modèle configuré installé
+Checks Ollama status:
+- Connection
+- Available models
+- Configured model installed
 
 ### `dso audit .`
 
-Utilise automatiquement Ollama pour analyser les résultats.
+Automatically uses Ollama to analyze results.
 
-## Dépannage
+## Troubleshooting
 
-### Ollama non accessible
+### Ollama not accessible
 
 ```bash
-# Vérifier que Ollama tourne
+# Check that Ollama is running
 ollama serve
 
-# Vérifier la connexion
+# Check connection
 dso check
 ```
 
-### Modèle non trouvé
+### Model not found
 
 ```bash
-# Lister les modèles
+# List models
 ollama list
 
-# Télécharger le modèle
+# Download model
 ollama pull llama3.1:8b
 ```
 
 ### Timeout
 
-Les timeouts sont configurés à 5 minutes par défaut. Pour les analyses très longues, augmente la valeur dans `ollama.go`.
+Timeouts are configured to 5 minutes by default. For very long analyses, increase the value in `ollama.go`.
 
-## Améliorations futures
+## Future improvements
 
-- [ ] Cache des réponses pour éviter les appels répétés
-- [ ] Support de plusieurs modèles en parallèle
-- [ ] Métriques de performance (latence, tokens/s)
-- [ ] Support des modèles externes (OpenAI, Anthropic) en fallback
-
+- [ ] Response caching to avoid repeated calls
+- [ ] Support for multiple models in parallel
+- [ ] Performance metrics (latency, tokens/s)
+- [ ] Support for external models (OpenAI, Anthropic) as fallback

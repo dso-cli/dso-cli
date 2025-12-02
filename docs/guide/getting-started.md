@@ -45,28 +45,28 @@ When using `--interactive` or `-i`, DSO launches a beautiful TUI (Terminal User 
 
 **Standard Mode:**
 ```
-🔒 DSO - DevSecOps Oracle
+ DSO - DevSecOps Oracle
 
-📊 Summary
+ Summary
 ────────────────────────────────────────────────────────────
-  You have 127 alerts but only 3 are critical and exploitable in prod.
+ You have 127 alerts but only 3 are critical and exploitable in prod.
 
-📈 Statistics
+ Statistics
 ────────────────────────────────────────────────────────────
-  Total: 127 findings
-  🔴 Critical: 3
-  🟠 High: 12
-  🟡 Medium: 45
-  🔵 Low: 67
+ Total: 127 findings
+ Critical: 3
+ High: 12
+ Medium: 45
+ Low: 67
 
-🔧 Top Priority Fixes
+ Top Priority Fixes
 ────────────────────────────────────────────────────────────
 
-❌ 1. Hardcoded AWS key in frontend/.env.production
-   📁 frontend/.env.production:12
-   Secret detected in a versioned file
-   
-   sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
+ 1. Hardcoded AWS key in frontend/.env.production
+ frontend/.env.production:12
+ Secret detected in a versioned file
+ 
+ sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
 ```
 
 ## Automatic Fix

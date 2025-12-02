@@ -1,6 +1,6 @@
-# 🎯 Fonctionnalités Complètes de DSO
+# Fonctionnalités Complètes de DSO
 
-## ✅ Fonctionnalités Implémentées
+## Fonctionnalités Implémentées
 
 ### 🔍 Scan et Analyse
 
@@ -22,7 +22,7 @@
 - Contexte d'exploitabilité
 - Recommandations de correction
 
-### 🔧 Correction Automatique
+### Correction Automatique
 
 #### `dso fix [path]`
 - Correction automatique des problèmes sûrs
@@ -69,7 +69,7 @@
 - `DSO_MODEL`: Modèle à utiliser (défaut: llama3.1:8b)
 - `OLLAMA_HOST`: URL d'Ollama (défaut: http://localhost:11434)
 
-### 🔧 Gestion des Outils
+### Gestion des Outils
 
 #### `dso tools`
 - Détecte les outils installés (Trivy, grype, gitleaks, tfsec)
@@ -81,7 +81,7 @@
 - `--install, -i`: Propose d'installer les outils manquants
 - `--all, -a`: Affiche tous les outils (y compris optionnels)
 
-### 📝 Génération de Politiques
+### Génération de Politiques
 
 #### `dso policy [path]`
 - Génère des politiques OPA/Rego
@@ -96,7 +96,7 @@
 - `--type, -t`: Type de politique (défaut: opa)
 - `--output, -o`: Fichier de sortie
 
-### 📦 SBOM (Software Bill of Materials)
+### SBOM (Software Bill of Materials)
 
 #### `dso sbom [path]`
 - Génère un SBOM complet du projet
@@ -123,7 +123,7 @@
 - `--provider, -p`: Provider CI (défaut: github)
 - `--output, -o`: Fichier de sortie
 
-## 🎨 Interface Interactive
+## Interface Interactive
 
 ### Barres de Progression
 - Affichage en temps réel de la progression des scans
@@ -162,7 +162,7 @@
 - **CycloneDX**: Format JSON standard
 - **SPDX**: Format texte standard
 
-## 🚀 Workflows Typiques
+## Workflows Typiques
 
 ### Premier Audit
 ```bash
@@ -211,7 +211,7 @@ dso watch --interval 10m . &
 dso watch --quiet .
 ```
 
-## 📊 Métriques et Rapports
+## Métriques et Rapports
 
 ### Statistiques Affichées
 - Total de findings
@@ -226,7 +226,7 @@ dso watch --quiet .
 - Compatible avec les outils de reporting
 - Métadonnées complètes (timestamp, version, etc.)
 
-## 🔒 Sécurité
+## Sécurité
 
 ### 100% Local
 - Aucune donnée envoyée à l'extérieur
@@ -240,7 +240,7 @@ dso watch --quiet .
 - Configuration par défaut intelligente
 - Variables d'environnement optionnelles
 
-## 🎯 Prochaines Étapes
+## Prochaines Étapes
 
 Pour utiliser DSO efficacement :
 
@@ -250,5 +250,5 @@ Pour utiliser DSO efficacement :
 4. **Intégration CI** : `dso ci --provider github .`
 5. **Surveillance** : `dso watch .`
 
-Tout est prêt ! 🎉
+Tout est prêt ! 
 

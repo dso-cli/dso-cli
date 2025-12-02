@@ -180,13 +180,13 @@ const ManualConfigIcon = {
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
-  { id: 'scan', label: 'Nouveau Scan', icon: ScanIcon },
+  { id: 'scan', label: 'New Scan', icon: ScanIcon },
   { id: 'monitoring', label: 'Monitoring', icon: MonitoringIcon },
-  { id: 'integrations', label: 'Intégrations', icon: IntegrationsIcon },
-  { id: 'history', label: 'Historique', icon: HistoryIcon },
-  { id: 'chat', label: 'Assistant IA', icon: ChatIcon, badge: 'Nouveau' },
-  { id: 'autofix', label: 'Résolution Auto', icon: AutoFixIcon },
-  { id: 'manual-config', label: 'Config Manuelle', icon: ManualConfigIcon },
+  { id: 'integrations', label: 'Integrations', icon: IntegrationsIcon },
+  { id: 'history', label: 'History', icon: HistoryIcon },
+  { id: 'chat', label: 'AI Assistant', icon: ChatIcon, badge: 'New' },
+  { id: 'autofix', label: 'Auto Fix', icon: AutoFixIcon },
+  { id: 'manual-config', label: 'Manual Config', icon: ManualConfigIcon },
   { id: 'repos', label: 'Repositories', icon: RepoIcon },
   { id: 'config', label: 'Configuration', icon: ConfigIcon }
 ]

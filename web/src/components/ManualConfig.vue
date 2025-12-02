@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-6">
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuration Manuelle des Outils</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Manual Tool Configuration</h3>
       <p class="text-sm text-gray-600 mb-6">
-        Certains outils nécessitent une configuration manuelle. Suivez les instructions ci-dessous.
+        Some tools require manual configuration. Follow the instructions below.
       </p>
 
       <!-- Tool Configurations -->
@@ -30,20 +30,20 @@
               class="text-xs font-semibold px-2 py-1 rounded-full"
               :class="tool.configured ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
             >
-              {{ tool.configured ? 'Configuré' : 'À configurer' }}
+              {{ tool.configured ? 'Configured' : 'To configure' }}
             </span>
           </div>
 
           <div v-if="!tool.configured" class="mt-4">
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-              <h5 class="font-medium text-yellow-900 mb-2">Instructions de configuration:</h5>
+              <h5 class="font-medium text-yellow-900 mb-2">Configuration instructions:</h5>
               <ol class="list-decimal list-inside space-y-2 text-sm text-yellow-800">
                 <li v-for="(step, idx) in tool.steps" :key="idx">{{ step }}</li>
               </ol>
             </div>
 
             <div v-if="tool.configFile" class="mb-4">
-              <h5 class="font-medium text-gray-900 mb-2">Fichier de configuration:</h5>
+              <h5 class="font-medium text-gray-900 mb-2">Configuration file:</h5>
               <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
                 <pre class="text-xs"><code>{{ tool.configFile }}</code></pre>
               </div>
@@ -51,12 +51,12 @@
                 @click="copyConfig(tool.configFile)"
                 class="mt-2 text-sm text-emerald-600 hover:text-emerald-800 font-medium"
               >
-                Copier la configuration
+                Copy configuration
               </button>
             </div>
 
             <div v-if="tool.environmentVars && tool.environmentVars.length > 0" class="mb-4">
-              <h5 class="font-medium text-gray-900 mb-2">Variables d'environnement:</h5>
+              <h5 class="font-medium text-gray-900 mb-2">Environment variables:</h5>
               <div class="space-y-2">
                 <div
                   v-for="env in tool.environmentVars"
@@ -76,7 +76,7 @@
               @click="markAsConfigured(tool)"
               class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
-              Marquer comme configuré
+              Mark as configured
             </button>
           </div>
 
@@ -85,7 +85,7 @@
               <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span class="text-sm font-medium text-green-900">Cet outil est correctement configuré</span>
+              <span class="text-sm font-medium text-green-900">This tool is correctly configured</span>
             </div>
           </div>
         </div>
@@ -115,17 +115,17 @@ const tools = ref<Tool[]>([
   {
     id: 'trivy',
     name: 'Trivy',
-    description: 'Scanner de vulnérabilités complet',
+    description: 'Complete vulnerability scanner',
     configured: false,
     steps: [
-      'Installer Trivy via brew ou le script d\'installation',
-      'Vérifier que Trivy est dans le PATH: `trivy --version`',
-      'Configurer les bases de données si nécessaire'
+      'Install Trivy via brew or installation script',
+      'Verify Trivy is in PATH: `trivy --version`',
+      'Configure databases if necessary'
     ],
     environmentVars: [
       {
         name: 'TRIVY_CACHE_DIR',
-        description: 'Répertoire de cache pour Trivy',
+        description: 'Cache directory for Trivy',
         value: '~/.cache/trivy'
       }
     ]
@@ -133,12 +133,12 @@ const tools = ref<Tool[]>([
   {
     id: 'gitleaks',
     name: 'Gitleaks',
-    description: 'Détecteur de secrets',
+    description: 'Secret detector',
     configured: false,
     steps: [
-      'Installer Gitleaks',
-      'Créer un fichier .gitleaksignore si nécessaire',
-      'Configurer les règles personnalisées'
+      'Install Gitleaks',
+      'Create a .gitleaksignore file if necessary',
+      'Configure custom rules'
     ],
     configFile: `# .gitleaksignore
 node_modules/
@@ -150,18 +150,18 @@ build/`
   {
     id: 'snyk',
     name: 'Snyk',
-    description: 'Scanner de dépendances',
+    description: 'Dependency scanner',
     configured: false,
     steps: [
-      'Installer Snyk: `npm install -g snyk`',
-      'S\'authentifier: `snyk auth`',
-      'Configurer le token API si nécessaire'
+      'Install Snyk: `npm install -g snyk`',
+      'Authenticate: `snyk auth`',
+      'Configure API token if necessary'
     ],
     environmentVars: [
       {
         name: 'SNYK_TOKEN',
-        description: 'Token d\'API Snyk',
-        value: 'votre-token-ici'
+        description: 'Snyk API token',
+        value: 'your-token-here'
       }
     ]
   }
@@ -169,7 +169,7 @@ build/`
 
 const copyConfig = (config: string) => {
   navigator.clipboard.writeText(config)
-  alert('Configuration copiée dans le presse-papiers!')
+  alert('Configuration copied to clipboard!')
 }
 
 const markAsConfigured = async (tool: Tool) => {
@@ -189,7 +189,7 @@ const markAsConfigured = async (tool: Tool) => {
     console.error('Failed to save tool configuration:', error)
     // Still mark as configured locally
     tool.configured = true
-    alert(`Configuration sauvegardée localement. Erreur serveur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+    alert(`Configuration saved locally. Server error: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 

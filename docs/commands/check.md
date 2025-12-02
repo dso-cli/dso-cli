@@ -11,9 +11,9 @@ dso check
 ## Description
 
 The `check` command verifies that:
-- ✅ Ollama is running and accessible
-- ✅ AI models are installed
-- ✅ The configured model is available
+- Ollama is running and accessible
+- AI models are installed
+- The configured model is available
 
 This is useful for troubleshooting AI-related issues.
 
@@ -29,17 +29,17 @@ Output:
 ```
 🔍 Checking Ollama integration...
 
-📡 Connecting to Ollama... ✅ OK
+📡 Connecting to Ollama... OK
 
-📦 Available models:
-   👉 llama3.1:8b
-      phi3
-      mistral:7b
+ Available models:
+ 👉 llama3.1:8b
+ phi3
+ mistral:7b
 
-🎯 Configured model: llama3.1:8b
-✅ Model available
+ Configured model: llama3.1:8b
+ Model available
 
-🎉 Everything is ready! You can run: dso audit .
+ Everything is ready! You can run: dso audit .
 ```
 
 ### Ollama Not Running
@@ -49,13 +49,13 @@ If Ollama is not running:
 ```
 🔍 Checking Ollama integration...
 
-📡 Connecting to Ollama... ❌ Failed
-   Error: connection refused
+📡 Connecting to Ollama... Failed
+ Error: connection refused
 
-💡 Solutions:
-   1. Check that Ollama is installed: https://ollama.ai
-   2. Start Ollama: ollama serve
-   3. Check OLLAMA_HOST environment variable if Ollama is not on localhost:11434
+ Solutions:
+ 1. Check that Ollama is installed: https://ollama.ai
+ 2. Start Ollama: ollama serve
+ 3. Check OLLAMA_HOST environment variable if Ollama is not on localhost:11434
 ```
 
 ### Model Not Installed
@@ -63,12 +63,12 @@ If Ollama is not running:
 If the configured model is not installed:
 
 ```
-📦 Available models:
-      phi3
+ Available models:
+ phi3
 
-🎯 Configured model: llama3.1:8b
-⚠️  Model llama3.1:8b is not installed
-💡 Download it: ollama pull llama3.1:8b
+ Configured model: llama3.1:8b
+ Model llama3.1:8b is not installed
+ Download it: ollama pull llama3.1:8b
 ```
 
 ## Troubleshooting
@@ -81,9 +81,9 @@ If the configured model is not installed:
 1. Start Ollama: `ollama serve`
 2. Check if Ollama is running: `ollama list`
 3. Verify OLLAMA_HOST if using remote Ollama:
-   ```bash
-   export OLLAMA_HOST=http://your-ollama-server:11434
-   ```
+ ```bash
+ export OLLAMA_HOST=http://your-ollama-server:11434
+ ```
 
 ### Model Not Found
 

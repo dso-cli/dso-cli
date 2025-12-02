@@ -177,8 +177,8 @@ dso tools --all
 ```
 
 The output is organized by category:
-- ✅ Installed tools with versions
-- ❌ Missing tools with installation instructions
+- Installed tools with versions
+- Missing tools with installation instructions
 
 ## Installation
 

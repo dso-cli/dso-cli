@@ -45,9 +45,9 @@ dso watch --quiet .
 ```
 
 In quiet mode:
-- ✅ No scan progress messages
-- ✅ Only notifications for new issues
-- ✅ Suppresses "no new issues" messages
+- No scan progress messages
+- Only notifications for new issues
+- Suppresses "no new issues" messages
 
 ## Examples
 
@@ -60,19 +60,19 @@ dso watch .
 Output:
 ```
 👀 Watching: /path/to/project
-⏱️  Interval: 5m0s
-💡 Press Ctrl+C to stop
+⏱️ Interval: 5m0s
+ Press Ctrl+C to stop
 
 [15:04:05] 🔍 Scanning...
-📊 Initial scan: 127 findings
+ Initial scan: 127 findings
 
 [15:09:05] 🔍 Scanning...
-✅ No new issues
+ No new issues
 
 [15:14:05] 🔍 Scanning...
 🚨 2 new issue(s) detected!
-   • [CRITICAL] Hardcoded AWS key in src/config.ts:45
-   • [HIGH] XSS vulnerability in components/Form.tsx:23
+ • [CRITICAL] Hardcoded AWS key in src/config.ts:45
+ • [HIGH] XSS vulnerability in components/Form.tsx:23
 ```
 
 ### Custom Interval

@@ -58,7 +58,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Service Status Over Time -->
       <div class="card p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Statut des Services (24h)</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Service Status (24h)</h3>
         <div class="h-64">
           <Line :data="serviceStatusData" :options="chartOptions" />
         </div>
@@ -66,7 +66,7 @@
 
       <!-- Resource Usage -->
       <div class="card p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Utilisation des Ressources</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Resource Usage</h3>
         <div class="h-64">
           <Bar :data="resourceUsageData" :options="chartOptions" />
         </div>
@@ -74,7 +74,7 @@
 
       <!-- Scan Activity -->
       <div class="card p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Activité des Scans</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Scan Activity</h3>
         <div class="h-64">
           <Doughnut :data="scanActivityData" :options="chartOptions" />
         </div>
@@ -82,7 +82,7 @@
 
       <!-- Findings Trend -->
       <div class="card p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Tendance des Vulnérabilités</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Vulnerability Trend</h3>
         <div class="h-64">
           <Line :data="findingsTrendData" :options="chartOptions" />
         </div>
@@ -91,16 +91,16 @@
 
     <!-- Service Health Table -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Santé des Services</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Service Health</h3>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uptime</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latence</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Erreurs</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latency</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Errors</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -117,7 +117,7 @@
                   class="px-2 py-1 text-xs font-semibold rounded-full"
                   :class="service.status === 'healthy' ? 'bg-green-100 text-green-800' : service.status === 'degraded' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'"
                 >
-                  {{ service.status === 'healthy' ? 'Opérationnel' : service.status === 'degraded' ? 'Dégradé' : 'Hors service' }}
+                  {{ service.status === 'healthy' ? 'Operational' : service.status === 'degraded' ? 'Degraded' : 'Down' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ service.uptime }}%</td>
@@ -130,7 +130,7 @@
                   @click="diagnoseService(service)"
                   class="text-emerald-600 hover:text-emerald-800 font-medium"
                 >
-                  Diagnostiquer
+                  Diagnose
                 </button>
               </td>
             </tr>
@@ -307,7 +307,7 @@ const serviceStatusData = computed(() => ({
   labels: Array.from({ length: 24 }, (_, i) => `${i}h`),
   datasets: [
     {
-      label: 'Services Opérationnels',
+      label: 'Operational Services',
       data: Array.from({ length: 24 }, () => Math.floor(Math.random() * 3) + 3),
       borderColor: 'rgb(16, 185, 129)',
       backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -334,7 +334,7 @@ const resourceUsageData = computed(() => ({
 }))
 
 const scanActivityData = computed(() => ({
-  labels: ['Réussis', 'Échoués', 'En cours'],
+      labels: ['Successful', 'Failed', 'In Progress'],
   datasets: [
     {
       data: [85, 10, 5],
@@ -348,24 +348,24 @@ const scanActivityData = computed(() => ({
 }))
 
 const findingsTrendData = computed(() => ({
-  labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-  datasets: [
-    {
-      label: 'Critiques',
-      data: [12, 15, 8, 10, 14, 9, 11],
-      borderColor: 'rgb(239, 68, 68)',
-      backgroundColor: 'rgba(239, 68, 68, 0.1)',
-      fill: true
-    },
-    {
-      label: 'Élevées',
-      data: [45, 52, 38, 42, 48, 40, 44],
-      borderColor: 'rgb(251, 191, 36)',
-      backgroundColor: 'rgba(251, 191, 36, 0.1)',
-      fill: true
-    },
-    {
-      label: 'Moyennes',
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [
+        {
+          label: 'Critical',
+          data: [12, 15, 8, 10, 14, 9, 11],
+          borderColor: 'rgb(239, 68, 68)',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          fill: true
+        },
+        {
+          label: 'High',
+          data: [45, 52, 38, 42, 48, 40, 44],
+          borderColor: 'rgb(251, 191, 36)',
+          backgroundColor: 'rgba(251, 191, 36, 0.1)',
+          fill: true
+        },
+        {
+          label: 'Medium',
       data: [120, 135, 110, 125, 130, 115, 122],
       borderColor: 'rgb(59, 130, 246)',
       backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -398,16 +398,16 @@ const diagnoseService = async (service: Service) => {
     if (response.ok) {
       const data = await response.json()
       if (data.diagnosis) {
-        alert(`Diagnostic pour ${service.name}:\n\n${data.diagnosis}`)
+        alert(`Diagnosis for ${service.name}:\n\n${data.diagnosis}`)
       } else {
-        alert(`Diagnostic en cours pour ${service.name}...`)
+        alert(`Diagnosing ${service.name}...`)
       }
     } else {
       throw new Error('Failed to diagnose service')
     }
   } catch (error) {
     console.error('Failed to diagnose service:', error)
-    alert(`Erreur lors du diagnostic: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+    alert(`Error during diagnosis: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 

@@ -58,9 +58,13 @@ features:
 
 ## About the Developer
 
-**DSO** is developed by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+**DSO** is developed and maintained by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
 
-With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail MOUYAHADA created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
+
+**Copyright © 2024 Ismail MOUYAHADA. All rights reserved.**
+
+This project was created and developed by Ismail MOUYAHADA.
 
 ---
 
@@ -144,25 +148,25 @@ ollama pull qwen2.5:7b  # Default model
 ## Example Output
 
 ```
-🔒 DSO - DevSecOps Oracle
+DSO - DevSecOps Oracle
 
-📊 Summary
+Summary
 ────────────────────────────────────────────────────────────
   You have 127 alerts but only 3 are critical and exploitable in prod.
 
-📈 Statistics
+Statistics
 ────────────────────────────────────────────────────────────
   Total: 127 findings
-  🔴 Critical: 3
-  🟠 High: 12
-  🟡 Medium: 45
-  🔵 Low: 67
+  Critical: 3
+  High: 12
+  Medium: 45
+  Low: 67
 
-🔧 Top Priority Fixes
+Top Priority Fixes
 ────────────────────────────────────────────────────────────
 
-❌ 1. Hardcoded AWS key in frontend/.env.production
-   📁 frontend/.env.production:12
+1. Hardcoded AWS key in frontend/.env.production
+   frontend/.env.production:12
    
    sed -i '12d' frontend/.env.production && git commit -am "fix: remove hardcoded AWS key"
 ```

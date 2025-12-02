@@ -39,12 +39,12 @@ install.bat
 ```
 
 The installation script automatically:
-- ✅ Checks/Installs Go (if missing)
-- ✅ Builds DSO binary
-- ✅ Checks/Installs Ollama
-- ✅ Downloads AI model **qwen2.5:7b** by default (if no models exist)
-- ✅ Optionally installs security tools (Trivy, gitleaks, etc.)
-- ✅ Updates to latest version if already installed
+- Checks/Installs Go (if missing)
+- Builds DSO binary
+- Checks/Installs Ollama
+- Downloads AI model **qwen2.5:7b** by default (if no models exist)
+- Optionally installs security tools (Trivy, gitleaks, etc.)
+- Updates to latest version if already installed
 
 ## Manual Installation
 
@@ -77,14 +77,14 @@ make build
 
 ```bash
 brew install ollama
-ollama serve  # Start Ollama
+ollama serve # Start Ollama
 ```
 
 #### Linux (Ubuntu/Debian)
 
 ```bash
 curl -fsSL https://ollama.ai/install.sh | sh
-ollama serve  # Start Ollama
+ollama serve # Start Ollama
 ```
 
 #### Linux (Other)
@@ -109,10 +109,10 @@ scoop install ollama
 ollama pull qwen2.5:7b
 
 # Other recommended models
-ollama pull llama3.1:8b  # ~4.7 GB - Alternative high quality
-ollama pull phi3         # ~2.3 GB - Lightweight, fast
-ollama pull mistral:7b   # ~4.1 GB - Good balance
-ollama pull gemma:7b     # ~5.2 GB - Google's model
+ollama pull llama3.1:8b # ~4.7 GB - Alternative high quality
+ollama pull phi3 # ~2.3 GB - Lightweight, fast
+ollama pull mistral:7b # ~4.1 GB - Good balance
+ollama pull gemma:7b # ~5.2 GB - Google's model
 ```
 
 **Note:** The installation script automatically installs `qwen2.5:7b` by default if no models are present.
@@ -262,12 +262,12 @@ install.bat
 ```
 
 The scripts will:
-- ✅ Check/Install Go (if missing)
-- ✅ Build DSO
-- ✅ Check/Install Ollama (if missing)
-- ✅ Download **qwen2.5:7b** model automatically (if no models exist)
-- ✅ Update to latest version if already installed
-- ✅ Remove old versions before reinstalling
+- Check/Install Go (if missing)
+- Build DSO
+- Check/Install Ollama (if missing)
+- Download **qwen2.5:7b** model automatically (if no models exist)
+- Update to latest version if already installed
+- Remove old versions before reinstalling
 
 ## Troubleshooting
 

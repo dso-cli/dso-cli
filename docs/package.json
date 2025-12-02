@@ -2,6 +2,7 @@
   "name": "dso-docs",
   "version": "0.1.0",
   "description": "DSO documentation with VitePress and Catppuccin theme",
+  "author": "Ismail MOUYAHADA",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
@@ -11,6 +12,7 @@
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/mdi": "^1.2.3",
     "shiki": "^0.14.0",
+    "shiki-themes": "^0.1.0",
     "vitepress": "^1.0.0"
   }
 }

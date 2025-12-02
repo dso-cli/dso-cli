@@ -49,7 +49,7 @@ The installation script automatically handles:
 
 ## Platform Support
 
-### ✅ Fully Supported
+### Fully Supported
 
 - **macOS** (Intel & Apple Silicon)
 - **Linux** (Ubuntu, Debian, Fedora, RHEL, CentOS)
@@ -187,8 +187,8 @@ ollama list
 ollama pull llama3.1:8b
 
 # Or use a lighter model
-ollama pull phi3        # ~2.3 GB
-ollama pull mistral:7b  # ~4.1 GB
+ollama pull phi3 # ~2.3 GB
+ollama pull mistral:7b # ~4.1 GB
 ```
 
 ### Permission Denied

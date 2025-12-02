@@ -1,81 +1,134 @@
-# Quick Start Guide
+# Quick Start - DSO CLI
 
-## One-Command Installation
+Quick start guide for using DSO CLI.
+
+## ⚡ Express Installation
 
 ### macOS / Linux
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dso-cli/dso-cli/main/install | bash
 ```
 
-That's it! The script will:
-1. Check/Install Go
-2. Build DSO
-3. Check/Install Ollama
-4. Download AI model
-5. Optionally install security tools
-
 ### Windows
-
-**PowerShell:**
 ```powershell
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 .\install.ps1
 ```
 
-**Batch:**
-```cmd
-git clone https://github.com/dso-cli/dso-cli.git
-cd dso
-install.bat
-```
-
-## First Use
-
-After installation:
+## Post-Installation Verification
 
 ```bash
 # Verify installation
-./dso check
+dso --version
 
-# Check available tools
-./dso tools
+# Verify Ollama
+dso check
 
-# Run your first audit
-./dso audit .
+# Verify tools
+dso tools
 ```
 
-## What You Get
+## First Steps
 
-- ✅ **DSO binary** - Ready to use
-- ✅ **Ollama** - Local AI runtime
-- ✅ **AI Model** - llama3.1:8b (~4.7 GB)
-- ✅ **Security Tools** - Optional but recommended
-
-## Next Steps
-
-1. **Read the docs**: `cd docs && npm install && npm run dev`
-2. **Explore commands**: `./dso --help`
-3. **Run an audit**: `./dso audit .`
-4. **Auto-fix issues**: `./dso fix --auto .`
-
-## Troubleshooting
-
-### Go Not Found
-- **macOS**: `brew install go`
-- **Linux**: `sudo apt-get install golang-go` (Ubuntu/Debian)
-- **Windows**: Download from [go.dev](https://go.dev/doc/install)
-
-### Ollama Not Starting
-- **macOS**: `brew services start ollama`
-- **Linux**: `systemctl --user start ollama` or `ollama serve`
-- **Windows**: Start from Start Menu or run `ollama serve`
-
-### Model Download Failed
+### 1. Security Audit
 ```bash
-ollama pull llama3.1:8b
+# Full scan with AI analysis
+dso audit .
+
+# Interactive mode (TUI)
+dso audit . --interactive
+
+# JSON format
+dso audit . --format json
 ```
 
-For more help, see [INSTALL.md](INSTALL.md) or [../guide/installation.md](../guide/installation.md).
+### 2. Automatic Fix
+```bash
+# With confirmation
+dso fix .
 
+# Without confirmation
+dso fix --auto .
+```
+
+### 3. Vulnerability Explanation
+```bash
+dso why CVE-2024-12345
+```
+
+### 4. Continuous Monitoring
+```bash
+# Monitor every 5 minutes
+dso watch .
+
+# Custom interval
+dso watch --interval 10m .
+```
+
+## 🌐 Web Interface
+
+### Start the server
+```bash
+cd web
+npm install
+npm run dev:full
+```
+
+Open `http://localhost:3000`
+
+### Web Features
+- Dashboard with statistics
+- 🔍 Interactive new scan
+- AI Assistant (chat)
+- AutoFix for issues
+- 🔌 Integration management
+- Service monitoring
+
+## Complete Documentation
+
+- **Documentation Index**: [docs/DOCUMENTATION_INDEX.md](../DOCUMENTATION_INDEX.md) - Complete list of all documentation
+- **Installation guide**: [docs/additional/INSTALL.md](INSTALL.md)
+- **Testing guide**: [docs/additional/TESTING.md](TESTING.md)
+- **Architecture**: [docs/guide/architecture.md](../guide/architecture.md)
+- **Roadmap**: [docs/additional/NEXT_STEPS.md](NEXT_STEPS.md)
+
+## 🆘 Help
+
+```bash
+# General help
+dso --help
+
+# Command help
+dso audit --help
+dso tools --help
+```
+
+## Common Issues
+
+### Ollama not detected
+```bash
+# Install Ollama
+brew install ollama # macOS
+# or
+curl -fsSL https://ollama.ai/install.sh | sh # Linux
+
+# Start Ollama
+ollama serve
+
+# Download a model
+ollama pull qwen2.5:7b
+```
+
+### Missing tools
+```bash
+# View available tools
+dso tools
+
+# Install interactively
+dso tools --install
+```
+
+## Ready!
+
+You are now ready to use DSO CLI. Happy vulnerability hunting! 

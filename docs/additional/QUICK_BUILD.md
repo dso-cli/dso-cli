@@ -1,6 +1,6 @@
 # Quick Build Guide
 
-## ⚠️ Important: Exécuter depuis la racine du projet
+## Important: Exécuter depuis la racine du projet
 
 Les commandes de build doivent être exécutées depuis la **racine du projet**, pas depuis `docs/`.
 
@@ -12,7 +12,7 @@ cd /Users/isma-dev/Desktop/DevSecOps-Cli
 cd "$(git rev-parse --show-toplevel)"
 ```
 
-## 🚀 Commandes rapides
+## Commandes rapides
 
 ### Build pour toutes les plateformes
 ```bash
@@ -29,7 +29,7 @@ make release
 ./scripts/build-release.sh v0.1.0
 ```
 
-## 📦 Résultat
+## Résultat
 
 Les binaires seront créés dans `dist/`:
 - `dist/dso-linux-amd64/dso`
@@ -50,6 +50,6 @@ Et les archives dans `dist/`:
 pwd
 
 # Doit trouver le Makefile
-test -f Makefile && echo "✅ Bon répertoire" || echo "❌ Mauvais répertoire"
+test -f Makefile && echo " Bon répertoire" || echo " Mauvais répertoire"
 ```
 

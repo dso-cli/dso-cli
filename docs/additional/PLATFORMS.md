@@ -4,9 +4,9 @@ DSO is designed to work across multiple platforms. This document outlines platfo
 
 ## Supported Platforms
 
-- ✅ **macOS** (Intel and Apple Silicon)
-- ✅ **Linux** (Ubuntu, Debian, and other distributions)
-- ✅ **Windows** (10, 11, and Windows Server)
+- **macOS** (Intel and Apple Silicon)
+- **Linux** (Ubuntu, Debian, and other distributions)
+- **Windows** (10, 11, and Windows Server)
 
 ## Installation by Platform
 

@@ -9,18 +9,18 @@ DSO (DevSecOps Oracle) is a DevSecOps CLI assistant powered by local AI that tal
 ### The Problem
 
 Existing security tools are often:
-- ❌ Too verbose (thousands of false positives)
-- ❌ Not contextual (don't understand your project)
-- ❌ Require complex configuration
-- ❌ Send your data outside
+- Too verbose (thousands of false positives)
+- Not contextual (don't understand your project)
+- Require complex configuration
+- Send your data outside
 
 ### The Solution
 
 DSO solves these problems by being:
-- ✅ **Intelligent**: Local AI analyzes and filters results
-- ✅ **Contextual**: Understands your project and gives you the 3-5 issues that really matter
-- ✅ **Local**: 100% local, zero code leakage
-- ✅ **Simple**: One command, zero configuration
+- **Intelligent**: Local AI analyzes and filters results
+- **Contextual**: Understands your project and gives you the 3-5 issues that really matter
+- **Local**: 100% local, zero code leakage
+- **Simple**: One command, zero configuration
 
 ## How It Works
 
@@ -61,7 +61,7 @@ DSO integrates **20+ security tools** across all categories:
 
 All tools are automatically detected and used when available. See [Scanners Guide](/guide/scanners.md) for details.
 
-### 🔧 Smart Auto-Fix
+### Smart Auto-Fix
 
 Automatically fixes safe issues:
 - Removes exposed secrets

@@ -45,3 +45,46 @@ docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Secrets and credentials
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+*.secret
+
+# Web build
+web/dist/
+web/node_modules/
+web/.vite/
+web/temp/
+
+# Logs
+*.log
+logs/
+docs/logs/
+
+# Coverage reports
+coverage/
+*.coverprofile
+*.coverage
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+

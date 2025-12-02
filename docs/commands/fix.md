@@ -82,25 +82,25 @@ dso fix ./src
 ## Safety
 
 The `fix` command only applies **safe** fixes:
-- ✅ Removes secrets (with confirmation)
-- ✅ Updates dependencies to patched versions
-- ✅ Fixes configuration issues
+- Removes secrets (with confirmation)
+- Updates dependencies to patched versions
+- Fixes configuration issues
 
 It will **NOT**:
-- ❌ Modify application logic
-- ❌ Change business-critical code
-- ❌ Apply fixes that could break functionality
+- Modify application logic
+- Change business-critical code
+- Apply fixes that could break functionality
 
 ## Output
 
 ```
 🔍 Quick scan to identify fixes…
-🔧 Applying fixes…
+ Applying fixes…
 
-✅ 3 fix(es) applied successfully:
-  • Secret removed from frontend/.env.production:12
-  • npm dependency lodash updated
-  • Go dependency github.com/gin-gonic/gin updated
+ 3 fix(es) applied successfully:
+ • Secret removed from frontend/.env.production:12
+ • npm dependency lodash updated
+ • Go dependency github.com/gin-gonic/gin updated
 ```
 
 ## See Also

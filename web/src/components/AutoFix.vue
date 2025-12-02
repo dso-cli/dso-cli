@@ -1,14 +1,14 @@
 <template>
   <div class="space-y-6">
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Résolution Automatique des Problèmes</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Automatic Problem Resolution</h3>
       <p class="text-sm text-gray-600 mb-6">
-        DSO utilise l'IA (Ollama) pour diagnostiquer et résoudre automatiquement les problèmes rencontrés.
+        DSO uses AI (Ollama) to automatically diagnose and resolve encountered issues.
       </p>
 
       <!-- Active Issues -->
       <div v-if="activeIssues.length > 0" class="space-y-4 mb-6">
-        <h4 class="font-medium text-gray-900">Problèmes Actifs</h4>
+        <h4 class="font-medium text-gray-900">Active Issues</h4>
         <div
           v-for="issue in activeIssues"
           :key="issue.id"
@@ -29,13 +29,13 @@
               <p class="text-sm text-gray-600 mb-2">{{ issue.description }}</p>
               <div v-if="issue.solution" class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <div class="flex items-center justify-between mb-2">
-                  <p class="text-sm font-medium text-emerald-900">Solution proposée:</p>
+                  <p class="text-sm font-medium text-emerald-900">Proposed solution:</p>
                   <div class="flex items-center gap-2">
                     <span v-if="issue.osInfo" class="text-xs px-2 py-1 bg-emerald-200 text-emerald-800 rounded-full">
                       {{ issue.osInfo.osName }}
                     </span>
                     <span v-if="issue.requiresSudo" class="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded-full">
-                      ⚠️ Permissions requises
+                      ⚠️ Permissions required
                     </span>
                   </div>
                 </div>
@@ -44,7 +44,7 @@
                   <strong>Note:</strong> {{ issue.permissionNote }}
                 </div>
                 <div v-if="issue.commands && issue.commands.length > 0" class="mt-2">
-                  <p class="text-xs font-medium text-emerald-900 mb-1">Commandes à exécuter:</p>
+                  <p class="text-xs font-medium text-emerald-900 mb-1">Commands to execute:</p>
                   <div class="space-y-1">
                     <div
                       v-for="(cmd, idx) in issue.commands"
@@ -57,7 +57,7 @@
                       <span
                         v-if="issue.requiresSudo && (cmd.includes('sudo') || cmd.includes('apt-get') || cmd.includes('yum') || cmd.includes('pacman'))"
                         class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded"
-                        title="Cette commande nécessite des permissions administrateur"
+                        title="This command requires administrator permissions"
                       >
                         🔒
                       </span>
@@ -73,14 +73,14 @@
               @click="applySolution(issue)"
               class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm"
             >
-              Appliquer la solution
+              Apply solution
             </button>
             <button
               @click="diagnoseIssue(issue)"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
               :disabled="diagnosing"
             >
-              {{ diagnosing ? 'Diagnostic en cours...' : 'Rediagnostiquer' }}
+              {{ diagnosing ? 'Diagnosing...' : 'Re-diagnose' }}
             </button>
           </div>
         </div>
@@ -88,7 +88,7 @@
 
       <!-- Issue History -->
       <div v-if="resolvedIssues.length > 0">
-        <h4 class="font-medium text-gray-900 mb-4">Problèmes Résolus</h4>
+        <h4 class="font-medium text-gray-900 mb-4">Resolved Issues</h4>
         <div class="space-y-2">
           <div
             v-for="issue in resolvedIssues"
@@ -113,8 +113,8 @@
         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-lg font-medium text-gray-600 mb-2">Aucun problème détecté</p>
-        <p class="text-sm text-gray-500">Tous les services fonctionnent correctement</p>
+        <p class="text-lg font-medium text-gray-600 mb-2">No issues detected</p>
+        <p class="text-sm text-gray-500">All services are functioning correctly</p>
       </div>
     </div>
   </div>
@@ -182,7 +182,7 @@ const diagnoseIssue = async (issue: Issue) => {
     issue.status = 'solved'
   } catch (error) {
     console.error('Error diagnosing issue:', error)
-    issue.solution = `Erreur lors du diagnostic: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+    issue.solution = `Error during diagnosis: ${error instanceof Error ? error.message : 'Unknown error'}`
   } finally {
     diagnosing.value = false
   }
@@ -190,7 +190,7 @@ const diagnoseIssue = async (issue: Issue) => {
 
 const applySolution = async (issue: Issue) => {
   if (!issue.commands || issue.commands.length === 0) {
-    alert('Aucune commande à exécuter')
+    alert('No commands to execute')
     return
   }
   
@@ -204,13 +204,13 @@ const applySolution = async (issue: Issue) => {
       issue.resolvedAt = new Date()
       resolvedIssues.value.push(issue)
       activeIssues.value = activeIssues.value.filter(i => i.id !== issue.id)
-      alert('Solution appliquée avec succès!')
+      alert('Solution applied successfully!')
     } else {
       const failed = results.filter(r => !r.success)
-      alert(`Certaines commandes ont échoué: ${failed.map(f => f.command).join(', ')}`)
+      alert(`Some commands failed: ${failed.map(f => f.command).join(', ')}`)
     }
   } catch (error) {
-    alert(`Erreur lors de l'application: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+      alert(`Error during application: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
@@ -259,8 +259,8 @@ const detectServiceIssues = async () => {
         if (service.status === 'down' || service.status === 'degraded') {
           issues.push({
             id: `issue-${service.name.toLowerCase().replace(/\s+/g, '-')}`,
-            title: `${service.name} non accessible`,
-            description: `Le service ${service.name} ne répond pas correctement. Statut: ${service.status}`,
+            title: `${service.name} not accessible`,
+            description: `The service ${service.name} is not responding correctly. Status: ${service.status}`,
             severity: service.status === 'down' ? 'critical' : 'high',
             status: 'detected'
           })

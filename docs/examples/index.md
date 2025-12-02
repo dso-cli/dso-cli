@@ -12,9 +12,9 @@ dso audit .
 dso audit . --interactive
 
 # Typical result
-# 🔴 1 critical: GitHub token secret in .env
-# 🟠 3 high: Vulnerable dependencies (lodash, axios)
-# 🟡 12 medium: Insecure configurations
+# 1 critical: GitHub token secret in .env
+# 3 high: Vulnerable dependencies (lodash, axios)
+# 12 medium: Insecure configurations
 
 # Automatic fix
 dso fix --auto .

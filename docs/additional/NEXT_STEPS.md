@@ -1,122 +1,121 @@
-# 🚀 Prochaines Étapes - DSO CLI
+# Next Steps - DSO CLI
 
-Ce document liste les prochaines étapes recommandées pour améliorer DSO CLI.
+This document lists recommended next steps to improve DSO CLI.
 
-## ✅ Complété
+## Completed
 
-- [x] Tous les TODOs implémentés
-- [x] Tests d'intégration API créés
-- [x] Tests E2E améliorés
-- [x] Workflow CI/CD configuré
-- [x] Documentation de test complète
-- [x] Commandes Make pour tests
+- [x] All TODOs implemented
+- [x] API integration tests created
+- [x] E2E tests improved
+- [x] CI/CD workflow configured
+- [x] Complete test documentation
+- [x] Make commands for tests
 
-## 📋 À Faire (Priorité Haute)
+## To Do (High Priority)
 
-### 1. Tests Unitaires Go
-- [ ] Ajouter des tests pour `internal/scanner/`
-- [ ] Ajouter des tests pour `internal/llm/`
-- [ ] Ajouter des tests pour `internal/fixer/`
-- [ ] Ajouter des tests pour `internal/tools/`
-- [ ] Objectif : > 70% de couverture
+### 1. Go Unit Tests
+- [ ] Add tests for `internal/scanner/`
+- [ ] Add tests for `internal/llm/`
+- [ ] Add tests for `internal/fixer/`
+- [ ] Add tests for `internal/tools/`
+- [ ] Goal: > 70% coverage
 
-### 2. Amélioration de la Documentation
-- [ ] Guide d'installation détaillé par plateforme
-- [ ] Guide de configuration avancée
-- [ ] Exemples d'utilisation par cas d'usage
+### 2. Documentation Improvement
+- [ ] Detailed installation guide by platform
+- [ ] Advanced configuration guide
+- [ ] Usage examples by use case
 - [ ] FAQ
 - [ ] Troubleshooting guide
 
 ### 3. Performance
-- [ ] Cache des résultats de scan
-- [ ] Parallélisation des scanners
-- [ ] Optimisation des appels Ollama
-- [ ] Compression des réponses API
+- [ ] Scan results caching
+- [ ] Scanner parallelization
+- [ ] Ollama call optimization
+- [ ] API response compression
 
-## 📋 À Faire (Priorité Moyenne)
+## To Do (Medium Priority)
 
-### 4. Fonctionnalités Avancées
-- [ ] Support Slack/Teams pour notifications
-- [ ] Support Gemini/Claude API (en plus d'Ollama)
-- [ ] Export vers Jira, Linear, etc.
-- [ ] Dashboard web optionnel avec historique
-- [ ] Intégration avec Supabase pour stockage
+### 4. Advanced Features
+- [ ] Slack/Teams support for notifications
+- [ ] Gemini/Claude API support (in addition to Ollama)
+- [ ] Export to Jira, Linear, etc.
+- [ ] Optional web dashboard with history
+- [ ] Supabase integration for storage
 
-### 5. Sécurité
-- [ ] Audit de sécurité du code
-- [ ] Scan des dépendances Go et npm
-- [ ] Signatures des binaires
-- [ ] Vérification d'intégrité
+### 5. Security
+- [ ] Code security audit
+- [ ] Go and npm dependency scanning
+- [ ] Binary signatures
+- [ ] Integrity verification
 
 ### 6. UX/UI
-- [ ] Améliorer l'interface TUI interactive
-- [ ] Thèmes pour l'interface web
-- [ ] Mode sombre/clair
-- [ ] Internationalisation (i18n)
+- [ ] Improve interactive TUI interface
+- [ ] Themes for web interface
+- [ ] Dark/light mode
+- [ ] Internationalization (i18n)
 
-## 📋 À Faire (Priorité Basse)
+## To Do (Low Priority)
 
 ### 7. Infrastructure
-- [ ] Docker image officielle
-- [ ] Helm chart pour Kubernetes
+- [ ] Official Docker image
+- [ ] Helm chart for Kubernetes
 - [ ] Terraform provider
-- [ ] Plugin pour VS Code / IntelliJ
+- [ ] VS Code / IntelliJ plugin
 
-### 8. Communauté
-- [ ] Template de contribution
+### 8. Community
+- [ ] Contribution template
 - [ ] Code of conduct
-- [ ] Guide pour les mainteneurs
-- [ ] Programme de bêta-testeurs
+- [ ] Maintainer guide
+- [ ] Beta tester program
 
-## 🎯 Objectifs à Court Terme (1-2 mois)
+## Short Term Goals (1-2 months)
 
-1. **Couverture de tests > 70%**
-   - Tests unitaires Go
-   - Tests d'intégration complets
-   - Tests E2E pour toutes les fonctionnalités
+1. **Test coverage > 70%**
+ - Go unit tests
+ - Complete integration tests
+ - E2E tests for all features
 
-2. **Documentation complète**
-   - Guides utilisateur
-   - API documentation
-   - Exemples pratiques
+2. **Complete documentation**
+ - User guides
+ - API documentation
+ - Practical examples
 
-3. **Performance optimisée**
-   - Cache intelligent
-   - Parallélisation
-   - Réduction des temps de scan
+3. **Optimized performance**
+ - Smart caching
+ - Parallelization
+ - Reduced scan times
 
-## 🎯 Objectifs à Moyen Terme (3-6 mois)
+## Medium Term Goals (3-6 months)
 
-1. **Fonctionnalités Enterprise**
-   - Multi-tenant
-   - RBAC (Role-Based Access Control)
-   - Audit logs
-   - Intégrations SSO
+1. **Enterprise Features**
+ - Multi-tenant
+ - RBAC (Role-Based Access Control)
+ - Audit logs
+ - SSO integrations
 
-2. **Écosystème**
-   - Plugins système
-   - Marketplace de règles
-   - Templates personnalisables
+2. **Ecosystem**
+ - System plugins
+ - Rules marketplace
+ - Customizable templates
 
-3. **Scalabilité**
-   - Support de très gros projets
-   - Distribution des scans
-   - Queue system
+3. **Scalability**
+ - Support for very large projects
+ - Distributed scanning
+ - Queue system
 
-## 📊 Métriques de Succès
+## Success Metrics
 
-- **Adoption** : > 1000 stars GitHub
-- **Qualité** : > 70% couverture de tests
-- **Performance** : < 30s pour scan moyen
-- **Satisfaction** : > 4.5/5 sur les reviews
+- **Adoption**: > 1000 GitHub stars
+- **Quality**: > 70% test coverage
+- **Performance**: < 30s for average scan
+- **Satisfaction**: > 4.5/5 on reviews
 
-## 🤝 Contribution
+## Contributing
 
-Pour contribuer, voir [CONTRIBUTING.md](../additional/CONTRIBUTING.md)
+To contribute, see [CONTRIBUTING.md](../additional/CONTRIBUTING.md)
 
-## 📝 Notes
+## Notes
 
-- Les fonctionnalités marquées comme "complétées" sont prêtes pour production
-- Les priorités peuvent changer selon les retours utilisateurs
-- Les suggestions sont les bienvenues via Issues GitHub
-
+- Features marked as "completed" are ready for production
+- Priorities may change based on user feedback
+- Suggestions welcome via GitHub Issues

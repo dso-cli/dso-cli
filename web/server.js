@@ -635,7 +635,7 @@ app.post('/api/chat', rateLimit(50, 15 * 60 * 1000), async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'Tu es un assistant DevSecOps expert senior avec une expertise approfondie en sécurité applicative, infrastructure et développement sécurisé. Tu aides les développeurs à comprendre et résoudre les problèmes de sécurité de manière pratique et actionnable.\n\nIMPORTANT:\n- Réponds TOUJOURS en français de manière claire, détaillée et professionnelle\n- Donne des réponses complètes, naturelles et personnalisées - ne répète pas de réponses pré-écrites\n- Adapte ta réponse à la question spécifique de l\'utilisateur\n- Explique les concepts en détail, donne des exemples concrets\n- Propose des solutions pratiques et des commandes spécifiques\n- Sois naturel et conversationnel, comme un expert qui aide un collègue\n- Utilise le formatage Markdown pour structurer tes réponses (titres, listes, code, etc.)'
+            content: 'You are a senior DevSecOps expert assistant with deep expertise in application security, infrastructure, and secure development. You help developers understand and resolve security issues in a practical and actionable way.\n\nIMPORTANT:\n- Always respond in English in a clear, detailed and professional manner\n- Give complete, natural and personalized answers - do not repeat pre-written responses\n- Adapt your answer to the user\'s specific question\n- Explain concepts in detail, give concrete examples\n- Propose practical solutions and specific commands\n- Be natural and conversational, like an expert helping a colleague\n- Use Markdown formatting to structure your answers (titles, lists, code, etc.)'
           },
           ...sanitizedHistory,
           {
@@ -712,14 +712,14 @@ app.post('/api/chat/explain', async (req, res) => {
     const dsoPath = await findDSOCLI()
     
     // Use DSO CLI to explain the finding
-    const prompt = `Explique cette vulnérabilité de manière claire et actionnable:
-Titre: ${finding.title}
+    const prompt = `Explain this vulnerability in a clear and actionable way:
+Title: ${finding.title}
 Description: ${finding.description}
-Fichier: ${finding.file}:${finding.line}
-Sévérité: ${finding.severity}
-Outil: ${finding.tool}
+File: ${finding.file}:${finding.line}
+Severity: ${finding.severity}
+Tool: ${finding.tool}
 
-Réponds en français.`
+Respond in English.`
     
     const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
     const model = process.env.DSO_MODEL || 'llama3.1:8b'
@@ -735,7 +735,7 @@ Réponds en français.`
         messages: [
           {
             role: 'system',
-            content: 'Tu es un expert en sécurité qui explique les vulnérabilités de manière claire et actionnable. Réponds toujours en français.'
+            content: 'You are a security expert who explains vulnerabilities in a clear and actionable way. Always respond in English.'
           },
           {
             role: 'user',
@@ -751,7 +751,7 @@ Réponds en français.`
     }
     
     const ollamaData = await ollamaResponse.json()
-    const explanation = ollamaData.message?.content || ollamaData.response || 'Explication non disponible'
+    const explanation = ollamaData.message?.content || ollamaData.response || 'Explanation not available'
     
     res.json({ explanation })
   } catch (error) {
@@ -780,36 +780,36 @@ app.post('/api/chat/recommendations', rateLimit(30, 15 * 60 * 1000), async (req,
       exploitable: parseInt(scanResults.summary?.exploitable) || 0
     }
     
-    const prompt = `Tu es un expert DevSecOps qui donne des recommandations de sécurité prioritaires en format SMART.
+    const prompt = `You are a DevSecOps expert who provides priority security recommendations in SMART format.
 
-Résultats du scan:
-- Total: ${summary.total} vulnérabilités
-- Critiques: ${summary.critical} (priorité immédiate)
-- Élevées: ${summary.high} (priorité haute)
-- Moyennes: ${summary.medium} (priorité moyenne)
-- Faibles: ${summary.low} (priorité basse)
-- Corrigeables automatiquement: ${summary.fixable}
-- Exploitables: ${summary.exploitable}
+Scan results:
+- Total: ${summary.total} vulnerabilities
+- Critical: ${summary.critical} (immediate priority)
+- High: ${summary.high} (high priority)
+- Medium: ${summary.medium} (medium priority)
+- Low: ${summary.low} (low priority)
+- Automatically fixable: ${summary.fixable}
+- Exploitable: ${summary.exploitable}
 
-Format de réponse SMART:
-1. **Recommandations prioritaires** (top 5)
-   - Pour chaque recommandation, indique:
-     - Spécificité: Quoi faire exactement
-     - Mesurabilité: Comment mesurer le progrès
-     - Atteignabilité: Comment y arriver
-     - Pertinence: Pourquoi c'est important
-     - Temporalité: Quand le faire
+SMART response format:
+1. **Priority recommendations** (top 5)
+   - For each recommendation, indicate:
+     - Specificity: What to do exactly
+     - Measurability: How to measure progress
+     - Achievability: How to get there
+     - Relevance: Why it's important
+     - Time-bound: When to do it
 
-2. **Plan d'action par phase**
-   - Phase 1 (0-48h): Actions critiques
-   - Phase 2 (3-7 jours): Actions importantes
-   - Phase 3 (7-14 jours): Améliorations continues
+2. **Action plan by phase**
+   - Phase 1 (0-48h): Critical actions
+   - Phase 2 (3-7 days): Important actions
+   - Phase 3 (7-14 days): Continuous improvements
 
-3. **Métriques de suivi**
-   - Objectifs quantifiables
-   - Seuils d'alerte
+3. **Tracking metrics**
+   - Quantifiable objectives
+   - Alert thresholds
 
-Utilise le formatage Markdown. Réponds en français.`
+Use Markdown formatting. Respond in English.`
     
     const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
     const model = process.env.DSO_MODEL || 'llama3.1:8b'
@@ -825,7 +825,7 @@ Utilise le formatage Markdown. Réponds en français.`
         messages: [
           {
             role: 'system',
-            content: 'Tu es un expert DevSecOps qui donne des recommandations de sécurité prioritaires. Réponds toujours en français.'
+            content: 'You are a DevSecOps expert who provides priority security recommendations. Always respond in English.'
           },
           {
             role: 'user',
@@ -1678,9 +1678,9 @@ app.get('/api/monitoring/kpis', async (req, res) => {
 app.get('/api/monitoring/slos', async (req, res) => {
   try {
     res.json([
-      { id: 'availability', name: 'Disponibilité', current: 99.9, target: 99.5, status: 'healthy', description: 'Objectif: 99.5% de disponibilité' },
-      { id: 'latency', name: 'Latence P95', current: 98, target: 95, status: 'healthy', description: 'Objectif: 95% des requêtes < 200ms' },
-      { id: 'error-rate', name: 'Taux d\'Erreur', current: 0.05, target: 0.1, status: 'healthy', description: 'Objectif: < 0.1% d\'erreurs' }
+      { id: 'availability', name: 'Availability', current: 99.9, target: 99.5, status: 'healthy', description: 'Goal: 99.5% availability' },
+      { id: 'latency', name: 'Latency P95', current: 98, target: 95, status: 'healthy', description: 'Goal: 95% of requests < 200ms' },
+      { id: 'error-rate', name: 'Error Rate', current: 0.05, target: 0.1, status: 'healthy', description: 'Goal: < 0.1% errors' }
     ])
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -1937,7 +1937,7 @@ app.post('/api/autofix/diagnose', async (req, res) => {
     // Detect operating system
     const osInfo = detectOS()
     
-    // Détecter le type de problème
+    // Detect problem type
     const isCommandNotFound = issue.description?.toLowerCase().includes('command not found') || 
                               issue.description?.toLowerCase().includes('not found') ||
                               issue.title?.toLowerCase().includes('not found')
@@ -1945,102 +1945,102 @@ app.post('/api/autofix/diagnose', async (req, res) => {
                               issue.description?.toLowerCase().includes('sudo') ||
                               issue.description?.toLowerCase().includes('access denied')
     
-    // Extraire le nom de l'outil si possible
+    // Extract tool name if possible
     const toolMatch = issue.title?.match(/(\w+)\s+(?:non\s+)?accessible|(\w+)\s+not\s+found/i)
     const toolName = toolMatch ? (toolMatch[1] || toolMatch[2]) : 'tool'
     
-    let prompt = `Système d'exploitation détecté: ${osInfo.osName} (${osInfo.platform})
-Gestionnaire de paquets: ${osInfo.packageManager}
+    let prompt = `Operating system detected: ${osInfo.osName} (${osInfo.platform})
+Package manager: ${osInfo.packageManager}
 Shell: ${osInfo.shell}
-Séparateur de chemin: ${osInfo.pathSeparator}
+Path separator: ${osInfo.pathSeparator}
 
-Un problème a été détecté: ${issue.title}. 
+A problem has been detected: ${issue.title}. 
 Description: ${issue.description}. 
 
 `
 
     if (isCommandNotFound) {
-      prompt += `PROBLÈME IDENTIFIÉ: Commande non trouvée (command not found)
-L'outil "${toolName}" n'est pas installé ou n'est pas dans le PATH.
+      prompt += `IDENTIFIED PROBLEM: Command not found
+The tool "${toolName}" is not installed or not in PATH.
 
-SOLUTION REQUISE:
-1. Installer ${toolName} avec ${osInfo.packageManager}
-2. Vérifier l'installation
-3. Ajouter au PATH si nécessaire
+REQUIRED SOLUTION:
+1. Install ${toolName} with ${osInfo.packageManager}
+2. Verify installation
+3. Add to PATH if necessary
 
 `
       
-      // Commandes spécifiques selon l'outil et l'OS
+      // Specific commands based on tool and OS
       if (toolName.toLowerCase() === 'trivy') {
         if (osInfo.osType === 'macos') {
-          prompt += `Commandes d'installation pour macOS:
+          prompt += `Installation commands for macOS:
 - brew install trivy
-- Vérifier: trivy --version
+- Verify: trivy --version
 `
         } else if (osInfo.osType === 'linux') {
-          prompt += `Commandes d'installation pour Linux:
+          prompt += `Installation commands for Linux:
 - sudo apt-get update && sudo apt-get install -y wget apt-transport-https gnupg lsb-release
 - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
 - echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
 - sudo apt-get update && sudo apt-get install -y trivy
-- Vérifier: trivy --version
+- Verify: trivy --version
 
-OU méthode alternative (plus simple):
+OR alternative method (simpler):
 - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 `
         } else if (osInfo.osType === 'windows') {
-          prompt += `Commandes d'installation pour Windows:
+          prompt += `Installation commands for Windows:
 - winget install AquaSecurity.Trivy
-- OU scoop install trivy
-- OU choco install trivy
-- Vérifier: trivy --version
+- OR scoop install trivy
+- OR choco install trivy
+- Verify: trivy --version
 `
         }
       } else {
-        prompt += `Installer ${toolName} avec ${osInfo.packageManager}:\n`
+        prompt += `Install ${toolName} with ${osInfo.packageManager}:\n`
       }
     }
     
     if (isPermissionError) {
-      prompt += `PROBLÈME IDENTIFIÉ: Erreur de permissions
-Des privilèges administrateur sont nécessaires.
+      prompt += `IDENTIFIED PROBLEM: Permission error
+Administrator privileges are required.
 
-SOLUTION REQUISE:
+REQUIRED SOLUTION:
 `
       if (osInfo.osType === 'macos' || osInfo.osType === 'linux') {
-        prompt += `1. Demander les permissions sudo si nécessaire
-2. Utiliser sudo pour les commandes nécessitant des privilèges élevés
-3. Vérifier les permissions des fichiers/répertoires
+        prompt += `1. Request sudo permissions if necessary
+2. Use sudo for commands requiring elevated privileges
+3. Check file/directory permissions
 
-IMPORTANT: Pour ${osInfo.osName}, vous devrez peut-être entrer votre mot de passe administrateur.
+IMPORTANT: For ${osInfo.osName}, you may need to enter your administrator password.
 `
       } else if (osInfo.osType === 'windows') {
-        prompt += `1. Exécuter PowerShell ou CMD en tant qu'administrateur
-2. Cliquer droit sur PowerShell/CMD > "Exécuter en tant qu'administrateur"
-3. Réessayer la commande
+        prompt += `1. Run PowerShell or CMD as administrator
+2. Right-click PowerShell/CMD > "Run as administrator"
+3. Retry the command
 
-IMPORTANT: Pour Windows, vous devez avoir les droits administrateur.
+IMPORTANT: For Windows, you must have administrator rights.
 `
       }
     }
     
     prompt += `
-Analyse ce problème et propose une solution détaillée avec les commandes à exécuter pour le résoudre.
-IMPORTANT: Les commandes doivent être adaptées au système ${osInfo.osName}:
-- Utiliser ${osInfo.packageManager} comme gestionnaire de paquets
-- Utiliser ${osInfo.shell} comme shell
-- Utiliser ${osInfo.pathSeparator} comme séparateur de chemin
-- Pour Windows: utiliser PowerShell ou CMD selon le contexte
-- Pour macOS/Linux: utiliser bash
-${isPermissionError ? `- Inclure sudo si nécessaire pour ${osInfo.osName}` : ''}
+Analyze this problem and propose a detailed solution with commands to execute to resolve it.
+IMPORTANT: Commands must be adapted to the ${osInfo.osName} system:
+- Use ${osInfo.packageManager} as package manager
+- Use ${osInfo.shell} as shell
+- Use ${osInfo.pathSeparator} as path separator
+- For Windows: use PowerShell or CMD depending on context
+- For macOS/Linux: use bash
+${isPermissionError ? `- Include sudo if necessary for ${osInfo.osName}` : ''}
 
-Réponds en format JSON avec: { 
-  "solution": "description détaillée de la solution", 
+Respond in JSON format with: { 
+  "solution": "detailed solution description", 
   "commands": ["cmd1", "cmd2"],
   "requiresSudo": ${isPermissionError ? 'true' : 'false'},
-  "permissionNote": "${isPermissionError ? `Pour ${osInfo.osName}, vous devrez peut-être entrer votre mot de passe administrateur.` : 'Aucune permission spéciale requise.'}"
+  "permissionNote": "${isPermissionError ? `For ${osInfo.osName}, you may need to enter your administrator password.` : 'No special permissions required.'}"
 }
-Les commandes doivent être exécutables directement sur ${osInfo.osName}.`
+Commands must be directly executable on ${osInfo.osName}.`
     
     const fetchFn = await getFetch()
     const response = await fetchFn(`${ollamaUrl}/api/generate`, {
@@ -2223,14 +2223,14 @@ app.post('/api/monitoring/services/diagnose', async (req, res) => {
     const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
     const model = process.env.DSO_MODEL || 'llama3.1:8b'
     
-    const prompt = `Tu es un expert DevSecOps. Un service nommé "${serviceName}" a un statut "${status}".
+    const prompt = `You are a DevSecOps expert. A service named "${serviceName}" has status "${status}".
 
-Analyse le problème et propose un diagnostic détaillé avec:
-1. Les causes probables du problème
-2. Les commandes pour vérifier l'état du service
-3. Les solutions possibles pour résoudre le problème
+Analyze the problem and propose a detailed diagnosis with:
+1. Probable causes of the problem
+2. Commands to check the service status
+3. Possible solutions to resolve the problem
 
-Réponds en français de manière claire et actionnable.`
+Respond in English in a clear and actionable way.`
 
     const fetchFn = await getFetch()
     const ollamaResponse = await fetchFn(`${ollamaHost}/api/chat`, {

@@ -77,8 +77,8 @@ dso pr --message "This PR fixes:
 
 - **Git**: Must be in a git repository
 - **GitHub CLI (gh)**: For GitHub PRs
-  - Install: `brew install gh` (macOS) or `winget install GitHub.cli` (Windows)
-  - Authenticate: `gh auth login`
+ - Install: `brew install gh` (macOS) or `winget install GitHub.cli` (Windows)
+ - Authenticate: `gh auth login`
 
 ### Git Configuration
 
@@ -102,16 +102,16 @@ git config --global user.email "your.email@example.com"
 
 ```
 🔍 Scanning and applying fixes…
-🔧 Applying fixes…
+ Applying fixes…
 
-✅ 3 fix(es) applied successfully:
-  • Secret removed from frontend/.env.production:12
-  • npm dependency lodash updated
-  • Go dependency github.com/gin-gonic/gin updated
+ 3 fix(es) applied successfully:
+ • Secret removed from frontend/.env.production:12
+ • npm dependency lodash updated
+ • Go dependency github.com/gin-gonic/gin updated
 
-📝 Creating Pull Request…
+ Creating Pull Request…
 
-✅ Pull Request created: https://github.com/user/repo/pull/123
+ Pull Request created: https://github.com/user/repo/pull/123
 ```
 
 ## Error Handling
@@ -121,7 +121,7 @@ git config --global user.email "your.email@example.com"
 If no fixes are available:
 
 ```
-✅ No fixes to apply.
+ No fixes to apply.
 ```
 
 ### Git Not Initialized
@@ -129,7 +129,7 @@ If no fixes are available:
 If not in a git repository:
 
 ```
-❌ Error: this directory is not a git repo
+ Error: this directory is not a git repo
 ```
 
 ### GitHub CLI Not Installed
@@ -137,8 +137,8 @@ If not in a git repository:
 If `gh` is not installed:
 
 ```
-❌ Error: GitHub CLI (gh) is not installed
-💡 Make sure you have GitHub CLI (gh) installed and configured.
+ Error: GitHub CLI (gh) is not installed
+ Make sure you have GitHub CLI (gh) installed and configured.
 ```
 
 ## Integration with CI/CD

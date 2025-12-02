@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900">Intégrations</h2>
-        <p class="text-gray-600 mt-1">Connectez DSO à vos outils de monitoring et de communication</p>
+        <h2 class="text-2xl font-bold text-gray-900">Integrations</h2>
+        <p class="text-gray-600 mt-1">Connect DSO to your monitoring and communication tools</p>
       </div>
       <button
         @click="showAddIntegration = true"
@@ -13,7 +13,7 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Ajouter une intégration
+        Add integration
       </button>
     </div>
 
@@ -54,13 +54,13 @@
             class="text-xs font-semibold px-2 py-1 rounded-full"
             :class="integration.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'"
           >
-            {{ integration.connected ? 'Connecté' : 'Non connecté' }}
+            {{ integration.connected ? 'Connected' : 'Not connected' }}
           </span>
           <button
             @click.stop="integration.connected ? disconnectIntegration(integration) : configureIntegration(integration)"
             class="text-sm font-medium text-emerald-600 hover:text-emerald-800"
           >
-            {{ integration.connected ? 'Déconnecter' : 'Configurer' }}
+            {{ integration.connected ? 'Disconnect' : 'Configure' }}
           </button>
         </div>
       </div>
@@ -76,7 +76,7 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-xl font-bold text-gray-900">
-              {{ selectedIntegration ? `Configurer ${selectedIntegration.name}` : 'Nouvelle Intégration' }}
+              {{ selectedIntegration ? `Configure ${selectedIntegration.name}` : 'New Integration' }}
             </h3>
             <button
               @click="closeModal"
@@ -214,7 +214,7 @@ const disconnectIntegration = async (integration: Integration) => {
     integration.config = undefined
   } catch (error) {
     console.error('Failed to disconnect integration:', error)
-    alert(`Erreur lors de la déconnexion: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+    alert(`Error during disconnection: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
