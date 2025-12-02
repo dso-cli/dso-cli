@@ -84,5 +84,5 @@ Supports OPA/Rego for validation and GitHub CODEOWNERS for review.`,
 func init() {
 	policyCmd.Flags().StringVarP(&policyType, "type", "t", "opa", "Policy type (opa, rego, codeowners)")
 	policyCmd.Flags().StringVarP(&policyOutput, "output", "o", "", "Output file (default: .dso/policy.rego or .github/CODEOWNERS)")
-	rootCmd.AddCommand(policyCmd)
+	// Command already added in root.go
 }

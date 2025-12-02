@@ -406,9 +406,19 @@ dso/
 ```bash
 # Install dependencies
 go mod download
+cd web && npm install && cd ..
 
-# Run tests
+# Run all tests
+make test-all
+
+# Run Go tests only
 go test ./...
+
+# Run Web tests
+cd web && npm run test
+
+# Run E2E tests
+cd web && npm run test:e2e
 
 # Build
 go build -o dso
@@ -416,6 +426,45 @@ go build -o dso
 # Install locally
 go install
 ```
+
+## 🧪 Testing
+
+### Tests Go
+```bash
+# Run unit tests
+go test ./...
+
+# Run with coverage
+go test -cover ./...
+
+# Run specific package
+go test ./internal/scanner/...
+```
+
+### Tests Web
+```bash
+cd web
+
+# Type checking
+npm run type-check
+
+# Unit tests
+npm run test
+
+# E2E tests (requires server running)
+npm run test:e2e
+
+# E2E with UI
+npm run test:e2e:ui
+```
+
+### Tests d'intégration API
+Les tests d'intégration API sont inclus dans les tests E2E et vérifient :
+- ✅ Détection des problèmes (`/api/autofix/issues`)
+- ✅ Configuration des outils (`/api/tools/config`)
+- ✅ Diagnostic des services (`/api/monitoring/services/diagnose`)
+- ✅ Statut des services (`/api/monitoring/services`)
+- ✅ Gestion des intégrations (`/api/integrations`)
 
 ## 📝 TODO / Roadmap
 

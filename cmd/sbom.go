@@ -65,5 +65,5 @@ Useful for compliance and dependency tracking.`,
 func init() {
 	sbomCmd.Flags().StringVarP(&sbomFormat, "format", "f", "cyclonedx", "SBOM format (cyclonedx, spdx)")
 	sbomCmd.Flags().StringVarP(&sbomOutput, "output", "o", "", "Output file (default: sbom.json or sbom.spdx)")
-	rootCmd.AddCommand(sbomCmd)
+	// Command already added in root.go
 }

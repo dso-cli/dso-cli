@@ -84,7 +84,7 @@ and only notifies about newly detected security issues.`,
 func init() {
 	watchCmd.Flags().DurationVarP(&watchInterval, "interval", "i", 5*time.Minute, "Interval between scans")
 	watchCmd.Flags().BoolVarP(&watchQuiet, "quiet", "q", false, "Quiet mode (only shows new issues)")
-	rootCmd.AddCommand(watchCmd)
+	// Command already added in root.go
 }
 
 // findNewFindings finds findings that weren't in the previous scan

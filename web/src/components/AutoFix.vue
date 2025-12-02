@@ -225,16 +225,54 @@ const formatDate = (date?: Date) => {
 }
 
 const checkForIssues = async () => {
-  // TODO: Check for issues via API
-  // For now, add a sample issue
-  if (activeIssues.value.length === 0) {
-    activeIssues.value.push({
-      id: '1',
-      title: 'Trivy non accessible',
-      description: 'Le service Trivy ne répond pas correctement. Erreur: command not found',
-      severity: 'high',
-      status: 'detected'
-    })
+  try {
+    const response = await fetch('/api/autofix/issues')
+    if (response.ok) {
+      const data = await response.json()
+      if (data.issues && data.issues.length > 0) {
+        activeIssues.value = data.issues.map((issue: any) => ({
+          ...issue,
+          status: issue.status || 'detected'
+        }))
+      }
+    } else {
+      // Fallback: check services and detect issues
+      await detectServiceIssues()
+    }
+  } catch (error) {
+    console.error('Failed to check for issues:', error)
+    // Fallback: check services and detect issues
+    await detectServiceIssues()
+  }
+}
+
+const detectServiceIssues = async () => {
+  try {
+    const response = await fetch('/api/monitoring/services')
+    if (response.ok) {
+      const data = await response.json()
+      const services = data.services || []
+      
+      // Detect issues from service status
+      const issues: Issue[] = []
+      services.forEach((service: any) => {
+        if (service.status === 'down' || service.status === 'degraded') {
+          issues.push({
+            id: `issue-${service.name.toLowerCase().replace(/\s+/g, '-')}`,
+            title: `${service.name} non accessible`,
+            description: `Le service ${service.name} ne répond pas correctement. Statut: ${service.status}`,
+            severity: service.status === 'down' ? 'critical' : 'high',
+            status: 'detected'
+          })
+        }
+      })
+      
+      if (issues.length > 0) {
+        activeIssues.value = issues
+      }
+    }
+  } catch (error) {
+    console.error('Failed to detect service issues:', error)
   }
 }
 

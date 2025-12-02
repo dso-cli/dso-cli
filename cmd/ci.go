@@ -81,5 +81,5 @@ Supports GitHub Actions and GitLab CI.`,
 func init() {
 	ciCmd.Flags().StringVarP(&ciProvider, "provider", "p", "github", "CI provider (github, gitlab)")
 	ciCmd.Flags().StringVarP(&ciOutput, "output", "o", "", "Output file (default: .github/workflows/dso.yml or .gitlab-ci.yml)")
-	rootCmd.AddCommand(ciCmd)
+	// Command already added in root.go
 }

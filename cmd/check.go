@@ -81,5 +81,5 @@ Useful for diagnosing connection issues.`,
 }
 
 func init() {
-	rootCmd.AddCommand(checkCmd)
+	// Command already added in root.go
 }

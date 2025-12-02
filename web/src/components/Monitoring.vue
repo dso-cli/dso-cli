@@ -385,9 +385,30 @@ const chartOptions = {
 }
 
 const diagnoseService = async (service: Service) => {
-  // Use Ollama to diagnose service issues
-  console.log('Diagnosing service:', service.name)
-  // TODO: Implement Ollama-based diagnosis
+  try {
+    console.log('Diagnosing service:', service.name)
+    
+    // Call API endpoint for service diagnosis
+    const response = await fetch('/api/monitoring/services/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serviceName: service.name, status: service.status })
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      if (data.diagnosis) {
+        alert(`Diagnostic pour ${service.name}:\n\n${data.diagnosis}`)
+      } else {
+        alert(`Diagnostic en cours pour ${service.name}...`)
+      }
+    } else {
+      throw new Error('Failed to diagnose service')
+    }
+  } catch (error) {
+    console.error('Failed to diagnose service:', error)
+    alert(`Erreur lors du diagnostic: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+  }
 }
 
 onMounted(async () => {

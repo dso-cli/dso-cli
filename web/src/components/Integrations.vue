@@ -208,8 +208,14 @@ const configureIntegration = (integration: Integration) => {
 }
 
 const disconnectIntegration = async (integration: Integration) => {
-  // TODO: Implement disconnect
-  integration.connected = false
+  try {
+    await integrationService.disconnectIntegration(integration.id)
+    integration.connected = false
+    integration.config = undefined
+  } catch (error) {
+    console.error('Failed to disconnect integration:', error)
+    alert(`Erreur lors de la déconnexion: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+  }
 }
 
 const handleSaveIntegration = async (config: any) => {

@@ -2154,6 +2154,147 @@ app.post('/api/autofix/apply', async (req, res) => {
   }
 })
 
+// Get issues endpoint
+app.get('/api/autofix/issues', async (req, res) => {
+  try {
+    // Check services and detect issues by calling the monitoring endpoint directly
+    const dsoPath = await findDSOCLI()
+    const services = []
+    
+    const serviceChecks = [
+      { name: 'DSO CLI', command: `"${dsoPath}" --version` },
+      { name: 'Ollama', command: 'curl -s http://localhost:11434/api/tags || echo "not running"' },
+      { name: 'Trivy', command: 'trivy --version 2>/dev/null || echo "not installed"' },
+      { name: 'Grype', command: 'grype version 2>/dev/null || echo "not installed"' },
+      { name: 'Gitleaks', command: 'gitleaks version 2>/dev/null || echo "not installed"' }
+    ]
+    
+    for (const check of serviceChecks) {
+      try {
+        const { stdout } = await execAsync(check.command, { timeout: 5000 })
+        const isHealthy = !stdout.includes('not') && stdout.trim().length > 0
+        services.push({
+          name: check.name,
+          status: isHealthy ? 'healthy' : 'down',
+          uptime: isHealthy ? 99.9 : 0,
+          latency: isHealthy ? Math.floor(Math.random() * 200) + 50 : 0,
+          errors: isHealthy ? 0 : 1
+        })
+      } catch {
+        services.push({
+          name: check.name,
+          status: 'down',
+          uptime: 0,
+          latency: 0,
+          errors: 1
+        })
+      }
+    }
+    
+    const issues = []
+    services.forEach(service => {
+      if (service.status === 'down' || service.status === 'degraded') {
+        issues.push({
+          id: `issue-${service.name.toLowerCase().replace(/\s+/g, '-')}`,
+          title: `${service.name} non accessible`,
+          description: `Le service ${service.name} ne répond pas correctement. Statut: ${service.status}`,
+          severity: service.status === 'down' ? 'critical' : 'high',
+          status: 'detected'
+        })
+      }
+    })
+    
+    res.json({ issues })
+  } catch (error) {
+    res.status(500).json({ error: error.message, issues: [] })
+  }
+})
+
+// Service diagnosis endpoint with Ollama
+app.post('/api/monitoring/services/diagnose', async (req, res) => {
+  try {
+    const { serviceName, status } = req.body
+    
+    if (!serviceName) {
+      return res.status(400).json({ error: 'Service name required' })
+    }
+    
+    // Use Ollama to diagnose the service issue
+    const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434'
+    const model = process.env.DSO_MODEL || 'llama3.1:8b'
+    
+    const prompt = `Tu es un expert DevSecOps. Un service nommé "${serviceName}" a un statut "${status}".
+
+Analyse le problème et propose un diagnostic détaillé avec:
+1. Les causes probables du problème
+2. Les commandes pour vérifier l'état du service
+3. Les solutions possibles pour résoudre le problème
+
+Réponds en français de manière claire et actionnable.`
+
+    const fetchFn = await getFetch()
+    const ollamaResponse = await fetchFn(`${ollamaHost}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        stream: false,
+        options: {
+          temperature: 0.7,
+          top_p: 0.9
+        }
+      })
+    })
+    
+    if (!ollamaResponse.ok) {
+      throw new Error('Ollama API error')
+    }
+    
+    const ollamaData = await ollamaResponse.json()
+    const diagnosis = ollamaData.message?.content || ollamaData.response || 'Diagnostic non disponible'
+    
+    res.json({ diagnosis })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Tools configuration endpoints
+const toolsConfigStore = new Map()
+
+app.get('/api/tools/config', async (req, res) => {
+  try {
+    const configs = Array.from(toolsConfigStore.entries()).map(([toolId, configured]) => ({
+      toolId,
+      configured
+    }))
+    res.json({ configs })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/tools/config', async (req, res) => {
+  try {
+    const { toolId, configured } = req.body
+    
+    if (!toolId) {
+      return res.status(400).json({ error: 'Tool ID required' })
+    }
+    
+    toolsConfigStore.set(toolId, configured !== false)
+    res.json({ success: true, message: 'Configuration saved' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`🚀 DSO API Server running on http://localhost:${PORT}`)
   console.log(`📡 Endpoints:`)

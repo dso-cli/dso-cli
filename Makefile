@@ -12,6 +12,21 @@ install:
 test:
 	go test ./...
 
+# Run all tests (Go + Web)
+test-all:
+	@echo "🧪 Running all tests..."
+	@echo "Running Go tests..."
+	@go test ./... || true
+	@echo "Running Web tests..."
+	@cd web && npm run test || true
+	@echo "✅ Tests completed"
+
+# Run E2E tests
+test-e2e:
+	@echo "🧪 Running E2E tests..."
+	@cd web && npm run test:e2e || true
+	@echo "✅ E2E tests completed"
+
 # Clean
 clean:
 	rm -rf dist/

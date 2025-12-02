@@ -172,9 +172,25 @@ const copyConfig = (config: string) => {
   alert('Configuration copiée dans le presse-papiers!')
 }
 
-const markAsConfigured = (tool: Tool) => {
-  tool.configured = true
-  // TODO: Save to backend
+const markAsConfigured = async (tool: Tool) => {
+  try {
+    const response = await fetch('/api/tools/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toolId: tool.id, configured: true })
+    })
+    
+    if (response.ok) {
+      tool.configured = true
+    } else {
+      throw new Error('Failed to save configuration')
+    }
+  } catch (error) {
+    console.error('Failed to save tool configuration:', error)
+    // Still mark as configured locally
+    tool.configured = true
+    alert(`Configuration sauvegardée localement. Erreur serveur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+  }
 }
 
 onMounted(async () => {
@@ -182,7 +198,23 @@ onMounted(async () => {
 })
 
 const loadToolConfigs = async () => {
-  // TODO: Load from API
+  try {
+    const response = await fetch('/api/tools/config')
+    if (response.ok) {
+      const data = await response.json()
+      if (data.configs) {
+        // Update tools with saved configurations
+        data.configs.forEach((config: { toolId: string; configured: boolean }) => {
+          const tool = tools.value.find(t => t.id === config.toolId)
+          if (tool) {
+            tool.configured = config.configured
+          }
+        })
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load tool configurations:', error)
+  }
 }
 </script>
 
