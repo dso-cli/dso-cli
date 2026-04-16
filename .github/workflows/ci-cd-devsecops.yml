@@ -11,9 +11,6 @@ on:
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 concurrency:
   group: ci-cd-devsecops-${{ github.ref }}
   cancel-in-progress: true
@@ -24,10 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
           check-latest: true
@@ -39,20 +38,23 @@ jobs:
         run: go test -v ./...
 
       - name: Run lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
-          args: --timeout=5m
+        shell: bash
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+            | sh -s -- -b "$(go env GOPATH)/bin" latest
+          "$(go env GOPATH)/bin/golangci-lint" run --timeout=5m
 
   quality-web:
     name: Quality - Web
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
@@ -79,13 +81,13 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Dependency review (PR only)
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v5
+        uses: actions/dependency-review-action@v4
 
       - name: Secret scan (gitleaks OSS)
         shell: bash
@@ -97,7 +99,7 @@ jobs:
           /tmp/gitleaks detect --source . --no-banner --verbose
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
           check-latest: true
@@ -153,10 +155,12 @@ jobs:
             ext: .exe
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
           check-latest: true
