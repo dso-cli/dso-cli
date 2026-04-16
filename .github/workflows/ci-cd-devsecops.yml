@@ -23,6 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          submodules: 'false'
           persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
@@ -50,6 +51,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          submodules: 'false'
           persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
@@ -85,6 +87,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          submodules: 'false'
           persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
@@ -160,6 +163,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          submodules: 'false'
           persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
