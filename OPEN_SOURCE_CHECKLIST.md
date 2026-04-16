@@ -56,5 +56,7 @@ This document confirms that DSO CLI is ready for open source release.
 
 All professional standards met. Project is ready for public release.
 
-**Last Verified:** 2024-12-02
+**Last Verified:** 2026-04-16
 **Version:** 0.1.0
+
+**Note:** Go unit tests live under `internal/**` and `cmd/` (where applicable). CI uses `go-version-file: go.mod` so the toolchain matches the module.

@@ -1,91 +1,29 @@
-# Structure du Projet DSO
+# DSO Project Structure
 
-```
-dso/
-├── main.go # Point d'entrée
-├── go.mod # Dépendances Go
-├── Makefile # Commandes de build
-├── install.sh # Script d'installation
-│
-├── cmd/ # Commandes CLI (Cobra)
-│ ├── root.go # Commande racine
-│ ├── audit.go # dso audit
-│ ├── fix.go # dso fix
-│ ├── why.go # dso why
-│ └── pr.go # dso pr
-│
-├── internal/
-│ ├── scanner/ # Scanners de sécurité
-│ │ ├── scanner.go # Orchestration des scans
-│ │ └── models.go # Structures de données
-│ │
-│ ├── llm/ # Intégration IA locale
-│ │ ├── ollama.go # Client Ollama
-│ │ └── prompts.go # Gestion des prompts
-│ │
-│ ├── fixer/ # Auto-correction
-│ │ ├── autofix.go # Application des correctifs
-│ │ └── patcher.go # Gestion des patches
-│ │
-│ └── ui/ # Interface terminal
-│ └── rich.go # Affichage avec lipgloss
-│
-├── templates/ # Templates de prompts
-│ └── prompt_system.txt # Prompt système pour l'IA
-│
-├── examples/ # Exemples de projets de test
-│
-├── README.md # Documentation principale
-├── docs/
-│ ├── additional/
-│ │ ├── INSTALL.md # Guide d'installation
-│ │ └── CONTRIBUTING.md # Guide de contribution
-├── LICENSE # Licence MIT
-└── .gitignore # Fichiers à ignorer
+```text
+dso-cli/
+├── cmd/                 # Cobra CLI commands
+├── internal/            # Core business logic (scanner, llm, fixer, ui, policy, sbom, ci)
+├── docs/                # VitePress documentation
+├── web/                 # Vue web interface and API server
+├── scripts/             # Build and verification scripts
+├── templates/           # Prompt templates and static assets
+├── .github/workflows/   # CI/CD workflows
+├── main.go              # CLI entry point
+├── go.mod               # Go module and dependencies
+└── Makefile             # Build, test, and release tasks
 ```
 
-## Flux d'Exécution
+## Runtime Flow (CLI)
 
-### `dso audit .`
+1. `main.go` calls `cmd.Execute()`
+2. Command handlers in `cmd/` parse args and options
+3. Security scanners in `internal/scanner/` collect findings
+4. AI analysis in `internal/llm/` enriches and prioritizes output
+5. Output is rendered via `internal/ui/` or exported as machine-readable formats
 
-1. **cmd/audit.go** → Parse les arguments
-2. **scanner/scanner.go** → Lance les scans (Trivy, grype, etc.)
-3. **scanner/models.go** → Structure les résultats
-4. **llm/prompts.go** → Formate pour l'IA
-5. **llm/ollama.go** → Appelle Ollama
-6. **llm/prompts.go** → Parse la réponse IA
-7. **ui/rich.go** → Affiche le résultat
+## Key Notes
 
-### `dso fix --auto`
-
-1. **cmd/fix.go** → Parse les arguments
-2. **scanner/scanner.go** → Scan rapide
-3. **fixer/autofix.go** → Applique les correctifs
-4. Affichage des résultats
-
-### `dso why <vuln-id>`
-
-1. **cmd/why.go** → Parse l'ID
-2. **llm/ollama.go** → Appelle Ollama avec contexte
-3. Affichage de l'explication
-
-## Dépendances Externes
-
-### Requises
-- **Go 1.21+**
-- **Ollama** (pour l'IA locale)
-
-### Optionnelles (mais recommandées)
-- **Trivy** (scanner principal)
-- **Grype** (complémentaire)
-- **gitleaks** (secrets)
-- **tfsec** (Terraform)
-- **gh** (pour `dso pr`)
-
-## Architecture
-
-- **Modulaire** : Chaque composant est indépendant
-- **Extensible** : Facile d'ajouter de nouveaux scanners
-- **Local-first** : Tout fonctionne en local
-- **Zero-config** : Détection automatique des langages
-
+- Keep command wiring in `cmd/` and implementation logic in `internal/`
+- Treat `docs/` and `web/` as first-class deliverables
+- Keep generated assets and build artifacts out of version control

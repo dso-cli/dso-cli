@@ -4,7 +4,7 @@ DSO supports multiple platforms: **macOS**, **Linux** (Ubuntu, Debian, and other
 
 ## Prerequisites
 
-- **Go 1.21+**: [Install Go](https://go.dev/doc/install)
+- **Go 1.24+**: [Install Go](https://go.dev/doc/install)
 - **Ollama**: [Install Ollama](https://ollama.ai)
 
 ## Quick Install

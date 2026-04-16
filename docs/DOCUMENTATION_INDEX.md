@@ -42,7 +42,6 @@ Complete documentation for DSO (DevSecOps Oracle) CLI tool.
 ## Testing & Development
 
 - **[Testing Guide](additional/TESTING.md)** - How to test DSO
-- **[Test Results](additional/TEST_RESULTS.md)** - Test execution results
 - **[Build Guide](additional/BUILD.md)** - Building from source
 - **[Quick Build](additional/QUICK_BUILD.md)** - Fast build instructions
 
@@ -52,13 +51,7 @@ Complete documentation for DSO (DevSecOps Oracle) CLI tool.
 - **[Features](additional/FEATURES.md)** - Complete feature list
 - **[Project Structure](additional/PROJECT_STRUCTURE.md)** - Codebase organization
 - **[Roadmap](additional/ROADMAP.md)** - Future development plans
-- **[Next Steps](additional/NEXT_STEPS.md)** - Recommended next steps
-
-## Status & Reports
-
-- **[Final Status](additional/FINAL_STATUS.md)** - Production readiness status
 - **[Production Checklist](additional/PRODUCTION_CHECKLIST.md)** - Pre-production checklist
-- **[Implementation Summary](additional/IMPLEMENTATION_SUMMARY.md)** - Implementation details
 
 ## API & Integration
 

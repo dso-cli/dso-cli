@@ -50,6 +50,17 @@ Verify Ollama connection and available models.
 dso check
 ```
 
+### Shell completion
+
+Generate completion scripts for your shell (no separate doc page).
+
+```bash
+dso completion bash
+dso completion zsh
+dso completion fish
+dso completion powershell
+```
+
 ### [`tools`](./tools.md)
 
 Manage scan tools (detection, installation).
@@ -106,6 +117,7 @@ dso ci --provider github .
 | `policy` | Generate policies | `dso policy --type opa .` |
 | `sbom` | Generate SBOM | `dso sbom .` |
 | `ci` | Generate CI/CD | `dso ci --provider github .` |
+| `completion` | Shell completions | `dso completion bash` |
 
 ## Getting Help
 

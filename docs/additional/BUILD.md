@@ -167,7 +167,7 @@ On Windows, use PowerShell or Git Bash for checksums. The scripts handle this au
 
 ### Cross-compilation issues
 
-Ensure you're using Go 1.21+ and have CGO disabled:
+Ensure you're using Go 1.24+ and have CGO disabled:
 ```bash
 CGO_ENABLED=0 go build ...
 ```

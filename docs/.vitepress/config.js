@@ -3,11 +3,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'DSO - DevSecOps Oracle',
   description: 'A DevSecOps CLI assistant powered by local AI',
-  base: '/',
+  // Use repository base path on GitHub Pages.
+  base: process.env.GITHUB_ACTIONS ? '/dso-cli/' : '/',
   
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['meta', { name: 'author', content: 'Ismail MOUYAHADA' }]
+    ['meta', { name: 'author', content: 'Ismail MOUYAHADA - Platform and DevSecOps Engineer' }]
   ],
 
   themeConfig: {
@@ -70,8 +71,8 @@ export default defineConfig({
     },
 
     footer: {
-      message: 'Developed and maintained by Ismail MOUYAHADA',
-      copyright: 'Copyright © 2024 Ismail MOUYAHADA. All rights reserved. MIT License.'
+      message: 'Project created by Platform and DevSecOps Engineer Ismail MOUYAHADA',
+      copyright: 'Copyright © 2024-2026 Ismail MOUYAHADA. All rights reserved. MIT License.'
     },
 
     search: {

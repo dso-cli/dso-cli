@@ -132,7 +132,7 @@ cd web && npm run test:e2e
 
 ### Prerequisites
 
-- Go 1.21+
+- Go 1.24+ (see `go.mod`)
 - Node.js 18+ (for web UI)
 - Ollama (for AI features)
 

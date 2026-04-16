@@ -2,7 +2,7 @@
 
 Documentation built with VitePress and the Catppuccin theme.
 
-**Developed by:** Ismail MOUYAHADA - DevSecOps Engineer & Multi-Platform Software Developer
+**Created by:** Ismail MOUYAHADA - Platform and DevSecOps Engineer
 
 ## Development
 
@@ -44,6 +44,14 @@ npm run build
 ```
 
 Generated files will be in `docs/.vitepress/dist`.
+
+## Publish to GitHub Pages
+
+The workflow `.github/workflows/docs-pages.yml` automatically builds and publishes the VitePress documentation to GitHub Pages on each push to `main` (when files in `docs/` change).
+
+GitHub prerequisites:
+- Enable **Pages** in repository settings
+- Source: **GitHub Actions**
 
 ## Preview
 

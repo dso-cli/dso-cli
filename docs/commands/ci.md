@@ -108,9 +108,9 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version-file: go.mod
       
       - name: Install DSO
         run: go install github.com/dso-cli/dso-cli@latest
@@ -138,7 +138,7 @@ stages:
 
 dso-audit:
   stage: security
-  image: golang:1.21
+  image: golang:1.24
   before_script:
     - # Install DSO and security tools
   script:

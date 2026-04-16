@@ -1,80 +1,26 @@
-# Documentation VitePress avec Catppuccin
+# Documentation Overview
 
-Cette documentation utilise VitePress avec les thèmes Catppuccin pour le code highlighting.
+This documentation uses VitePress with a custom theme.
 
-## Installation
+## Local Development
 
 ```bash
 cd docs
 npm install
-```
-
-## Développement
-
-```bash
 npm run dev
 ```
 
-La documentation sera accessible sur `http://localhost:5173`.
+The docs site is available at `http://localhost:5173`.
 
-## Build
+## Build and Preview
 
 ```bash
 npm run build
-```
-
-Les fichiers générés seront dans `.vitepress/dist/`.
-
-## Preview
-
-```bash
 npm run preview
 ```
 
-## Thèmes Catppuccin
+Generated static files are in `docs/.vitepress/dist/`.
 
-La documentation utilise les thèmes Catppuccin pour le code highlighting :
+## Deploy
 
-- **Light mode** : `catppuccin-latte`
-- **Dark mode** : `catppuccin-mocha`
-
-Ces thèmes sont configurés dans `.vitepress/config.mjs` via Shiki.
-
-## Structure
-
-```
-docs/
-├── .vitepress/
-│   ├── config.mjs      # Configuration VitePress
-│   └── theme/
-│       ├── index.js    # Thème personnalisé
-│       └── custom.css  # Styles Catppuccin
-├── guide/             # Guide d'utilisation
-├── commands/          # Documentation des commandes
-├── configuration/     # Guide de configuration
-├── examples/          # Exemples
-└── index.md          # Page d'accueil
-```
-
-## Personnalisation
-
-Les couleurs Catppuccin sont définies dans `.vitepress/theme/custom.css` :
-
-- **Mocha (dark)** : `#1e1e2e` (background), `#8aadf4` (blue)
-- **Latte (light)** : `#eff1f5` (background), `#1e66f5` (blue)
-
-## Déploiement
-
-### GitHub Pages
-
-1. Build la documentation : `npm run build`
-2. Configurer GitHub Pages pour servir `.vitepress/dist/`
-
-### Netlify / Vercel
-
-Les plateformes modernes détectent automatiquement VitePress et le build.
-
-## Support
-
-Pour toute question sur la documentation, ouvre une issue sur GitHub.
-
+GitHub Pages deployment is handled by `.github/workflows/docs-pages.yml`.

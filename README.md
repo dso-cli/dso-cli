@@ -1,7 +1,7 @@
 # DSO - DevSecOps Oracle
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://golang.org/)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://go.dev/)
 [![GitHub release](https://img.shields.io/github/release/dso-cli/dso-cli.svg)](https://github.com/dso-cli/dso-cli/releases)
 [![GitHub issues](https://img.shields.io/github/issues/dso-cli/dso-cli)](https://github.com/dso-cli/dso-cli/issues)
 [![GitHub stars](https://img.shields.io/github/stars/dso-cli/dso-cli?style=social)](https://github.com/dso-cli/dso-cli/stargazers)
@@ -105,14 +105,14 @@ msiexec /i dso_0.1.0_amd64.msi
 ### Manual Installation
 
 **Prerequisites:**
-- Go 1.21+ ([Install Go](https://go.dev/doc/install))
+- Go 1.24+ ([Install Go](https://go.dev/doc/install))
 - Ollama ([Install Ollama](https://ollama.ai))
 
 **Build:**
 ```bash
 # Clone the repo
 git clone https://github.com/dso-cli/dso-cli.git
-cd dso
+cd dso-cli
 
 # Build
 go build -o dso        # Linux/macOS
@@ -186,6 +186,19 @@ dso tools --install
 ```
 
 ## Usage
+
+### Shell completion
+
+```bash
+# Bash
+dso completion bash | sudo tee /etc/bash_completion.d/dso > /dev/null
+
+# Zsh
+mkdir -p ~/.zsh/completions && dso completion zsh > ~/.zsh/completions/_dso
+
+# Fish
+dso completion fish > ~/.config/fish/completions/dso.fish
+```
 
 ### Complete audit
 
@@ -351,7 +364,7 @@ Ready to fix this in 2 min? Run: dso fix --auto
 
 ### AI Model
 
-By default, DSO uses `llama3.1:8b`. To change the model:
+By default, DSO uses `qwen2.5:7b` (see `internal/llm/ollama.go`). To change the model:
 
 ```bash
 export DSO_MODEL=phi3
@@ -401,7 +414,9 @@ dso/
 │   ├── audit.go
 │   ├── fix.go
 │   ├── why.go
-│   └── pr.go
+│   ├── pr.go
+│   ├── completion.go
+│   └── …
 ├── internal/
 │   ├── scanner/      # Scanners (Trivy, grype, etc.)
 │   ├── llm/          # Ollama wrapper
@@ -485,11 +500,11 @@ For detailed testing information, see [Testing Guide](docs/additional/TESTING.md
 
 ## TODO / Roadmap
 
-- [ ] TUI interface with bubbletea
+- [x] TUI for audit (`dso audit . --interactive`)
+- [x] Optional web dashboard (`web/`, see `web/README.md`)
 - [ ] Slack/Teams integration
-- [ ] Gemini/Claude API support
+- [ ] Gemini/Claude API support (optional cloud backends)
 - [ ] Result caching to avoid repeated scans
-- [ ] Optional web dashboard
 - [ ] Export to Jira, Linear, etc.
 
 ## Contributing

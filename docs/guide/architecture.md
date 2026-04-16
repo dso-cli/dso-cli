@@ -177,7 +177,7 @@ Beautiful output, clear error messages, helpful suggestions.
 
 ## Technology Stack
 
-- **Language**: Go 1.21+
+- **Language**: Go 1.24+
 - **CLI Framework**: [Cobra](https://github.com/spf13/cobra)
 - **UI**: [Lipgloss](https://github.com/charmbracelet/lipgloss)
 - **AI**: [Ollama](https://ollama.ai) (local)

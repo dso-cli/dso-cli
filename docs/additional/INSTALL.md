@@ -43,7 +43,7 @@ The installation script automatically handles:
 
 ## Requirements
 
-- **Go 1.21+** - Will be installed automatically if missing
+- **Go 1.24+** - Will be installed automatically if missing
 - **Git** - For cloning the repository
 - **Internet connection** - For downloading dependencies and models
 

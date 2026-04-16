@@ -91,7 +91,7 @@ Open `http://localhost:3000`
 - **Installation guide**: [docs/additional/INSTALL.md](INSTALL.md)
 - **Testing guide**: [docs/additional/TESTING.md](TESTING.md)
 - **Architecture**: [docs/guide/architecture.md](../guide/architecture.md)
-- **Roadmap**: [docs/additional/NEXT_STEPS.md](NEXT_STEPS.md)
+- **Roadmap**: [docs/additional/ROADMAP.md](ROADMAP.md)
 
 ## 🆘 Help
 

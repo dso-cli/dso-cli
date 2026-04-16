@@ -1,108 +1,37 @@
-# Guide de Contribution
+# Contributing to DSO
 
-Merci de ton intérêt pour contribuer à DSO ! 
+Thank you for your interest in contributing to DSO.
 
-## Comment Contribuer
+## Workflow
 
-### 1. Fork et Clone
+1. Fork and clone the repository
+2. Create a feature branch
+3. Implement changes with tests
+4. Run checks locally
+5. Open a pull request
 
-```bash
-git clone https://github.com/ton-username/dso.git
-cd dso
-```
-
-### 2. Créer une Branche
-
-```bash
-git checkout -b feature/ma-nouvelle-fonctionnalite
-```
-
-### 3. Développer
-
-- Suis les conventions de code Go
-- Ajoute des tests pour les nouvelles fonctionnalités
-- Documente ton code
-
-### 4. Tester
+## Local Checks
 
 ```bash
-make test
-make build
+go test ./...
+make test-all
 ```
 
-### 5. Commit et Push
+## Commit Convention
 
-```bash
-git commit -m "feat: ajoute ma fonctionnalité"
-git push origin feature/ma-nouvelle-fonctionnalite
-```
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:`
+- `fix:`
+- `docs:`
+- `refactor:`
+- `test:`
+- `chore:`
 
-### 6. Ouvrir une Pull Request
+## Contribution Ideas
 
-Crée une PR sur GitHub avec une description claire de tes changements.
+- Improve error handling and diagnostics
+- Add scanner integrations
+- Expand test coverage
+- Improve documentation and examples
 
-## Conventions
-
-### Messages de Commit
-
-Utilise le format [Conventional Commits](https://www.conventionalcommits.org/) :
-
-- `feat:` Nouvelle fonctionnalité
-- `fix:` Correction de bug
-- `docs:` Documentation
-- `refactor:` Refactoring
-- `test:` Tests
-- `chore:` Maintenance
-
-Exemples :
-```
-feat: ajoute le support de GitHub Actions
-fix: corrige le parsing des résultats Trivy
-docs: met à jour le README
-```
-
-### Code Style
-
-- Utilise `gofmt` pour formater le code
-- Suis les conventions Go standard
-- Commente les fonctions publiques
-- Garde les fonctions courtes et focalisées
-
-### Tests
-
-Ajoute des tests pour :
-- Les nouvelles fonctionnalités
-- Les corrections de bugs
-- Les cas limites
-
-## Idées de Contributions
-
-### Faciles (Good First Issues)
-
-- [ ] Améliorer les messages d'erreur
-- [ ] Ajouter plus de langages supportés
-- [ ] Améliorer la documentation
-- [ ] Ajouter des exemples
-
-### Intermédiaires
-
-- [ ] Support de plus de scanners
-- [ ] Améliorer l'analyse IA
-- [ ] Ajouter des tests d'intégration
-- [ ] Support de GitLab (en plus de GitHub)
-
-### Avancées
-
-- [ ] Mode watch (surveillance continue)
-- [ ] Intégration Slack/Teams
-- [ ] Génération de politiques OPA/Rego
-- [ ] Support de modèles IA externes (OpenAI, Anthropic)
-
-## Questions ?
-
-Ouvre une issue pour discuter de tes idées avant de commencer à coder !
-
-## Code de Conduite
-
-Sois respectueux, inclusif et constructif. On est tous là pour apprendre et améliorer DSO ensemble. 
-
+Please open an issue before starting major work so scope and design can be discussed.

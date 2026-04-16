@@ -58,13 +58,13 @@ features:
 
 ## About the Developer
 
-**DSO** is developed and maintained by **Ismail MOUYAHADA**, a **DevSecOps Engineer** and **Multi-Platform Software Developer**.
+**DSO** is a project created by **Ismail MOUYAHADA**, **Platform and DevSecOps Engineer**.
 
 With expertise in security automation, cloud infrastructure, and cross-platform development, Ismail MOUYAHADA created DSO to bring enterprise-grade security analysis to developers' terminals with zero configuration and complete privacy.
 
 **Copyright © 2024 Ismail MOUYAHADA. All rights reserved.**
 
-This project was created and developed by Ismail MOUYAHADA.
+This project was created and developed by Ismail MOUYAHADA, Platform and DevSecOps Engineer.
 
 ---
 
