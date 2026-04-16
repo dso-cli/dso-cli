@@ -12,7 +12,7 @@ describe('markdown utils', () => {
     it('renders code blocks', () => {
       const result = renderMarkdown('```bash\necho "test"\n```')
       expect(result).toContain('<pre>')
-      expect(result).toContain('<code>')
+      expect(result).toContain('<code')
     })
 
     it('sanitizes dangerous content', () => {

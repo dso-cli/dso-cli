@@ -63,8 +63,11 @@ export const chatService = {
       })
 
       if (!response.ok) {
+        if (response.status === 429) {
+          return '⚠️ Too many requests. Please wait a moment before trying again.'
+        }
         const errorData = await response.json().catch(() => ({ message: 'Chat failed' }))
-        throw new Error(errorData.message || 'Chat failed')
+        throw new Error(errorData.message || errorData.error || `Chat failed (${response.status})`)
       }
 
       const data = await response.json()
@@ -88,7 +91,7 @@ export const chatService = {
       console.error('Chat API error:', error)
       
       // Check if it's a rate limit error
-      if (error instanceof Error && error.message.includes('429')) {
+      if (error instanceof Error && (error.message.includes('429') || error.message.toLowerCase().includes('rate limit'))) {
         return '⚠️ Too many requests. Please wait a moment before trying again.'
       }
       

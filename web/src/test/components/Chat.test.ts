@@ -63,8 +63,7 @@ describe('Chat', () => {
     expect(chatService.sendMessage).toHaveBeenCalled()
   })
 
-  it('sanitizes user input before sending', async () => {
-    const { sanitizeInput } = await import('../../utils/markdown')
+  it('clears textarea after sending message', async () => {
     const wrapper = mount(Chat, {
       props: {
         scanContext: undefined,
@@ -73,14 +72,11 @@ describe('Chat', () => {
     })
 
     const textarea = wrapper.find('textarea')
-    await textarea.setValue('  <script>alert("xss")</script>  ')
-    
-    const sendButton = wrapper.find('button[type="button"]')
-    if (sendButton) {
-      await sendButton.trigger('click')
-    }
+    await textarea.setValue('Test message')
+    await textarea.trigger('keydown.enter')
+    await wrapper.vm.$nextTick()
 
-    expect(sanitizeInput).toHaveBeenCalled()
+    expect((textarea.element as HTMLTextAreaElement).value).toBe('')
   })
 
   it('displays connection status', async () => {

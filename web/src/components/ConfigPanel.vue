@@ -292,7 +292,7 @@ const checkTools = async () => {
   try {
     const tools = await scanService.getToolsStatus()
     // Store all tools (they will be grouped by computed property)
-    toolsStatus.value = tools
+    toolsStatus.value = Array.isArray(tools) ? tools : []
   } catch (error) {
     console.error('Error checking tools:', error)
     // Fallback to empty list (will be populated by groupedTools computed)

@@ -80,7 +80,7 @@ export const scanService = {
     }
   },
 
-  async autoFix(finding: Finding): Promise<void> {
+  async autoFix(finding: Finding): Promise<{ success?: boolean; message?: string } | void> {
     // Call the DSO CLI via backend API
     try {
       const response = await fetch('/api/fix', {
@@ -98,7 +98,7 @@ export const scanService = {
       
       const result = await response.json()
       console.log('Fix applied:', result)
-      return
+      return result
     } catch (error) {
       console.error('Fix API error:', error)
       // Only simulate if API is completely unavailable

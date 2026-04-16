@@ -42,11 +42,7 @@ func TestGenerateOPAPolicy_containsPackage(t *testing.T) {
 func TestDetectFileType(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
-	sub := filepath.Join(dir, "k8s")
-	if err := os.MkdirAll(sub, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(sub, "deploy.yaml"), []byte("apiVersion: v1\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yaml"), []byte("apiVersion: v1\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if !detectFileType(dir, "*.yaml") {

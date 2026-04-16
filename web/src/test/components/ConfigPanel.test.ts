@@ -15,6 +15,10 @@ vi.mock('../../services/scanService', () => ({
 describe('ConfigPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(scanService.checkOllama as any).mockResolvedValue({ connected: false })
+    ;(scanService.getToolsStatus as any).mockResolvedValue([])
+    ;(scanService.getVersion as any).mockResolvedValue('0.1.0')
+    ;(scanService.installTool as any).mockResolvedValue({ success: true, message: 'Installed' })
   })
 
   it('should render correctly', () => {
