@@ -8,7 +8,7 @@ test.describe('Integrations Component', () => {
 
   test('should display integrations list', async ({ page }) => {
     // Navigate to integrations if available
-    const integrationsLink = page.getByText(/intégrations/i).first()
+    const integrationsLink = page.getByText(/integrations/i).first()
     const linkExists = await integrationsLink.isVisible().catch(() => false)
     
     if (linkExists) {
@@ -23,7 +23,7 @@ test.describe('Integrations Component', () => {
   })
 
   test('should allow disconnecting integration', async ({ page }) => {
-    const integrationsLink = page.getByText(/intégrations/i).first()
+    const integrationsLink = page.getByText(/integrations/i).first()
     const linkExists = await integrationsLink.isVisible().catch(() => false)
     
     if (linkExists) {
@@ -31,7 +31,7 @@ test.describe('Integrations Component', () => {
       await page.waitForTimeout(1000)
       
       // Look for disconnect button
-      const disconnectButton = page.getByText(/déconnecter/i).first()
+      const disconnectButton = page.getByText(/disconnect/i).first()
       const buttonExists = await disconnectButton.isVisible().catch(() => false)
       
       if (buttonExists) {
@@ -39,7 +39,7 @@ test.describe('Integrations Component', () => {
         await page.waitForTimeout(500)
         
         // Integration should be disconnected
-        const disconnectedStatus = page.getByText(/non connecté/i).first()
+        const disconnectedStatus = page.getByText(/not connected/i).first()
         const isDisconnected = await disconnectedStatus.isVisible().catch(() => false)
         
         // Either disconnected or still processing

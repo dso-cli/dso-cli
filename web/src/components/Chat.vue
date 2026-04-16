@@ -9,8 +9,8 @@
           </svg>
         </div>
         <div>
-          <h3 class="font-semibold text-slate-900">Assistant IA DSO</h3>
-          <p class="text-xs text-slate-600">Conseils et explications de sécurité</p>
+          <h3 class="font-semibold text-slate-900">DSO AI Assistant</h3>
+          <p class="text-xs text-slate-600">Security guidance and explanations</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -18,7 +18,7 @@
           'w-2 h-2 rounded-full',
           isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
         ]"></div>
-        <span class="text-xs text-slate-600">{{ isConnected ? 'Connecté' : 'Déconnecté' }}</span>
+        <span class="text-xs text-slate-600">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
       </div>
     </div>
 
@@ -31,8 +31,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <h4 class="text-lg font-semibold text-slate-900 mb-2">Bonjour ! Je suis votre assistant DSO</h4>
-        <p class="text-sm text-slate-600 mb-6">Je peux vous aider à comprendre les vulnérabilités, proposer des solutions et donner des conseils de sécurité.</p>
+        <h4 class="text-lg font-semibold text-slate-900 mb-2">Hello! I am your DSO assistant</h4>
+        <p class="text-sm text-slate-600 mb-6">I can help you understand vulnerabilities, suggest fixes, and provide security best practices.</p>
         
         <!-- Quick Suggestions -->
         <div class="grid grid-cols-1 gap-2 max-w-md mx-auto">
@@ -84,7 +84,7 @@
             {{ formatTime(message.timestamp) }}
           </div>
           
-          <!-- Actions proposées -->
+          <!-- Suggested actions -->
           <div v-if="message.role === 'assistant' && message.actions && message.actions.length > 0" class="mt-3 flex flex-wrap gap-2">
             <button
               v-for="(action, actionIndex) in message.actions"
@@ -142,7 +142,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <span class="font-semibold text-blue-900">Contexte du scan:</span>
+            <span class="font-semibold text-blue-900">Scan context:</span>
             <p class="text-blue-700 mt-1">{{ scanContext }}</p>
           </div>
         </div>
@@ -167,7 +167,7 @@
             v-model="inputText"
             @keydown.enter.exact.prevent="handleEnter"
             @keydown.enter.shift.exact="inputText += '\n'"
-            placeholder="Posez votre question ou demandez des conseils..."
+            placeholder="Ask your question or request guidance..."
             rows="1"
             class="w-full px-4 py-3 pr-12 border border-slate-300/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-400 resize-none transition-all bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md"
             :class="isTyping ? 'opacity-50 cursor-not-allowed' : 'hover:border-emerald-300'"
@@ -279,16 +279,16 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLTextAreaElement | null>(null)
 
 const quickSuggestions = [
-  'Comment améliorer la sécurité de mon projet ?',
-  'Explique-moi les vulnérabilités critiques',
-  'Quelles sont les meilleures pratiques DevSecOps ?',
-  'Comment corriger les problèmes détectés ?'
+  'How can I improve my project security?',
+  'Explain the critical vulnerabilities',
+  'What are the best DevSecOps practices?',
+  'How can I fix the detected issues?'
 ]
 
 const suggestions = ref<string[]>([])
 
 const formatTime = (date: Date): string => {
-  return new Date(date).toLocaleTimeString('fr-FR', {
+  return new Date(date).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit'
   })
@@ -372,7 +372,7 @@ const sendMessage = async (text: string) => {
   } catch (error) {
     const errorMessage: Message = {
       role: 'assistant',
-      content: `Désolé, une erreur s'est produite: ${error instanceof Error ? error.message : 'Erreur inconnue'}. Veuillez réessayer.`,
+      content: `Sorry, an error occurred: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
       timestamp: new Date()
     }
     messages.value.push(errorMessage)
@@ -386,22 +386,22 @@ const generateSuggestions = (response: string) => {
   // Generate contextual suggestions based on response
   const newSuggestions: string[] = []
   
-  if (response.toLowerCase().includes('vulnérabilité') || response.toLowerCase().includes('vulnerability')) {
-    newSuggestions.push('Comment corriger cette vulnérabilité ?')
-    newSuggestions.push('Quel est l\'impact de cette vulnérabilité ?')
+  if (response.toLowerCase().includes('vulnerability')) {
+    newSuggestions.push('How should I fix this vulnerability?')
+    newSuggestions.push('What is the impact of this vulnerability?')
   }
   
-  if (response.toLowerCase().includes('secret') || response.toLowerCase().includes('clé')) {
-    newSuggestions.push('Comment gérer les secrets de manière sécurisée ?')
+  if (response.toLowerCase().includes('secret') || response.toLowerCase().includes('key')) {
+    newSuggestions.push('How should I manage secrets securely?')
   }
   
-  if (response.toLowerCase().includes('dépendance') || response.toLowerCase().includes('dependency')) {
-    newSuggestions.push('Comment mettre à jour les dépendances ?')
+  if (response.toLowerCase().includes('dependency')) {
+    newSuggestions.push('How should I update dependencies safely?')
   }
   
   if (newSuggestions.length === 0) {
-    newSuggestions.push('Donne-moi plus de détails')
-    newSuggestions.push('Quelles sont les prochaines étapes ?')
+    newSuggestions.push('Give me more details')
+    newSuggestions.push('What are the next steps?')
   }
   
   suggestions.value = newSuggestions.slice(0, 3)
@@ -430,7 +430,7 @@ const executeAction = async (action: ChatAction) => {
   // Add user message showing the action
   const actionMessage: Message = {
     role: 'user',
-    content: `Exécution: ${action.label}`,
+    content: `Executing: ${action.label}`,
     timestamp: new Date()
   }
   messages.value.push(actionMessage)
@@ -450,7 +450,7 @@ const executeAction = async (action: ChatAction) => {
   } catch (error) {
     const errorMessage: Message = {
       role: 'assistant',
-      content: `Erreur lors de l'exécution de l'action: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+      content: `Error while executing action: ${error instanceof Error ? error.message : 'Unknown error'}`,
       timestamp: new Date()
     }
     messages.value.push(errorMessage)

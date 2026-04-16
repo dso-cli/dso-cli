@@ -121,7 +121,7 @@ const integrations = ref<Integration[]>([
     id: 'datadog',
     name: 'Datadog',
     category: 'Monitoring',
-    description: 'Intégration avec Datadog pour le monitoring des services et métriques',
+    description: 'Datadog integration for service and metrics monitoring',
     connected: false,
     logo: 'https://www.svgrepo.com/show/354428/datadog.svg'
   },
@@ -129,7 +129,7 @@ const integrations = ref<Integration[]>([
     id: 'incident-io',
     name: 'Incident.io',
     category: 'Incident Management',
-    description: 'Gestion des incidents et alertes de sécurité',
+    description: 'Incident and security alert management',
     connected: false,
     logo: 'https://www.svgrepo.com/show/448221/incident.svg'
   },
@@ -137,7 +137,7 @@ const integrations = ref<Integration[]>([
     id: 'slack',
     name: 'Slack',
     category: 'Communication',
-    description: 'Notifications et alertes dans Slack',
+    description: 'Notifications and alerts in Slack',
     connected: false,
     logo: 'https://www.svgrepo.com/show/303299/slack-icon-logo.svg'
   },
@@ -145,7 +145,7 @@ const integrations = ref<Integration[]>([
     id: 'discord',
     name: 'Discord',
     category: 'Communication',
-    description: 'Notifications et alertes dans Discord',
+    description: 'Notifications and alerts in Discord',
     connected: false,
     logo: 'https://www.svgrepo.com/show/353728/discord-icon.svg'
   },
@@ -153,7 +153,7 @@ const integrations = ref<Integration[]>([
     id: 's3',
     name: 'AWS S3',
     category: 'Storage',
-    description: 'Stockage des résultats de scan dans S3',
+    description: 'Store scan results in S3',
     connected: false,
     logo: 'https://www.svgrepo.com/show/331348/aws-s3.svg'
   },
@@ -161,7 +161,7 @@ const integrations = ref<Integration[]>([
     id: 'azure',
     name: 'Azure',
     category: 'Cloud',
-    description: 'Intégration avec Azure pour le stockage et les services cloud',
+    description: 'Azure integration for storage and cloud services',
     connected: false,
     logo: 'https://www.svgrepo.com/show/303181/azure-1-logo.svg'
   },
@@ -169,7 +169,7 @@ const integrations = ref<Integration[]>([
     id: 'aws',
     name: 'AWS',
     category: 'Cloud',
-    description: 'Intégration avec AWS pour les services cloud',
+    description: 'AWS integration for cloud services',
     connected: false,
     logo: 'https://www.svgrepo.com/show/303251/aws-logo.svg'
   },
@@ -177,7 +177,7 @@ const integrations = ref<Integration[]>([
     id: 'grafana',
     name: 'Grafana',
     category: 'Monitoring',
-    description: 'Visualisation des métriques et dashboards',
+    description: 'Metrics and dashboard visualization',
     connected: false,
     logo: 'https://www.svgrepo.com/show/303430/grafana-logo.svg'
   },
@@ -185,7 +185,7 @@ const integrations = ref<Integration[]>([
     id: 'prometheus',
     name: 'Prometheus',
     category: 'Monitoring',
-    description: 'Collecte et stockage des métriques',
+    description: 'Metrics collection and storage',
     connected: false,
     logo: 'https://www.svgrepo.com/show/354428/prometheus.svg'
   },
@@ -193,7 +193,7 @@ const integrations = ref<Integration[]>([
     id: 'froggy-git',
     name: 'Froggy Git',
     category: 'Version Control',
-    description: 'Intégration avec Froggy Git pour la gestion de code',
+    description: 'Froggy Git integration for source control workflows',
     connected: false,
     logo: 'https://www.svgrepo.com/show/452091/git.svg'
   }

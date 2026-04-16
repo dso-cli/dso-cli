@@ -1,18 +1,18 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Chat IA', () => {
+test.describe('AI Chat', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await page.waitForSelector('aside', { timeout: 5000 })
     
     // Navigate to chat
-    const chatButton = page.locator('button').filter({ hasText: 'Assistant IA' }).first()
+    const chatButton = page.locator('button').filter({ hasText: 'AI Assistant' }).first()
     await chatButton.click()
     await page.waitForTimeout(500)
   })
 
   test('chat interface is displayed', async ({ page }) => {
-    const chatHeader = page.getByText('Assistant IA DSO')
+    const chatHeader = page.getByText('DSO AI Assistant')
     await expect(chatHeader).toBeVisible({ timeout: 3000 })
   })
 
@@ -20,7 +20,7 @@ test.describe('Chat IA', () => {
     const textarea = page.locator('textarea[placeholder*="question"]')
     await expect(textarea).toBeVisible()
     
-    await textarea.fill('Comment améliorer la sécurité ?')
+    await textarea.fill('How can I improve security?')
     await textarea.press('Enter')
     
     // Wait for message to appear
@@ -32,17 +32,17 @@ test.describe('Chat IA', () => {
   })
 
   test('displays welcome message initially', async ({ page }) => {
-    const welcomeText = page.getByText('Bonjour ! Je suis votre assistant DSO')
+    const welcomeText = page.getByText('Hello! I am your DSO assistant')
     await expect(welcomeText).toBeVisible({ timeout: 3000 })
   })
 
   test('shows connection status', async ({ page }) => {
-    const connectionStatus = page.getByText(/Connecté|Déconnecté/)
+    const connectionStatus = page.getByText(/Connected|Disconnected/)
     await expect(connectionStatus).toBeVisible({ timeout: 3000 })
   })
 
   test('quick suggestions are clickable', async ({ page }) => {
-    const suggestion = page.getByText('Comment améliorer la sécurité de mon projet ?')
+    const suggestion = page.getByText('How can I improve my project security?')
     if (await suggestion.isVisible({ timeout: 2000 })) {
       await suggestion.click()
       await page.waitForTimeout(1000)

@@ -7,7 +7,7 @@ import { chatService } from '../../services/chatService'
 vi.mock('../../services/chatService', () => ({
   chatService: {
     checkConnection: vi.fn(() => Promise.resolve({ connected: true, model: 'llama3.1:8b' })),
-    sendMessage: vi.fn(() => Promise.resolve('Réponse de test'))
+    sendMessage: vi.fn(() => Promise.resolve('Test response'))
   }
 }))
 
@@ -31,7 +31,7 @@ describe('Chat', () => {
       }
     })
 
-    expect(wrapper.find('.text-slate-900').text()).toContain('Assistant IA DSO')
+    expect(wrapper.find('.text-slate-900').text()).toContain('DSO AI Assistant')
   })
 
   it('displays welcome message when no messages', () => {
@@ -42,7 +42,7 @@ describe('Chat', () => {
       }
     })
 
-    expect(wrapper.text()).toContain('Bonjour ! Je suis votre assistant DSO')
+    expect(wrapper.text()).toContain('Hello! I am your DSO assistant')
   })
 
   it('sends message when user types and submits', async () => {

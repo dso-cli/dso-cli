@@ -7,7 +7,7 @@ const options = {
     info: {
       title: 'DSO (DevSecOps Oracle) API',
       version: '0.1.0',
-      description: 'API complète pour l\'analyse de sécurité, le monitoring, les intégrations et la résolution automatique de problèmes',
+      description: 'Complete API for security analysis, monitoring, integrations, and automatic issue resolution',
       contact: {
         name: 'DSO Support',
         url: 'https://github.com/dso-cli/dso-cli'
@@ -20,32 +20,32 @@ const options = {
     servers: [
       {
         url: 'http://localhost:3001',
-        description: 'Serveur de développement'
+        description: 'Development server'
       },
       {
         url: 'https://api.dso.dev',
-        description: 'Serveur de production'
+        description: 'Production server'
       }
     ],
     tags: [
-      { name: 'Health', description: 'Endpoints de santé et statut' },
-      { name: 'Scan', description: 'Exécution et analyse de scans de sécurité' },
-      { name: 'Analysis', description: 'Analyse IA des résultats de scan' },
-      { name: 'Fix', description: 'Application automatique de correctifs' },
-      { name: 'Ollama', description: 'Gestion et vérification de Ollama' },
-      { name: 'Tools', description: 'Gestion des outils DevSecOps' },
-      { name: 'Repositories', description: 'Gestion des dépôts GitHub/GitLab' },
-      { name: 'Monitoring', description: 'Monitoring, KPI et SLO' },
-      { name: 'Integrations', description: 'Intégrations avec services externes' },
-      { name: 'AutoFix', description: 'Résolution automatique de problèmes' }
+      { name: 'Health', description: 'Health and status endpoints' },
+      { name: 'Scan', description: 'Security scan execution and analysis' },
+      { name: 'Analysis', description: 'AI analysis of scan results' },
+      { name: 'Fix', description: 'Automatic fix application' },
+      { name: 'Ollama', description: 'Ollama management and verification' },
+      { name: 'Tools', description: 'DevSecOps tools management' },
+      { name: 'Repositories', description: 'GitHub/GitLab repository management' },
+      { name: 'Monitoring', description: 'Monitoring, KPI, and SLO endpoints' },
+      { name: 'Integrations', description: 'External service integrations' },
+      { name: 'AutoFix', description: 'Automatic issue resolution' }
     ],
     components: {
       schemas: {
         Error: {
           type: 'object',
           properties: {
-            error: { type: 'string', description: 'Message d\'erreur' },
-            message: { type: 'string', description: 'Description détaillée' }
+            error: { type: 'string', description: 'Error message' },
+            message: { type: 'string', description: 'Detailed description' }
           }
         },
         ScanResults: {
@@ -167,7 +167,7 @@ const options = {
       }
     }
   },
-  apis: ['./server.js'] // Chemin vers les fichiers contenant les annotations Swagger
+  apis: ['./server.js'] // Path to files containing Swagger annotations
 }
 
 export const swaggerSpec = swaggerJsdoc(options)

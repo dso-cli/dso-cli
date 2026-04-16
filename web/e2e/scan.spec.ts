@@ -7,7 +7,7 @@ test.describe('Scan Functionality', () => {
   })
 
   test('can navigate to scan view', async ({ page }) => {
-    const scanButton = page.locator('button').filter({ hasText: 'Nouveau Scan' }).first()
+    const scanButton = page.locator('button').filter({ hasText: 'New Scan' }).first()
     await scanButton.click()
     
     await page.waitForTimeout(500)
@@ -19,7 +19,7 @@ test.describe('Scan Functionality', () => {
 
   test('scan options form is displayed', async ({ page }) => {
     // Navigate to scan
-    const scanButton = page.locator('button').filter({ hasText: 'Nouveau Scan' }).first()
+    const scanButton = page.locator('button').filter({ hasText: 'New Scan' }).first()
     await scanButton.click()
     await page.waitForTimeout(500)
     

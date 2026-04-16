@@ -43,7 +43,7 @@ describe('chatService', () => {
     })
 
     const response = await chatService.sendMessage('Test')
-    expect(response).toContain('Trop de requêtes')
+    expect(response).toContain('Too many requests')
   })
 
   it('maintains conversation history', () => {

@@ -1,75 +1,27 @@
-# 🗄️ Configuration Supabase pour DSO
+# Supabase Setup
 
-## Vue d'ensemble
+Supabase integration is optional and mainly used for persistence/collaboration features in the web interface.
 
-Supabase est utilisé pour :
-- **Suivi des scans** : Historique complet de tous les scans
-- **Analytics** : Statistiques et tendances
-- **Collaboration** : Partage de résultats d'équipe
-- **Persistance** : Sauvegarde des résultats et analyses
+## 1) Create a Supabase Project
 
-## Configuration
+1. Sign in at [supabase.com](https://supabase.com)
+2. Create a new project
+3. Copy your project URL and anon key
 
-### 1. Créer un projet Supabase
+## 2) Initialize Database Schema
 
-1. Allez sur [supabase.com](https://supabase.com)
-2. Créez un nouveau projet
-3. Notez l'URL du projet et la clé anonyme
+Run `web/supabase/schema.sql` in the Supabase SQL editor.
 
-### 2. Configurer la base de données
+## 3) Configure Environment
 
-1. Dans Supabase Dashboard, allez dans **SQL Editor**
-2. Exécutez le script `web/supabase/schema.sql`
-3. Vérifiez que toutes les tables sont créées
+Create a `.env` file in `web/` with:
 
-### 3. Configurer les variables d'environnement
+```bash
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
 
-1. Copiez `.env.example` vers `.env` :
- ```bash
- cp .env.example .env
- ```
+## 4) Verify Integration
 
-2. Remplissez les valeurs :
- ```env
- VITE_SUPABASE_URL=https://your-project.supabase.co
- VITE_SUPABASE_ANON_KEY=your-anon-key
- ```
-
-### 4. Vérifier la configuration
-
-L'interface web détectera automatiquement si Supabase est configuré. Si ce n'est pas le cas, elle fonctionnera en mode local sans persistance.
-
-## Structure de la base de données
-
-### Tables principales
-
-- **users** : Utilisateurs (étend auth.users)
-- **projects** : Projets scannés
-- **scans** : Historique des scans
-- **findings** : Vulnérabilités détectées
-- **fixes** : Correctifs appliqués
-- **ai_analysis** : Analyses IA
-- **top_fixes** : Corrections prioritaires
-- **scan_history** : Historique pour analytics
-
-## Sécurité
-
-- **Row Level Security (RLS)** activé sur toutes les tables
-- Les utilisateurs ne voient que leurs propres données
-- Authentification via Supabase Auth
-
-## Analytics disponibles
-
-- Statistiques de scans (30 derniers jours)
-- Tendances des vulnérabilités
-- Temps moyen de scan
-- Taux de correction
-
-## Utilisation
-
-Une fois configuré, Supabase est utilisé automatiquement :
-- Chaque scan est sauvegardé
-- Les résultats sont persistés
-- L'historique est disponible dans le Dashboard
-- Les analytics sont calculés automatiquement
-
+Start the web app and ensure database-backed features load correctly.  
+If Supabase is not configured, the app should still run in local mode.

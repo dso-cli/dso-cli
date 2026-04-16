@@ -150,8 +150,8 @@
               <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p class="text-lg font-medium text-gray-600 mb-2">Historique des scans</p>
-              <p class="text-sm text-gray-500">L'historique sera disponible après configuration de Supabase</p>
+              <p class="text-lg font-medium text-gray-600 mb-2">Scan history</p>
+              <p class="text-sm text-gray-500">History will be available after Supabase configuration</p>
             </div>
           </div>
 
@@ -200,7 +200,7 @@ const sidebarOpen = ref<boolean>(true)
 const currentScanPath = ref<string>('.')
 const scanContext = computed(() => {
   if (scanResults.value) {
-    return `Scan récent: ${scanResults.value.summary.total} vulnérabilités détectées (${scanResults.value.summary.critical} critiques, ${scanResults.value.summary.high} élevées)`
+    return `Recent scan: ${scanResults.value.summary.total} vulnerabilities detected (${scanResults.value.summary.critical} critical, ${scanResults.value.summary.high} high)`
   }
   return undefined
 })
@@ -211,30 +211,30 @@ const timelineRef = ref<InstanceType<typeof Timeline> | null>(null)
 const pageTitle = computed(() => {
   switch (activeView.value) {
     case 'dashboard': return 'Dashboard'
-    case 'scan': return 'Nouveau Scan'
-    case 'results': return 'Résultats du Scan'
-    case 'history': return 'Historique'
+    case 'scan': return 'New Scan'
+    case 'results': return 'Scan Results'
+    case 'history': return 'History'
     case 'config': return 'Configuration'
     case 'repos': return 'Repositories'
-    case 'chat': return 'Assistant IA'
+    case 'chat': return 'AI Assistant'
     default: return 'DSO - DevSecOps Oracle'
   }
 })
 
 const pageSubtitle = computed(() => {
   switch (activeView.value) {
-    case 'dashboard': return 'Vue d\'ensemble de vos scans de sécurité'
-    case 'scan': return 'Lancez un nouveau scan de sécurité'
-    case 'results': return 'Analysez les résultats de votre scan'
-    case 'monitoring': return 'Surveillez les KPI, SLO et l\'utilisation des services'
-    case 'integrations': return 'Connectez DSO à vos outils de monitoring et communication'
-    case 'autofix': return 'Résolution automatique des problèmes avec l\'IA'
-    case 'manual-config': return 'Configuration manuelle des outils nécessitant une intervention'
-    case 'history': return 'Consultez l\'historique de vos scans'
-    case 'config': return 'Configurez vos outils et paramètres'
-    case 'repos': return 'Connectez-vous à GitHub ou GitLab'
-    case 'chat': return 'Posez vos questions et obtenez des conseils'
-    default: return 'Plateforme d\'analyse de sécurité'
+    case 'dashboard': return 'Overview of your security scans'
+    case 'scan': return 'Start a new security scan'
+    case 'results': return 'Analyze your scan results'
+    case 'monitoring': return 'Monitor KPIs, SLOs, and service usage'
+    case 'integrations': return 'Connect DSO to your monitoring and communication tools'
+    case 'autofix': return 'Automatic issue resolution with AI'
+    case 'manual-config': return 'Manual configuration for tools requiring user action'
+    case 'history': return 'Review your scan history'
+    case 'config': return 'Configure your tools and settings'
+    case 'repos': return 'Connect to GitHub or GitLab'
+    case 'chat': return 'Ask questions and get guidance'
+    default: return 'Security analysis platform'
   }
 })
 
@@ -618,13 +618,13 @@ const handleChatAction = async (action: { label: string; command: string }) => {
     if (action.command === 'scan') {
       // Navigate to scan view
       handleNavigation('scan')
-      showToast('info', 'Action', 'Lancement d\'un nouveau scan...')
+      showToast('info', 'Action', 'Starting a new scan...')
     } else if (action.command === 'fix') {
       // Apply auto-fixes if we have scan results
       if (scanResults.value && scanResults.value.findings) {
         const fixableFindings = scanResults.value.findings.filter(f => f.fixable)
         if (fixableFindings.length > 0) {
-          showToast('loading', 'Application des correctifs', `Correction de ${fixableFindings.length} problèmes...`)
+          showToast('loading', 'Applying fixes', `Fixing ${fixableFindings.length} issues...`)
           // Trigger fix for all fixable findings
           for (const finding of fixableFindings.slice(0, 5)) { // Limit to 5 fixes at a time
             try {
@@ -633,27 +633,27 @@ const handleChatAction = async (action: { label: string; command: string }) => {
               console.error('Fix error:', error)
             }
           }
-          showToast('success', 'Correctifs appliqués', `${fixableFindings.length} problèmes corrigés`)
+          showToast('success', 'Fixes applied', `${fixableFindings.length} issues fixed`)
         } else {
-          showToast('info', 'Aucun correctif disponible', 'Aucun problème ne peut être corrigé automatiquement')
+          showToast('info', 'No fixes available', 'No issues can be fixed automatically')
         }
       } else {
-        showToast('warning', 'Aucun scan disponible', 'Veuillez d\'abord lancer un scan')
+        showToast('warning', 'No scan available', 'Please run a scan first')
       }
     } else if (action.command === 'export') {
       // Export scan results
       if (scanResults.value) {
         await scanService.exportResults(scanResults.value, 'json')
-        showToast('success', 'Export réussi', 'Résultats exportés en JSON')
+        showToast('success', 'Export successful', 'Results exported as JSON')
       } else {
-        showToast('warning', 'Aucun résultat à exporter', 'Veuillez d\'abord lancer un scan')
+        showToast('warning', 'No results to export', 'Please run a scan first')
       }
     } else {
-      showToast('info', 'Action', `Exécution: ${action.label}`)
+      showToast('info', 'Action', `Executing: ${action.label}`)
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
-    showToast('error', 'Erreur d\'action', errorMessage)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    showToast('error', 'Action error', errorMessage)
   }
 }
 

@@ -236,9 +236,9 @@ const testConnection = async () => {
   testing.value = true
   try {
     await integrationService.testIntegration(props.integration.id, config.value)
-    alert('Connexion réussie!')
+    alert('Connection successful!')
   } catch (error) {
-    alert(`Erreur: ${error instanceof Error ? error.message : 'Connexion échouée'}`)
+    alert(`Error: ${error instanceof Error ? error.message : 'Connection failed'}`)
   } finally {
     testing.value = false
   }

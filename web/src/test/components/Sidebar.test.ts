@@ -33,7 +33,7 @@ describe('Sidebar', () => {
     })
 
     const scanButton = wrapper.findAll('button').find(btn => 
-      btn.text().includes('Nouveau Scan')
+      btn.text().includes('New Scan')
     )
 
     if (scanButton) {

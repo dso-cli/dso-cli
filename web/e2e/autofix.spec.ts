@@ -18,7 +18,7 @@ test.describe('AutoFix Component', () => {
     const issuesCount = await issuesSection.count()
     
     // Either issues are displayed or the "no issues" message
-    const noIssuesMessage = page.getByText(/aucun problème/i)
+    const noIssuesMessage = page.getByText(/no issues/i)
     const hasIssues = issuesCount > 0
     const hasNoIssuesMessage = await noIssuesMessage.isVisible().catch(() => false)
     
@@ -29,7 +29,7 @@ test.describe('AutoFix Component', () => {
     await page.waitForTimeout(2000)
     
     // Look for diagnose button
-    const diagnoseButton = page.getByText(/diagnostiquer|rediagnostiquer/i).first()
+    const diagnoseButton = page.getByText(/diagnose|re-diagnose/i).first()
     const buttonExists = await diagnoseButton.isVisible().catch(() => false)
     
     if (buttonExists) {
@@ -38,7 +38,7 @@ test.describe('AutoFix Component', () => {
       
       // Check if solution appears or loading state
       const solution = page.locator('[class*="solution"], [class*="Solution"]').first()
-      const loading = page.getByText(/diagnostic en cours/i)
+      const loading = page.getByText(/diagnosis in progress/i)
       
       const hasSolution = await solution.isVisible().catch(() => false)
       const isLoading = await loading.isVisible().catch(() => false)

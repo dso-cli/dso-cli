@@ -31,7 +31,7 @@ export const autofixService = {
     }
     const data = await response.json()
     return {
-      solution: data.solution || 'Aucune solution trouvée',
+      solution: data.solution || 'No solution found',
       commands: data.commands || [],
       osInfo: data.osInfo,
       requiresSudo: data.requiresSudo || false,

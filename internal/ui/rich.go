@@ -45,7 +45,7 @@ var (
 			Margin(1, 0)
 )
 
-// PrintBeautifulSummary affiche un résumé magnifique des résultats
+// PrintBeautifulSummary renders a rich summary of scan results
 func PrintBeautifulSummary(analysis *llm.AnalysisResult, results *scanner.ScanResults, jsonOutput bool) {
 	if jsonOutput {
 		printJSON(analysis, results)
@@ -185,7 +185,7 @@ func PrintRawResults(results *scanner.ScanResults) {
 	}
 }
 
-// printJSON affiche les résultats en JSON
+// printJSON renders results as JSON
 func printJSON(analysis *llm.AnalysisResult, results *scanner.ScanResults) {
 	output := map[string]interface{}{
 		"analysis": analysis,

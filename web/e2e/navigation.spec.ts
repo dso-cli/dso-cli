@@ -13,8 +13,8 @@ test.describe('Navigation', () => {
     
     // Check if sidebar contains navigation items
     await expect(sidebar.getByText('Dashboard')).toBeVisible()
-    await expect(sidebar.getByText('Nouveau Scan')).toBeVisible()
-    await expect(sidebar.getByText('Assistant IA')).toBeVisible()
+    await expect(sidebar.getByText('New Scan')).toBeVisible()
+    await expect(sidebar.getByText('AI Assistant')).toBeVisible()
   })
 
   test('can navigate to dashboard', async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe('Navigation', () => {
   })
 
   test('can navigate to scan view', async ({ page }) => {
-    const scanButton = page.locator('button').filter({ hasText: 'Nouveau Scan' }).first()
+    const scanButton = page.locator('button').filter({ hasText: 'New Scan' }).first()
     await scanButton.click()
     
     await page.waitForTimeout(500)
@@ -41,7 +41,7 @@ test.describe('Navigation', () => {
   })
 
   test('can navigate to chat view', async ({ page }) => {
-    const chatButton = page.locator('button').filter({ hasText: 'Assistant IA' }).first()
+    const chatButton = page.locator('button').filter({ hasText: 'AI Assistant' }).first()
     await chatButton.click()
     
     await page.waitForTimeout(500)

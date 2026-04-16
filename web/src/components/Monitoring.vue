@@ -234,9 +234,9 @@ const kpis = ref<KPI[]>([
   },
   {
     id: 'scans',
-    label: 'Scans Exécutés',
+    label: 'Scans Executed',
     value: 1247,
-    description: 'Ce mois',
+    description: 'This month',
     trend: 12.5,
     bgColor: 'bg-blue-100',
     iconColor: 'text-blue-600',
@@ -244,9 +244,9 @@ const kpis = ref<KPI[]>([
   },
   {
     id: 'findings',
-    label: 'Vulnérabilités',
+    label: 'Vulnerabilities',
     value: 342,
-    description: 'Total actif',
+    description: 'Active total',
     trend: -8.3,
     bgColor: 'bg-red-100',
     iconColor: 'text-red-600',
@@ -254,9 +254,9 @@ const kpis = ref<KPI[]>([
   },
   {
     id: 'response',
-    label: 'Temps de Réponse',
+    label: 'Response Time',
     value: '145ms',
-    description: 'Moyenne',
+    description: 'Average',
     trend: -5.2,
     bgColor: 'bg-purple-100',
     iconColor: 'text-purple-600',
@@ -267,27 +267,27 @@ const kpis = ref<KPI[]>([
 const slos = ref<SLO[]>([
   {
     id: 'availability',
-    name: 'Disponibilité',
+    name: 'Availability',
     current: 99.9,
     target: 99.5,
     status: 'healthy',
-    description: 'Objectif: 99.5% de disponibilité'
+    description: 'Goal: 99.5% availability'
   },
   {
     id: 'latency',
-    name: 'Latence P95',
+    name: 'P95 Latency',
     current: 98,
     target: 95,
     status: 'healthy',
-    description: 'Objectif: 95% des requêtes < 200ms'
+    description: 'Goal: 95% of requests < 200ms'
   },
   {
     id: 'error-rate',
-    name: 'Taux d\'Erreur',
+    name: 'Error Rate',
     current: 0.05,
     target: 0.1,
     status: 'healthy',
-    description: 'Objectif: < 0.1% d\'erreurs'
+    description: 'Goal: < 0.1% errors'
   }
 ])
 
@@ -318,10 +318,10 @@ const serviceStatusData = computed(() => ({
 }))
 
 const resourceUsageData = computed(() => ({
-  labels: ['CPU', 'Mémoire', 'Disque', 'Réseau'],
+  labels: ['CPU', 'Memory', 'Disk', 'Network'],
   datasets: [
     {
-      label: 'Utilisation (%)',
+      label: 'Usage (%)',
       data: [45, 62, 38, 72],
       backgroundColor: [
         'rgba(16, 185, 129, 0.8)',

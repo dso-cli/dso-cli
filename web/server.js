@@ -562,22 +562,22 @@ app.post('/api/chat', rateLimit(50, 15 * 60 * 1000), async (req, res) => {
     // Build context from scan results if available
     let contextInfo = ''
     if (context?.findings && Array.isArray(context.findings) && context.findings.length > 0) {
-      contextInfo += `\n\nContexte du projet:\n`
-      contextInfo += `- Nombre de vulnérabilités détectées: ${context.findings.length}\n`
+      contextInfo += `\n\nProject context:\n`
+      contextInfo += `- Number of detected vulnerabilities: ${context.findings.length}\n`
       const bySeverity = context.findings.reduce((acc, f) => {
         acc[f.severity] = (acc[f.severity] || 0) + 1
         return acc
       }, {})
-      contextInfo += `- Répartition: ${JSON.stringify(bySeverity)}\n`
+      contextInfo += `- Distribution: ${JSON.stringify(bySeverity)}\n`
       if (context.findings.length <= 5) {
-        contextInfo += `- Détails:\n`
+        contextInfo += `- Details:\n`
         context.findings.slice(0, 5).forEach((f, idx) => {
           contextInfo += `  ${idx + 1}. ${f.title || f.id} (${f.severity}) - ${f.file || 'N/A'}:${f.line || 'N/A'}\n`
         })
       }
     }
     if (context?.scanContext) {
-      contextInfo += `\nContexte du scan: ${context.scanContext}\n`
+      contextInfo += `\nScan context: ${context.scanContext}\n`
     }
     
     // Build context from history (sanitize each message)
@@ -657,18 +657,18 @@ app.post('/api/chat', rateLimit(50, 15 * 60 * 1000), async (req, res) => {
     }
     
     const ollamaData = await ollamaResponse.json()
-    const aiResponse = ollamaData.message?.content || ollamaData.response || 'Désolé, je n\'ai pas pu générer de réponse.'
+    const aiResponse = ollamaData.message?.content || ollamaData.response || 'Sorry, I could not generate a response.'
     
     // Extract potential actions from the response
     const actions = []
     if (aiResponse.toLowerCase().includes('scanner') || aiResponse.toLowerCase().includes('scan')) {
-      actions.push({ label: 'Lancer un scan', command: 'scan' })
+      actions.push({ label: 'Run a scan', command: 'scan' })
     }
-    if (aiResponse.toLowerCase().includes('corriger') || aiResponse.toLowerCase().includes('fix')) {
-      actions.push({ label: 'Appliquer les correctifs', command: 'fix' })
+    if (aiResponse.toLowerCase().includes('fix')) {
+      actions.push({ label: 'Apply fixes', command: 'fix' })
     }
-    if (aiResponse.toLowerCase().includes('exporter') || aiResponse.toLowerCase().includes('export')) {
-      actions.push({ label: 'Exporter les résultats', command: 'export' })
+    if (aiResponse.toLowerCase().includes('export')) {
+      actions.push({ label: 'Export results', command: 'export' })
     }
     
     res.json({
@@ -691,12 +691,12 @@ app.post('/api/chat/action', async (req, res) => {
     
     // Map commands to actual actions
     const commandMap = {
-      'scan': 'Lancer un scan de sécurité',
-      'fix': 'Appliquer les correctifs automatiques',
-      'export': 'Exporter les résultats du scan'
+      'scan': 'Run a security scan',
+      'fix': 'Apply automatic fixes',
+      'export': 'Export scan results'
     }
     
-    const message = commandMap[command] || `Action "${command}" exécutée`
+    const message = commandMap[command] || `Action "${command}" executed`
     
     res.json({ message, command })
   } catch (error) {
@@ -766,7 +766,7 @@ app.post('/api/chat/recommendations', rateLimit(30, 15 * 60 * 1000), async (req,
     const { scanResults } = req.body
     
     if (!scanResults || typeof scanResults !== 'object') {
-      return res.json({ recommendations: 'Aucun résultat de scan disponible pour générer des recommandations.' })
+      return res.json({ recommendations: 'No scan results available to generate recommendations.' })
     }
     
     // Validate and sanitize scan results
@@ -1663,11 +1663,11 @@ app.get('/api/monitoring/kpis', async (req, res) => {
  * @swagger
  * /api/monitoring/slos:
  *   get:
- *     summary: Récupère les SLO (Service Level Objectives)
+ *     summary: Get SLOs (Service Level Objectives)
  *     tags: [Monitoring]
  *     responses:
  *       200:
- *         description: Liste des SLO
+ *         description: List of SLOs
  *         content:
  *           application/json:
  *             schema:
@@ -1691,11 +1691,11 @@ app.get('/api/monitoring/slos', async (req, res) => {
  * @swagger
  * /api/monitoring/services:
  *   get:
- *     summary: Récupère le statut de santé des services
+ *     summary: Get service health status
  *     tags: [Monitoring]
  *     responses:
  *       200:
- *         description: Liste des services et leur statut
+ *         description: List of services and their status
  *         content:
  *           application/json:
  *             schema:
@@ -1760,7 +1760,7 @@ app.get('/api/integrations', async (req, res) => {
  * @swagger
  * /api/integrations/{id}/connect:
  *   post:
- *     summary: Connecte une intégration
+ *     summary: Connect an integration
  *     tags: [Integrations]
  *     parameters:
  *       - in: path
@@ -1776,7 +1776,7 @@ app.get('/api/integrations', async (req, res) => {
  *             type: object
  *     responses:
  *       200:
- *         description: Intégration connectée
+ *         description: Integration connected
  */
 app.post('/api/integrations/:id/connect', async (req, res) => {
   try {
@@ -1803,7 +1803,7 @@ app.post('/api/integrations/:id/disconnect', async (req, res) => {
  * @swagger
  * /api/integrations/{id}/test:
  *   post:
- *     summary: Teste la connexion d'une intégration
+ *     summary: Test an integration connection
  *     tags: [Integrations]
  *     parameters:
  *       - in: path
@@ -1819,7 +1819,7 @@ app.post('/api/integrations/:id/disconnect', async (req, res) => {
  *             type: object
  *     responses:
  *       200:
- *         description: Test de connexion réussi
+ *         description: Connection test successful
  */
 app.post('/api/integrations/:id/test', async (req, res) => {
   try {
@@ -1886,7 +1886,7 @@ function detectOS() {
  * @swagger
  * /api/autofix/diagnose:
  *   post:
- *     summary: Diagnostique un problème et propose une solution avec Ollama
+ *     summary: Diagnose an issue and propose a solution with Ollama
  *     tags: [AutoFix]
  *     requestBody:
  *       required: true
@@ -1909,7 +1909,7 @@ function detectOS() {
  *                     type: string
  *     responses:
  *       200:
- *         description: Solution proposée
+ *         description: Proposed solution
  *         content:
  *           application/json:
  *             schema:
@@ -1926,7 +1926,7 @@ function detectOS() {
  *                 osInfo:
  *                   $ref: '#/components/schemas/OSInfo'
  *       500:
- *         description: Erreur lors du diagnostic
+ *         description: Diagnosis error
  */
 app.post('/api/autofix/diagnose', async (req, res) => {
   try {
@@ -2068,7 +2068,7 @@ Commands must be directly executable on ${osInfo.osName}.`
       }
     } catch {}
     
-    // Extraire requiresSudo et permissionNote du JSON parsé
+    // Extract requiresSudo and permissionNote from parsed JSON
     const requiresSudo = parsed.requiresSudo || false
     const permissionNote = parsed.permissionNote || ''
     
@@ -2089,7 +2089,7 @@ Commands must be directly executable on ${osInfo.osName}.`
  * @swagger
  * /api/autofix/apply:
  *   post:
- *     summary: Applique les commandes de résolution proposées
+ *     summary: Apply proposed remediation commands
  *     tags: [AutoFix]
  *     requestBody:
  *       required: true
@@ -2106,7 +2106,7 @@ Commands must be directly executable on ${osInfo.osName}.`
  *                   type: string
  *     responses:
  *       200:
- *         description: Résultats de l'exécution des commandes
+ *         description: Command execution results
  *         content:
  *           application/json:
  *             schema:
@@ -2196,8 +2196,8 @@ app.get('/api/autofix/issues', async (req, res) => {
       if (service.status === 'down' || service.status === 'degraded') {
         issues.push({
           id: `issue-${service.name.toLowerCase().replace(/\s+/g, '-')}`,
-          title: `${service.name} non accessible`,
-          description: `Le service ${service.name} ne répond pas correctement. Statut: ${service.status}`,
+          title: `${service.name} not reachable`,
+          description: `Service ${service.name} is not responding correctly. Status: ${service.status}`,
           severity: service.status === 'down' ? 'critical' : 'high',
           status: 'detected'
         })

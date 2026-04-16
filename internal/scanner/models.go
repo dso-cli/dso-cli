@@ -2,7 +2,7 @@ package scanner
 
 import "time"
 
-// Severity représente le niveau de sévérité
+// Severity represents the severity level
 type Severity string
 
 const (
@@ -13,7 +13,7 @@ const (
 	SeverityInfo     Severity = "INFO"
 )
 
-// Finding représente une vulnérabilité ou un problème de sécurité
+// Finding represents a vulnerability or security issue
 type Finding struct {
 	ID          string    `json:"id"`
 	Type        string    `json:"type"` // SAST, SECRET, DEPENDENCY, IAC
@@ -26,13 +26,13 @@ type Finding struct {
 	RuleID      string    `json:"rule_id,omitempty"`
 	Tool        string    `json:"tool"` // trivy, grype, gitleaks, tfsec, etc.
 	Fixable     bool      `json:"fixable"`
-	Fix         string    `json:"fix,omitempty"`         // Commande ou patch
-	Exploitable bool      `json:"exploitable,omitempty"` // Est-ce exploitable en prod ?
+	Fix         string    `json:"fix,omitempty"`         // Command or patch
+	Exploitable bool      `json:"exploitable,omitempty"` // Whether it is exploitable in production
 	CVSS        float64   `json:"cvss,omitempty"`
 	Timestamp   time.Time `json:"timestamp"`
 }
 
-// ScanResults contient tous les résultats d'un scan
+// ScanResults contains all scan results
 type ScanResults struct {
 	Path      string    `json:"path"`
 	Timestamp time.Time `json:"timestamp"`
@@ -40,7 +40,7 @@ type ScanResults struct {
 	Summary   Summary   `json:"summary"`
 }
 
-// Summary contient les statistiques du scan
+// Summary contains scan statistics
 type Summary struct {
 	Total       int `json:"total"`
 	Critical    int `json:"critical"`
@@ -52,7 +52,7 @@ type Summary struct {
 	Exploitable int `json:"exploitable"`
 }
 
-// CalculateSummary calcule le résumé à partir des findings
+// CalculateSummary computes summary values from findings
 func (sr *ScanResults) CalculateSummary() {
 	sr.Summary = Summary{}
 	for _, f := range sr.Findings {

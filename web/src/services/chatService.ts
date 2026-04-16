@@ -68,7 +68,7 @@ export const chatService = {
       }
 
       const data = await response.json()
-      const aiResponse = data.response || data.message || 'Désolé, je n\'ai pas pu générer de réponse.'
+      const aiResponse = data.response || data.message || 'Sorry, I could not generate a response.'
       const actions = data.actions || []
       
       // Add to history
@@ -89,13 +89,13 @@ export const chatService = {
       
       // Check if it's a rate limit error
       if (error instanceof Error && error.message.includes('429')) {
-        return '⚠️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.'
+        return '⚠️ Too many requests. Please wait a moment before trying again.'
       }
       
       // Return error message - no fallback responses
-      const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error'
       this.addToHistory('user', message)
-      this.addToHistory('assistant', `Désolé, une erreur s'est produite: ${errorMsg}. Veuillez réessayer.`)
+      this.addToHistory('assistant', `Sorry, an error occurred: ${errorMsg}. Please try again.`)
       throw error
     }
   },

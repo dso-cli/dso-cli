@@ -184,7 +184,7 @@ Send a message to the AI assistant.
   "response": "AI response text",
   "actions": [
     {
-      "label": "Lancer un scan",
+      "label": "Run a scan",
       "command": "scan",
       "icon": "scan"
     }
