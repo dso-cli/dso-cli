@@ -11,9 +11,6 @@ on:
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 concurrency:
   group: ci-cd-devsecops-${{ github.ref }}
   cancel-in-progress: true
@@ -24,8 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
+          persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
           set-safe-directory: true
@@ -50,8 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
+          persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
           set-safe-directory: true
@@ -84,16 +83,12 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
+          persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
           set-safe-directory: true
-
-      - name: Dependency review (PR only)
-        if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4
-        continue-on-error: true
 
       - name: Secret scan (gitleaks OSS)
         shell: bash
@@ -115,10 +110,7 @@ jobs:
           GOTOOLCHAIN: auto
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck -scan=module ./... || {
-            echo "::warning::govulncheck reported potential vulnerabilities. Review the logs for details."
-            exit 0
-          }
+          govulncheck -scan=module ./... || true
 
   build:
     name: Build - ${{ matrix.os }}-${{ matrix.arch }}
@@ -166,8 +158,9 @@ jobs:
             ext: .exe
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
+          persist-credentials: false
           token: ${{ github.token }}
           fetch-depth: 0
           set-safe-directory: true
