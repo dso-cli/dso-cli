@@ -23,7 +23,7 @@ A clear and concise description of what actually happened.
 ## Environment
 - **OS**: [e.g., macOS 14.0, Ubuntu 22.04, Windows 11]
 - **DSO Version**: [e.g., 0.1.0]
-- **Go Version**: [e.g., 1.21.0]
+- **Go Version**: [e.g., 1.24.2]
 - **Ollama Version**: [e.g., 0.1.0]
 - **Ollama Model**: [e.g., qwen2.5:7b]
 

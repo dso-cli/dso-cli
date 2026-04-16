@@ -86,7 +86,7 @@ install_go() {
             else
                 echo -e "${YELLOW}⚠️  Please install Go manually: https://go.dev/doc/install${NC}"
                 echo -e "${YELLOW}   Or use the official installer script:${NC}"
-                echo "   curl -fsSL https://go.dev/dl/go1.21.linux-amd64.tar.gz | sudo tar -xzC /usr/local"
+                echo "   curl -fsSL https://go.dev/dl/go1.24.2.linux-amd64.tar.gz | sudo tar -xzC /usr/local"
                 exit 1
             fi
             ;;

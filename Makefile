@@ -16,15 +16,15 @@ test:
 test-all:
 	@echo " Running all tests..."
 	@echo "Running Go tests..."
-	@go test ./... || true
+	@go test ./...
 	@echo "Running Web tests..."
-	@cd web && npm run test || true
+	@cd web && npm run test
 	@echo " Tests completed"
 
 # Run E2E tests
 test-e2e:
 	@echo " Running E2E tests..."
-	@cd web && npm run test:e2e || true
+	@cd web && npm run test:e2e
 	@echo " E2E tests completed"
 
 # Clean

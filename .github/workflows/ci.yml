@@ -22,9 +22,9 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version-file: go.mod
 
       - name: Download dependencies
         run: go mod download
@@ -33,7 +33,7 @@ jobs:
         run: go test -v ./...
 
       - name: Run linter
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
           version: latest
           args: --timeout=5m
@@ -51,9 +51,9 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version-file: go.mod
 
       - name: Get version
         id: version
@@ -85,74 +85,3 @@ jobs:
           else
             ./dso --version
           fi
-
-  tag-version:
-    name: Auto Tag Version
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    permissions:
-      contents: write
-      pull-requests: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get current version
-        id: current_version
-        shell: bash
-        run: |
-          CURRENT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
-          echo "Current tag: $CURRENT_TAG"
-
-      - name: Calculate next version
-        id: next_version
-        shell: bash
-        run: |
-          CURRENT_TAG="${{ steps.current_version.outputs.current_tag }}"
-          # Remove 'v' prefix if present
-          VERSION=${CURRENT_TAG#v}
-          # Split version into parts
-          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
-          MAJOR=${VERSION_PARTS[0]:-0}
-          MINOR=${VERSION_PARTS[1]:-0}
-          PATCH=${VERSION_PARTS[2]:-0}
-          
-          # Increment patch version
-          PATCH=$((PATCH + 1))
-          NEXT_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
-          
-          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-          echo "Next version: $NEXT_VERSION"
-
-      - name: Check if tag exists
-        id: check_tag
-        shell: bash
-        run: |
-          NEXT_VERSION="${{ steps.next_version.outputs.next_version }}"
-          if git rev-parse "$NEXT_VERSION" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Tag $NEXT_VERSION already exists"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Tag $NEXT_VERSION does not exist"
-          fi
-
-      - name: Create and push tag
-        if: steps.check_tag.outputs.exists == 'false'
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          NEXT_VERSION="${{ steps.next_version.outputs.next_version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$NEXT_VERSION" -m "Release $NEXT_VERSION"
-          # Use HTTPS with token for pushing
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          git push origin "$NEXT_VERSION"
-          echo "✅ Created and pushed tag: $NEXT_VERSION"
-

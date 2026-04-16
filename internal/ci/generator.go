@@ -15,7 +15,7 @@ on:
   push:
     branches: [ main, master ]
   schedule:
-    # Exécute tous les lundis à 9h
+    # Runs every Monday at 9:00 UTC
     - cron: '0 9 * * 1'
   workflow_dispatch:
 
@@ -29,9 +29,9 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
-        go-version: '1.21'
+        go-version-file: go.mod
         
     - name: Install DSO
       run: |
@@ -43,7 +43,7 @@ jobs:
         
     - name: Pull Ollama model
       run: |
-        ollama pull llama3.1:8b
+        ollama pull qwen2.5:7b
         
     - name: Install security tools
       run: |
@@ -65,7 +65,7 @@ jobs:
         dso audit . --format json > dso-results.json || true
         
     - name: Upload results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: dso-results
@@ -125,14 +125,14 @@ func GenerateGitLabCI(projectPath string, customOutput string) (string, string, 
 
 dso-audit:
   stage: security
-  image: golang:1.21
+  image: golang:1.24
   before_script:
     - apt-get update && apt-get install -y wget curl
     # Install Ollama
     - curl -fsSL https://ollama.ai/install.sh | sh
     - ollama serve &
     - sleep 5
-    - ollama pull llama3.1:8b
+    - ollama pull qwen2.5:7b
     # Install Trivy
     - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
     - echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
