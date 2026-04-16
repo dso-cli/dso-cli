@@ -65,16 +65,13 @@ Example:
 
 ### GitHub Actions
 
-The project includes two GitHub Actions workflows:
+The project uses a unified DevSecOps pipeline:
 
-1. **`.github/workflows/ci.yml`** - Runs on every push/PR
-   - Tests the code
-   - Builds on multiple platforms to verify compilation
-
-2. **`.github/workflows/release.yml`** - Runs on tags
-   - Builds for all platforms
-   - Creates release archives
-   - Publishes to GitHub Releases
+1. **`.github/workflows/ci-cd-devsecops.yml`**
+   - Runs quality checks (Go + web)
+   - Runs security checks (dependency review, secret scan, govulncheck)
+   - Builds for multiple platforms
+   - Publishes GitHub Releases when a tag is pushed
 
 To create a release:
 ```bash
