@@ -26,14 +26,14 @@ Useful to verify that all scanners are available.`,
 
 		// Group tools by category
 		categories := map[string][]tools.Tool{
-			"SAST":           {},
-			"Dependencies":   {},
-			"Secrets":        {},
-			"IaC":            {},
-			"Containers":     {},
-			"SBOM":           {},
-			"Compliance":     {},
-			"Linting":        {},
+			"SAST":         {},
+			"Dependencies": {},
+			"Secrets":      {},
+			"IaC":          {},
+			"Containers":   {},
+			"SBOM":         {},
+			"Compliance":   {},
+			"Linting":      {},
 		}
 
 		// Categorize tools

@@ -14,10 +14,12 @@ import (
 )
 
 var (
-	auditFormat     string
-	auditVerbose    bool
+	auditFormat      string
+	auditVerbose     bool
 	auditInteractive bool
 )
+
+const outputFormatJSON = "json"
 
 var auditCmd = &cobra.Command{
 	Use:   "audit [path]",
@@ -89,14 +91,14 @@ and analyzes results with local AI to give you the 3-5 critical issues.`,
 		}
 
 		// Phase 3: Display
-		if auditInteractive && auditFormat != "json" {
+		if auditInteractive && auditFormat != outputFormatJSON {
 			if err := ui.ShowInteractiveUI(summary, results); err != nil {
 				fmt.Fprintf(os.Stderr, "Error displaying interactive UI: %v\n", err)
 				ui.PrintBeautifulSummary(summary, results, false)
 			}
 		} else {
 			fmt.Println()
-			ui.PrintBeautifulSummary(summary, results, auditFormat == "json")
+			ui.PrintBeautifulSummary(summary, results, auditFormat == outputFormatJSON)
 		}
 	},
 }

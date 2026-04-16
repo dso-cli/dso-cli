@@ -25,18 +25,20 @@ type Tool struct {
 type ToolCategory string
 
 const (
-	CategorySAST        ToolCategory = "SAST"        // Static Application Security Testing
-	CategoryDAST        ToolCategory = "DAST"        // Dynamic Application Security Testing
-	CategorySecrets     ToolCategory = "Secrets"     // Secret detection
+	CategorySAST         ToolCategory = "SAST"         // Static Application Security Testing
+	CategoryDAST         ToolCategory = "DAST"         // Dynamic Application Security Testing
+	CategorySecrets      ToolCategory = "Secrets"      // Secret detection
 	CategoryDependencies ToolCategory = "Dependencies" // Software Composition Analysis
-	CategoryIaC         ToolCategory = "IaC"         // Infrastructure as Code
-	CategoryContainers  ToolCategory = "Containers"  // Container security
-	CategoryCompliance  ToolCategory = "Compliance"  // Compliance scanning
-	CategorySBOM        ToolCategory = "SBOM"       // Software Bill of Materials
-	CategoryLinting     ToolCategory = "Linting"    // Code quality and security linting
+	CategoryIaC          ToolCategory = "IaC"          // Infrastructure as Code
+	CategoryContainers   ToolCategory = "Containers"   // Container security
+	CategoryCompliance   ToolCategory = "Compliance"   // Compliance scanning
+	CategorySBOM         ToolCategory = "SBOM"         // Software Bill of Materials
+	CategoryLinting      ToolCategory = "Linting"      // Code quality and security linting
 )
 
 var (
+	gosecInstallCmd = "go install github.com/securego/gosec/v2/cmd/gosec@latest"
+
 	// List of supported tools - Comprehensive DevSecOps toolkit
 	Tools = []Tool{
 		// SAST Tools
@@ -82,7 +84,7 @@ var (
 			Required:    false,
 			InstallCmd:  getBrakemanInstallCmd(),
 		},
-		
+
 		// Dependency Scanners
 		{
 			Name:        "grype",
@@ -119,7 +121,7 @@ var (
 			Required:    false,
 			InstallCmd:  getDependencyCheckInstallCmd(),
 		},
-		
+
 		// Secret Detection
 		{
 			Name:        "gitleaks",
@@ -142,7 +144,7 @@ var (
 			Required:    false,
 			InstallCmd:  getDetectSecretsInstallCmd(),
 		},
-		
+
 		// IaC Scanners
 		{
 			Name:        "tfsec",
@@ -172,7 +174,7 @@ var (
 			Required:    false,
 			InstallCmd:  getKicsInstallCmd(),
 		},
-		
+
 		// Container Security
 		{
 			Name:        "hadolint",
@@ -188,7 +190,7 @@ var (
 			Required:    false,
 			InstallCmd:  getDockerBenchInstallCmd(),
 		},
-		
+
 		// SBOM Tools
 		{
 			Name:        "syft",
@@ -197,7 +199,7 @@ var (
 			Required:    false,
 			InstallCmd:  getSyftInstallCmd(),
 		},
-		
+
 		// Compliance
 		{
 			Name:        "opa",
@@ -216,7 +218,7 @@ func GetToolCategory(toolName string) string {
 		"trivy":    "SAST",
 		"semgrep":  "SAST",
 		"bandit":   "SAST",
-		"eslint":    "SAST",
+		"eslint":   "SAST",
 		"gosec":    "SAST",
 		"brakeman": "SAST",
 		// Dependencies
@@ -226,8 +228,8 @@ func GetToolCategory(toolName string) string {
 		"snyk":             "Dependencies",
 		"dependency-check": "Dependencies",
 		// Secrets
-		"gitleaks":      "Secrets",
-		"trufflehog":    "Secrets",
+		"gitleaks":       "Secrets",
+		"trufflehog":     "Secrets",
 		"detect-secrets": "Secrets",
 		// IaC
 		"tfsec":     "IaC",
@@ -235,14 +237,14 @@ func GetToolCategory(toolName string) string {
 		"terrascan": "IaC",
 		"kics":      "IaC",
 		// Containers
-		"hadolint":             "Containers",
+		"hadolint":              "Containers",
 		"docker-bench-security": "Containers",
 		// SBOM
 		"syft": "SBOM",
 		// Compliance
 		"opa": "Compliance",
 	}
-	
+
 	if cat, ok := categoryMap[strings.ToLower(toolName)]; ok {
 		return cat
 	}
@@ -488,11 +490,11 @@ func getGosecInstallCmd() string {
 	case constants.OSDarwin:
 		return "brew install gosec"
 	case constants.OSLinux:
-		return "go install github.com/securego/gosec/v2/cmd/gosec@latest"
+		return gosecInstallCmd
 	case constants.OSWindows:
-		return "go install github.com/securego/gosec/v2/cmd/gosec@latest"
+		return gosecInstallCmd
 	default:
-		return "go install github.com/securego/gosec/v2/cmd/gosec@latest"
+		return gosecInstallCmd
 	}
 }
 

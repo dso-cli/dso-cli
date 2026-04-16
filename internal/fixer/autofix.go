@@ -113,9 +113,8 @@ func fixNPMDependency(finding scanner.Finding, projectPath string, _ bool) (stri
 	// Run npm audit fix
 	cmd := exec.Command("npm", "audit", "fix", "--package-lock-only")
 	cmd.Dir = projectPath
-	if err := cmd.Run(); err != nil {
-		// npm audit fix may fail, continue anyway
-	}
+	// npm audit fix may fail in constrained environments; keep best-effort behavior.
+	_ = cmd.Run()
 
 	return fmt.Sprintf("npm dependency %s updated", packageName), nil
 }

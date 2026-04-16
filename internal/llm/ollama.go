@@ -92,14 +92,12 @@ func (c *OllamaClient) GenerateWithContext(prompt string, context []map[string]s
 	// Build messages for the chat API
 	messages := []map[string]interface{}{}
 
-	// Add context if provided
-	if context != nil {
-		for _, msg := range context {
-			messages = append(messages, map[string]interface{}{
-				"role":    msg["role"],
-				"content": msg["content"],
-			})
-		}
+	// Add context if provided.
+	for _, msg := range context {
+		messages = append(messages, map[string]interface{}{
+			"role":    msg["role"],
+			"content": msg["content"],
+		})
 	}
 
 	// Add the current prompt

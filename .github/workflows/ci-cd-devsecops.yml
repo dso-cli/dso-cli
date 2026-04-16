@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: ci-cd-devsecops-${{ github.ref }}
   cancel-in-progress: true
@@ -21,12 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: '1.24.x'
+          check-latest: true
 
       - name: Download dependencies
         run: go mod download
@@ -35,7 +39,7 @@ jobs:
         run: go test -v ./...
 
       - name: Run lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           version: latest
           args: --timeout=5m
@@ -45,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: npm
@@ -75,13 +79,13 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Dependency review (PR only)
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@v5
 
       - name: Secret scan (gitleaks OSS)
         shell: bash
@@ -93,9 +97,10 @@ jobs:
           /tmp/gitleaks detect --source . --no-banner --verbose
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: '1.24.x'
+          check-latest: true
 
       - name: Go vulnerability scan
         run: |
@@ -148,23 +153,22 @@ jobs:
             ext: .exe
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: '1.24.x'
+          check-latest: true
 
       - name: Resolve version
         id: version
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.ref_name }}" ]; then
-            VERSION="${{ github.ref_name }}"
-          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             VERSION="${GITHUB_REF#refs/tags/}"
           else
-            VERSION="$(git describe --tags --always --dirty 2>/dev/null || echo dev)"
+            VERSION="${GITHUB_SHA::7}"
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 

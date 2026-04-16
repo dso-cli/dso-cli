@@ -15,12 +15,8 @@ import (
 )
 
 var (
-	docStyle = lipgloss.NewStyle().Margin(1, 2)
+	docStyle  = lipgloss.NewStyle().Margin(1, 2)
 	helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Margin(1, 0)
-	statusMessageStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("86")).
-		Background(lipgloss.Color("235")).
-		Padding(0, 1)
 )
 
 type model struct {
@@ -419,4 +415,3 @@ func ShowInteractiveUI(analysis *llm.AnalysisResult, results *scanner.ScanResult
 	_, err := p.Run()
 	return err
 }
-

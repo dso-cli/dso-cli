@@ -6,8 +6,8 @@ import (
 )
 
 // GenerateGitHubActions generates a GitHub Actions workflow
-func GenerateGitHubActions(projectPath string, customOutput string) (string, string, error) {
-	workflow := `name: DSO Security Audit
+func GenerateGitHubActions(projectPath string, customOutput string) (workflow string, filename string, err error) {
+	workflow = `name: DSO Security Audit
 
 on:
   pull_request:
@@ -110,7 +110,7 @@ jobs:
         exit 1
 `
 
-	filename := customOutput
+	filename = customOutput
 	if filename == "" {
 		filename = ".github/workflows/dso.yml"
 	}
@@ -119,8 +119,8 @@ jobs:
 }
 
 // GenerateGitLabCI generates a GitLab CI pipeline
-func GenerateGitLabCI(projectPath string, customOutput string) (string, string, error) {
-	workflow := `stages:
+func GenerateGitLabCI(projectPath string, customOutput string) (workflow string, filename string, err error) {
+	workflow = `stages:
   - security
 
 dso-audit:
@@ -170,11 +170,11 @@ dso-audit:
   allow_failure: false
 `
 
-	filename := customOutput
+	filename = customOutput
 	if filename == "" {
 		filename = ".gitlab-ci.yml"
 		// Check if .gitlab-ci.yml already exists
-		if _, err := os.Stat(filepath.Join(projectPath, ".gitlab-ci.yml")); err == nil {
+		if _, statErr := os.Stat(filepath.Join(projectPath, ".gitlab-ci.yml")); statErr == nil {
 			// Create a separate file
 			filename = ".gitlab-ci-dso.yml"
 		}
