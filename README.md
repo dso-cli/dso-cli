@@ -1,5 +1,8 @@
 # DSO - DevSecOps Oracle
 
+<img width="2172" height="724" alt="image" src="https://github.com/user-attachments/assets/ea737dae-4e0f-4f9a-ab3b-c8bdc0ab0e83" />
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://go.dev/)
 [![GitHub release](https://img.shields.io/github/release/dso-cli/dso-cli.svg)](https://github.com/dso-cli/dso-cli/releases)
