@@ -3,106 +3,112 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'DSO - DevSecOps Oracle',
   description: 'A DevSecOps CLI assistant powered by local AI',
+  // Use repository base path on GitHub Pages.
+  base: process.env.GITHUB_ACTIONS ? '/dso-cli/' : '/',
+  // localhost URLs in the guides point to the locally running web UI.
+  ignoreDeadLinks: 'localhostLinks',
   
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['meta', { name: 'author', content: 'Ismail MOUYAHADA - Platform and DevSecOps Engineer' }]
+  ],
+
   themeConfig: {
+    // Catppuccin theme colors
+    appearance: 'dark',
+    
     nav: [
+      { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'Commands', link: '/commands/' },
-      { text: 'Configuration', link: '/configuration/' },
-      { text: 'Examples', link: '/examples/' }
+      { text: 'API', link: '/CLI_API_DOCUMENTATION.md' },
+      { text: 'GitHub', link: 'https://github.com/dso-cli/dso-cli' }
     ],
-    
+
     sidebar: {
       '/guide/': [
         {
-          text: 'Introduction',
+          text: 'Getting Started',
           items: [
-            { text: 'What is DSO?', link: '/guide/' },
+            { text: 'Introduction', link: '/guide/' },
             { text: 'Installation', link: '/guide/installation' },
-            { text: 'Getting Started', link: '/guide/getting-started' }
+            { text: 'Quick Start', link: '/guide/getting-started' }
           ]
         },
         {
-          text: 'Concepts',
+          text: 'Features',
           items: [
             { text: 'Architecture', link: '/guide/architecture' },
-            { text: 'Ollama Integration', link: '/guide/ollama' },
             { text: 'Scanners', link: '/guide/scanners' },
             { text: 'Interactive UI', link: '/guide/interactive-ui' },
-            { text: 'Web Interface', link: '/guide/web-interface' }
+            { text: 'Web Interface', link: '/guide/web-interface' },
+            { text: 'Ollama Integration', link: '/guide/ollama' }
+          ]
+        },
+        {
+          text: 'Roadmap',
+          items: [
+            { text: 'Future Plans', link: '/guide/roadmap' }
           ]
         }
       ],
       '/commands/': [
         {
-          text: 'Overview',
+          text: 'Commands',
           items: [
-            { text: 'Commands', link: '/commands/' }
-          ]
-        },
-        {
-          text: 'Main Commands',
-          items: [
+            { text: 'Overview', link: '/commands/' },
             { text: 'audit', link: '/commands/audit' },
+            { text: 'check', link: '/commands/check' },
             { text: 'fix', link: '/commands/fix' },
             { text: 'why', link: '/commands/why' },
-            { text: 'pr', link: '/commands/pr' }
-          ]
-        },
-        {
-          text: 'Tools & Configuration',
-          items: [
-            { text: 'check', link: '/commands/check' },
+            { text: 'pr', link: '/commands/pr' },
             { text: 'tools', link: '/commands/tools' },
-            { text: 'watch', link: '/commands/watch' }
-          ]
-        },
-        {
-          text: 'Generation',
-          items: [
+            { text: 'watch', link: '/commands/watch' },
             { text: 'policy', link: '/commands/policy' },
             { text: 'sbom', link: '/commands/sbom' },
             { text: 'ci', link: '/commands/ci' }
           ]
         }
-      ],
-      '/configuration/': [
-        {
-          text: 'Configuration',
-          items: [
-            { text: 'Overview', link: '/configuration/' }
-          ]
-        }
-      ],
-      '/examples/': [
-        {
-          text: 'Examples',
-          items: [
-            { text: 'Usage Examples', link: '/examples/' }
-          ]
-        }
       ]
     },
-    
+
+    footer: {
+      message: 'Project created by Platform and DevSecOps Engineer Ismail MOUYAHADA',
+      copyright: 'Copyright © 2024-2026 Ismail MOUYAHADA. All rights reserved. MIT License.'
+    },
+
+    search: {
+      provider: 'local'
+    },
+
     socialLinks: [
       { icon: 'github', link: 'https://github.com/dso-cli/dso-cli' }
     ],
-    
-    footer: {
-      message: 'Made with love for DevSecOps engineers',
-      copyright: 'Copyright © 2024 DSO Contributors'
+
+    editLink: {
+      pattern: 'https://github.com/dso-cli/dso-cli/edit/main/docs/:path',
+      text: 'Edit this page on GitHub'
     },
-    
-    search: {
-      provider: 'local'
+
+    lastUpdated: {
+      text: 'Last updated',
+      formatOptions: {
+        dateStyle: 'short',
+        timeStyle: 'medium'
+      }
     }
   },
-  
+
   markdown: {
     theme: {
-      light: 'catppuccin-latte',
-      dark: 'catppuccin-mocha'
-    }
+      light: 'github-light',
+      dark: 'github-dark'
+    },
+    codeTheme: {
+      light: 'github-light',
+      dark: 'github-dark'
+    },
+    lineNumbers: true
   }
 })
 

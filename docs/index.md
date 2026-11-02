@@ -52,7 +52,7 @@ features:
   - icon: 
       src: /icons/zap.svg
     title: Comprehensive Toolset
-    details: 20+ DevSecOps tools integrated: SAST, Secrets, Dependencies, IaC, Containers, SBOM, Compliance.
+    details: "20+ DevSecOps tools integrated: SAST, Secrets, Dependencies, IaC, Containers, SBOM, Compliance."
 
 ---
 

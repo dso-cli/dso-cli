@@ -56,7 +56,7 @@ Complete documentation for DSO (DevSecOps Oracle) CLI tool.
 ## API & Integration
 
 - **[CLI API Documentation](CLI_API_DOCUMENTATION.md)** - CLI API reference
-- **[Web API Endpoints](../web/API_ENDPOINTS.md)** - Web UI API endpoints
+- **[Web API Endpoints](https://github.com/dso-cli/dso-cli/blob/main/web/API_ENDPOINTS.md)** - Web UI API endpoints
 
 ## Contributing
 
@@ -70,8 +70,8 @@ Complete documentation for DSO (DevSecOps Oracle) CLI tool.
 ## Additional Resources
 
 - **[Documentation Overview](DOCUMENTATION.md)** - Documentation structure
-- **[README](../README.md)** - Main project README
-- **[Changelog](../CHANGELOG.md)** - Version history
+- **[README](https://github.com/dso-cli/dso-cli/blob/main/README.md)** - Main project README
+- **[Changelog](https://github.com/dso-cli/dso-cli/blob/main/CHANGELOG.md)** - Version history
 
 ---
 
